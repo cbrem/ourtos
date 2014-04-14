@@ -1,7 +1,9 @@
 RTOS Design
 
+4/13
+
 Control Flow:
-  * Scheduler runs and dispatches <= 1 task whenever timer iterrupt fires.
+  * Scheduler runs and dispatches <= 1 task whenever timer interrupt fires.
   * Scheduler manipulates stack pointer ( :( ) before RTI to dispatch task
   * dispatching involves either:
     1. restoring a saved instance of the task
@@ -18,6 +20,33 @@ Control Flow:
 State:
   * For each task, maintain:
     - frame (i.e. state that task put on stack before last timer interrupt)
-    - last time task ran
-    - whether task is currently scheduled to run
+    - next run
     - whether its frame is valid, or whether we should call a new instance
+
+4/14
+
+We should schedule and dispatch:
+  1. on timer interrupt
+  2. when we yield (via a SWI)
+
+In schedule/dispatch function:
+  * save frame for task which lead to the interrupt?
+  * call scheduler, which returns ID of highest-priority task that is ready to run
+  * if the task with this ID has running == True:
+    - restore saved frame (i.e. set SP to point to frame, then RTI)
+  * if running == False:
+    - create a TEMPORARY frame (note: this is different than the frames that we'll
+      save for tasks upon enterring the interrupts) that will:
+        1. run the task
+        2. set running = False for the task
+        3. yield
+
+Global Data:
+  * one task struct for each task
+
+typedef struct {
+  - function pointer
+  - frame saved last time that the task was interrupted
+  - running
+  - next time to run
+} task;
