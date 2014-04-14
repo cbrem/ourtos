@@ -1,0 +1,23 @@
+RTOS Design
+
+Control Flow:
+  * Scheduler runs and dispatches <= 1 task whenever timer iterrupt fires.
+  * Scheduler manipulates stack pointer ( :( ) before RTI to dispatch task
+  * dispatching involves either:
+    1. restoring a saved instance of the task
+    2. calling a new instance of the task
+  * Saving state:
+    - scheduler isr saves all registers (including SP) from each task that
+      enters it, so that it can restore them the next time that it schedules
+      the task
+    - NOTE: scheduler needs to save only "frame" for each task...because if
+      it goes to schedule a task and sees that it is currently scheduled,
+      it will just resume the task
+  * tasks should note when they are finished running
+
+State:
+  * For each task, maintain:
+    - frame (i.e. state that task put on stack before last timer interrupt)
+    - last time task ran
+    - whether task is currently scheduled to run
+    - whether its frame is valid, or whether we should call a new instance
