@@ -93,17 +93,34 @@ Our interrupts will be:
 	\item Watchdog Kick Task shall occur every .5 second.
 	\item Short Block Task shall occur with period of 2 seconds and will run for .1 seconds with a blocking time of .1 seconds (holding the mutex).	
 	\item Long Block Task shall occur with period of 1.9 seconds and will run for .3 seconds with a blocking time of .3 seconds (holding the mutex).
-	\item When Long Task and Short Task are enabled both shall attempt to acquire the mutex thus with Long Task periodically acquiring the mutex first and rising in priority due to priority ceiling.
+	\item When Long Task and Short Task are enabled both shall attempt to acquire the mutex with Long Task periodically acquiring the mutex first and rising above Short Task in priority due to priority ceiling.
+	\item RTOS shall start with mutexs enabled and shall initialize tasks before running.
 	\end{enumerate}
 \end{enumerate}
 
 \sectPart{State Chart}
 
-Spencer
+\includegraphics[scale=.5]{RTOS_State_Chart.pdf}
 
 \sectPart{Requirements/State-Chart Traceability Table}
 
-Spencer
+NOTE: Because we are implementing an RTOS that majority of our requirements relate to RTOS timing and behavior. RTOS state is not easily encapsulated in a state diagram as its state is based on task timing. The state transition diagram relates to the demonstration and peripherals which function as a result of correct RTOS behavior but do not define the RTOS behavior itself.
+
+\vspace*{1em}
+
+\begin{tabular}{c | c | c | c | c | c | c | c | c}
+Req. & State 1 & State 2 & State 3 & Trans 1 & Trans 2 & Trans 3 & Trans 4 & Trans 5 \\ \hline
+a & - & X & X & - & X & X & X & X \\
+b & - & - & - & - & - & - & - & - \\
+c & - & X & X & - & - & - & - & - \\
+d & - & - & - & - & - & - & - & - \\
+e & - & - & - & - & - & - & - & - \\
+f & - & - & - & - & - & - & - & - \\
+g & - & - & - & - & - & - & - & - \\
+h & - & - & - & - & - & - & - & - \\
+i & - & - & - & - & - & - & - & - \\
+j & X & - & - & X & - & - & - & - \\
+\end{tabular}
 
 \sectPart{Scheduling}
 
