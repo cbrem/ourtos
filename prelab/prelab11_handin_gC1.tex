@@ -3,7 +3,9 @@
 \usepackage{color}
 \usepackage{amsmath}
 \usepackage{fullpage}
+\usepackage{multirow}
 \usepackage{graphicx}
+\usepackage{pdfpages}
 
 
 \sloppy
@@ -19,6 +21,8 @@
         \stepcounter{partNum}%
         \thepartNum}
 \newcommand{\sectPart}[1]{\section*{Part \partNum: #1}}
+
+\newcommand{\bitem}[1]{\item \textbf{#1}}
 
 \newcommand{\assignment}{PreLab 11}
 \newcommand{\duedate}{April 18, 2014}
@@ -37,11 +41,61 @@
 
 \sectPart{Description}
 
-Spencer
+\paragraph*{}
+We plan to build an RTOS. We will implement priority ceiling with mutex and a timer to handle periodic tasks. A serial buffer shall act as a shared resource for the mutex. We shall use serial to output details on current tasks and the state of the various tasks. Two interrupts that we will use are swi (for yield) and timer. If we have time we will also implement yield.	
+
+\paragraph*{}
+We shall include the following items:
+\begin{enumerate}
+\item Serial Communications
+\item Counter / timer
+\item Mutex
+\item Priority Ceiling
+\item Watchdog
+\end{enumerate}
+
+\paragraph*{}
+Our interrupts will be:
+\begin{enumerate}
+\item Timer interrupt
+\end{enumerate}
 
 \sectPart{Requirements}
 
-Connor
+\begin{enumerate}
+\bitem{System Inputs}
+	\begin{enumerate}
+	\bitem{mutexDisableBtn} Boolean based off of button on board (PB1). When asserted this button disables mutex. Default state is unasserted.
+	\bitem{taskEnableBtn[0:2]} Boolean based off of SW[0:2]. When asserted this switch enables a task. When off the task is disabled.
+	\end{enumerate}
+\bitem{System Outputs}
+	\begin{enumerate}
+	\bitem{Serial} The Scheduler shall expose internal task state via serial. It shall write to serial after each scheduling event. The format shall be as follows:
+\begin{verbatim}
+ Task(Default Priority) | Priority | Running | Ready to Run | Scheduled to Run
+ -----------------------+----------+---------+--------------+-----------------
+ 1                      | 1        | false   | true         | false
+ 3                      | 0        | true    | false        | true
+ 5                      | 5        | true    | false        | false
+\end{verbatim}
+	\end{enumerate}
+\bitem{State Variables}
+	\begin{enumerate}
+	\bitem{mutexEnabled} Boolean state variable to keep track of mutex state.
+	\end{enumerate}
+\bitem{Requirements}
+	\begin{enumerate}
+	\item When mutexDisableBtn button is pressed the mutex shall be disabled with the mutex enabled otherwise.
+	\item When the SWx switch is on task x shall be enabled and when the switch is off task x shall be disabled.
+	\item When the scheduler completes execution it shall write the current task state to serial.
+	\item Scheduler shall at least every .1 second.
+	\item Poll Button Task shall occur every .5 second.
+	\item Watchdog Kick Task shall occur every .5 second.
+	\item Short Block Task shall occur with period of 2 seconds and will run for .1 seconds with a blocking time of .1 seconds (holding the mutex).	
+	\item Long Block Task shall occur with period of 1.9 seconds and will run for .3 seconds with a blocking time of .3 seconds (holding the mutex).
+	\item When Long Task and Short Task are enabled both shall attempt to acquire the mutex thus with Long Task periodically acquiring the mutex first and rising in priority due to priority ceiling.
+	\end{enumerate}
+\end{enumerate}
 
 \sectPart{State Chart}
 
