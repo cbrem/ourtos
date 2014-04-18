@@ -60,6 +60,7 @@ Our interrupts will be:
 \item Timer interrupt
 \end{enumerate}
 
+%-----------------------------------------
 \sectPart{Requirements}
 
 \begin{enumerate}
@@ -98,6 +99,8 @@ Our interrupts will be:
 	\end{enumerate}
 \end{enumerate}
 
+%-----------------------------------------
+
 \sectPart{State Chart}
 
 \includegraphics[scale=.5]{RTOS_State_Chart.pdf}
@@ -122,30 +125,58 @@ i & - & - & - & - & - & - & - & - \\
 j & X & - & - & X & - & - & - & - \\
 \end{tabular}
 
+%-----------------------------------------
+
 \sectPart{Scheduling}
 
 Connor
+
+%-----------------------------------------
 
 \sectPart{Watchdog/COP}
 
 Connor
 
+%-----------------------------------------
+
 \sectPart{Test Plan}
 
-Connor
+\subsection*{Part 7.1: White Box Testing}
+
+\begin{tabular}{c | c | c | c | c | c | c | c | c}
+Req. & State 1 & State 2 & State 3 & Trans 1 & Trans 2 & Trans 3 & Trans 4 & Trans 5 \\ \hline
+a & - & X & X & - & X & X & X & X \\
+b & - & - & - & - & - & - & - & - \\
+c & - & X & X & - & - & - & - & - \\
+d & - & - & - & - & - & - & - & - \\
+e & - & - & - & - & - & - & - & - \\
+f & - & - & - & - & - & - & - & - \\
+g & - & - & - & - & - & - & - & - \\
+h & - & - & - & - & - & - & - & - \\
+i & - & - & - & - & - & - & - & - \\
+j & X & - & - & X & - & - & - & - \\
+\end{tabular}
+
+\subsection*{Part 7.2: Black Box Testing}
+
+%-----------------------------------------
 
 \sectPart{Hardware}
 
 Connor
 
+%-----------------------------------------
+
 \sectPart{Acceptance Test Plan}
 
 Connor
 
+%-----------------------------------------
+
 \section*{Appendix}
 
 	\subsection*{RTOS API}
-	
+		TODO
 		
 %=======================================================
 
