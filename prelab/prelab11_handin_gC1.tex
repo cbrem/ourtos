@@ -2,10 +2,8 @@
 
 \usepackage{color}
 \usepackage{amsmath}
-\usepackage{fullpage}
-\usepackage{multirow}
 \usepackage{graphicx}
-\usepackage{pdfpages}
+\usepackage{fullpage}
 
 
 \sloppy
@@ -88,12 +86,12 @@ Our interrupts will be:
 	\item When mutexDisableBtn button is pressed the mutex shall be disabled with the mutex enabled otherwise.
 	\item When the SWx switch is on task x shall be enabled and when the switch is off task x shall be disabled.
 	\item When the scheduler completes execution it shall write the current task state to serial.
-	\item Scheduler shall at least every .1 second.
-	\item Poll Button Task shall occur every .5 second.
-	\item Watchdog Kick Task shall occur every .5 second.
-	\item Short Block Task shall occur with period of 2 seconds and will run for .1 seconds with a blocking time of .1 seconds (holding the mutex).	
-	\item Long Block Task shall occur with period of 1.9 seconds and will run for .3 seconds with a blocking time of .3 seconds (holding the mutex).
-	\item When Long Task and Short Task are enabled both shall attempt to acquire the mutex thus with Long Task periodically acquiring the mutex first and rising in priority due to priority ceiling.
+	\item The scheduler shall run at least every 100ms.
+	\item Buttons shall be polled once per 500 ms to determine which tasks to enable.
+	\item The watchdog shall be kicked once per 500 ms.
+	\item A task (\texttt{shortBlockTask}) shall run once per 2000 ms for at least 100ms, and shall acquire a mutex for 100ms.
+	\item A task (\texttt{longBlockTask}) shall run once per 1900 ms for at least 100ms, and shall acquire a mutex for 300ms.
+	\item When \texttt{longBlockTask} and \texttt{shortBlockTask} vie for a mutex and \texttt{longBlockTask} wins, the RTOS shall raise \texttt{longBlockTask}'s priority in order to avoid deadlock.
 	\end{enumerate}
 \end{enumerate}
 
@@ -107,11 +105,23 @@ Spencer
 
 \sectPart{Scheduling}
 
-Connor
+The RTOS shall implement and preemptive multitasking and use this to schedule tasks. It shall use the following priorities and periods:
+
+\vspace{1em}
+\begin{tabular}{|l|l|l|p{10em}|p{15em}|}
+    \hline
+    \textbf{Priority} & \textbf{Task} & \textbf{Period (ms)} & \textbf{Description} & \textbf{Timing Rationale} \\ \hline
+    N/A & \texttt{scheduler} & 100 & Schedules other tasks. & N/A \\ \hline
+    0 & \texttt{kickWatchdog} & 500 & Kicks COP. & Should run with highest priority to avoid tripping COP. \\ \hline
+    1 & \texttt{pollSwitches} & 500 & Polls module SW3 to determine which other tasks to enable. & Should run with higher priority than most tasks it enables/disables. \\ \hline
+    2 & \texttt{shortBlockTask} & 2000 & Grabs the same mutex that \texttt{longBlockTask} wants. & Should run infrequently enough that it can be observed visually. \\ \hline
+    3 & \texttt{longBlockTask} & 3000 & Grabs the same mutex that \texttt{shortBlockTask} wants. & Should run infrequently enough that it can be observed visually. \\ \hline
+\end{tabular}
 
 \sectPart{Watchdog/COP}
 
-Connor
+The \texttt{kickWatchdog} task will kick the watchdog timer whenever it runs. We shall set COPCTL\_CR to 0x7, which will require the watchdog to be kicked every 1.048576 seconds (assuming an 8 MHz bus clock). \\
+Therefore, the watchdog will trip if the scheduler does not run regularly or fails to respect priorities in such a way that \texttt{kickWatchdog} (priority 0) is not run.
 
 \sectPart{Test Plan}
 
@@ -119,7 +129,15 @@ Connor
 
 \sectPart{Hardware}
 
-Connor
+Our project shall use the following hardware:
+\begin{itemize}
+    \item MC9S12C128 microcontroller module (including switches and LEDs)
+    \item USB cable (for serial communication)
+    \item desktop computer
+\end{itemize}
+This hardware shall be connected as shown here:\\
+\vspace{0.25in}
+\includegraphics[scale=0.5]{hardware.png}
 
 \sectPart{Acceptance Test Plan}
 
