@@ -82,6 +82,9 @@ Our interrupts will be:
 	\begin{enumerate}
 	\bitem{mutexEnabled} Boolean state variable to keep track of mutex state.
 	\end{enumerate}
+
+\newpage
+
 \bitem{Requirements}
 	\begin{enumerate}
 	\item When mutexDisableBtn button is pressed the mutex shall be disabled with the mutex enabled otherwise.
@@ -101,7 +104,11 @@ Our interrupts will be:
 
 \sectPart{State Chart}
 
-\includegraphics[scale=.5]{RTOS_State_Chart.pdf}
+\begin{center}
+    \includegraphics[scale=.5]{RTOS_State_Chart.pdf}
+\end{center}
+
+\newpage
 
 \sectPart{Requirements/State-Chart Traceability Table}
 
@@ -109,19 +116,22 @@ NOTE: Because we are implementing an RTOS that majority of our requirements rela
 
 \vspace*{1em}
 
-\begin{tabular}{c | c | c | c | c | c | c | c | c}
-Req. & State 1 & State 2 & State 3 & Trans 1 & Trans 2 & Trans 3 & Trans 4 & Trans 5 \\ \hline
-a & - & X & X & - & X & X & X & X \\
-b & - & - & - & - & - & - & - & - \\
-c & - & X & X & - & - & - & - & - \\
-d & - & - & - & - & - & - & - & - \\
-e & - & - & - & - & - & - & - & - \\
-f & - & - & - & - & - & - & - & - \\
-g & - & - & - & - & - & - & - & - \\
-h & - & - & - & - & - & - & - & - \\
-i & - & - & - & - & - & - & - & - \\
-j & X & - & - & X & - & - & - & - \\
-\end{tabular}
+\begin{center}
+    \begin{tabular}{| c | c | c | c | c | c | c | c | c |}
+        \hline
+    Req. & State 1 & State 2 & State 3 & Trans 1 & Trans 2 & Trans 3 & Trans 4 & Trans 5 \\ \hline
+    a & - & X & X & - & X & X & X & X \\ \hline
+    b & - & - & - & - & - & - & - & - \\ \hline
+    c & - & X & X & - & - & - & - & - \\ \hline
+    d & - & - & - & - & - & - & - & - \\ \hline
+    e & - & - & - & - & - & - & - & - \\ \hline
+    f & - & - & - & - & - & - & - & - \\ \hline
+    g & - & - & - & - & - & - & - & - \\ \hline
+    h & - & - & - & - & - & - & - & - \\ \hline
+    i & - & - & - & - & - & - & - & - \\ \hline
+    j & X & - & - & X & - & - & - & - \\ \hline
+    \end{tabular}
+\end{center}
 
 %-----------------------------------------
 
@@ -130,22 +140,33 @@ j & X & - & - & X & - & - & - & - \\
 The RTOS shall implement and preemptive multitasking and use this to schedule tasks. It shall use the following priorities and periods:
 
 \vspace{1em}
-\begin{tabular}{|l|l|l|p{10em}|p{15em}|}
-    \hline
-    \textbf{Priority} & \textbf{Task} & \textbf{Period (ms)} & \textbf{Description} & \textbf{Timing Rationale} \\ \hline
-    N/A & \texttt{scheduler} & 100 & Schedules other tasks. & N/A \\ \hline
-    0 & \texttt{kickWatchdog} & 500 & Kicks COP. & Should run with highest priority to avoid tripping COP. \\ \hline
-    1 & \texttt{pollSwitches} & 500 & Polls module SW3 to determine which other tasks to enable. & Should run with higher priority than most tasks it enables/disables. \\ \hline
-    2 & \texttt{shortBlockTask} & 2000 & Grabs the same mutex that \texttt{longBlockTask} wants. & Should run infrequently enough that it can be observed visually. \\ \hline
-    3 & \texttt{longBlockTask} & 1900 & Grabs the same mutex that \texttt{shortBlockTask} wants. & Should run infrequently enough that it can be observed visually. \\ \hline
-\end{tabular}
+
+\begin{center}
+    \begin{tabular}{|l|l|l|p{10em}|p{15em}|}
+        \hline
+        \textbf{Priority} & \textbf{Task} & \textbf{Period (ms)} & \textbf{Description} & \textbf{Timing Rationale} \\ \hline
+        N/A & \texttt{scheduler} & 100 & Schedules other tasks. & N/A \\ \hline
+        0 & \texttt{kickWatchdog} & 500 & Kicks COP. & Should run with highest priority to avoid tripping COP. \\ \hline
+        1 & \texttt{pollSwitches} & 500 & Polls module SW3 to determine which other tasks to enable. & Should run with higher priority than most tasks it enables/disables. \\ \hline
+        2 & \texttt{shortBlockTask} & 2000 & Grabs the same mutex that \texttt{longBlockTask} wants. & Should run infrequently enough that it can be observed visually. \\ \hline
+        3 & \texttt{longBlockTask} & 1900 & Grabs the same mutex that \texttt{shortBlockTask} wants. & Should run infrequently enough that it can be observed visually. \\ \hline
+    \end{tabular}
+\end{center}
 
 %-----------------------------------------
 
+\newpage
+
 \sectPart{Watchdog/COP}
 
-The \texttt{kickWatchdog} task will kick the watchdog timer whenever it runs. We shall set COPCTL\_CR to 0x7, which will require the watchdog to be kicked every 1.048576 seconds (assuming an 8 MHz bus clock). \\
-Therefore, the watchdog will trip if the scheduler does not run regularly or fails to respect priorities in such a way that \texttt{kickWatchdog} (priority 0) is not run.
+When the \texttt{kickWatchdog} task is enabled, it shall kick the watchdog whenever it is run. We shall set COPCTL\_CR = 0x7, so that the watchdog timer will trip if it is not kicked every 1.048576 seconds (assuming an 8 MHz bus clock). \\
+Therefore, the watchdog timer will trip if the \texttt{kickWatchdog} task is not scheduled regularly. This would occur if:
+    \begin{itemize}
+        \item The \texttt{scheduler} does not run regularly or frequently.
+        \item The \texttt{scheduler} fails to respect priorities in such a way that \texttt{kickWatchdog} (priority 0) is not scheduled regularly or frequently.
+    \end{itemize}
+Therefore, if the watchdog trips, we will know that either \texttt{kickWatchdog} is disabled or the scheduler is functioning incorrectly. \\
+If the watchdog trips, the RTOS shall shutdown. Then, the demo shall send a message over serial indicating that the watchdog tripped and restart the RTOS.
 
 %-----------------------------------------
 
@@ -157,19 +178,23 @@ NOTE: Key used to simplify table: M is mutexDisableBtn = 1 and ~M is mutexDisabl
 
 \vspace*{2em}
 
-\textbf{Tests}\\
-\begin{tabular}{c | c | c | c | c | c | c}
-Test & Init State & In1 & In2 & In3 & In4 & In5 \\ \hline
-1 & 1 & Any(2) & ~M(2) & M(3) & M(3) & ~M(2) \\
-\end{tabular}
+\begin{center}
+    \textbf{Tests}\\
+    \begin{tabular}{c | c | c | c | c | c | c}
+    Test & Init State & In1 & In2 & In3 & In4 & In5 \\ \hline
+    1 & 1 & Any(2) & ~M(2) & M(3) & M(3) & ~M(2) \\
+    \end{tabular}
+\end{center}
 
 \vspace*{2em}
 
-\textbf{Traceability} \\
-\begin{tabular}{c | c | c | c | c | c}
-Test & Trans 1 & Trans 2 & Trans 3 & Trans 4 & Trans 5 \\ \hline
-1 & X & X & X & X & X \\
-\end{tabular}
+\begin{center}
+    \textbf{Traceability} \\
+    \begin{tabular}{c | c | c | c | c | c}
+    Test & Trans 1 & Trans 2 & Trans 3 & Trans 4 & Trans 5 \\ \hline
+    1 & X & X & X & X & X \\
+    \end{tabular}
+\end{center}
 
 \subsection*{Part 7.2: Black Box Testing}
 
@@ -184,8 +209,10 @@ Our project shall use the following hardware:
     \item desktop computer
 \end{itemize}
 This hardware shall be connected as shown here:\\
-\vspace{0.25in}
-\includegraphics[scale=0.5]{hardware.png}
+
+\begin{center}
+    \includegraphics[scale=0.5]{hardware.png}
+\end{center}
 
 %-----------------------------------------
 
@@ -198,7 +225,35 @@ Connor
 \section*{Appendix}
 
 	\subsection*{RTOS API}
-		TODO
+		
+        Users may start and stop the RTOS using:
+        \begin{itemize}
+            \bitem{\texttt{void rtosStart(void)}}
+            \bitem{\texttt{void rtosShutdown(void)}}
+        \end{itemize}
+
+        The RTOS will internally represent tasks using the type \texttt{task\_t}. Users may configure the RTOS's task scheduler using:
+        \begin{itemize}
+            \bitem{\texttt{void rtosSetSchedulerPeriod(uint16\_t period)}}
+            \bitem{\texttt{void rtosSetTaskArray(task\_t[] tasks, uint8\_t numTasks)}}
+            \bitem{\texttt{void void rtosAddTask(uint8\_t priority, uint16\_t period, void (*task) (void))}}
+        \end{itemize}
+        These configuration functions should be called before calling \texttt{rtosStart()}. \\
+
+
+        Additionally, the RTOS will provide a mutex implementation. Mutexs will have type \texttt{mutex\_t}. The RTOS will support the following functions for mutexes:
+        \begin{itemize}
+            \bitem{\texttt{rtosAddMutex(uint8\_t priority, mutex\_t *mutex)}}
+            \bitem{\texttt{rtosAcquireMutex(mutex\_t *mutex)}}
+            \bitem{\texttt{rtosReleaseMutex(mutex\_t *mutex)}}
+        \end{itemize}
+
+        Finally, the user may enable and disable various features and tasks while the RTOS is running using the following methods:
+        \begin{itemize}
+            \bitem{\texttt{void rtosEnableDebug(bool\_t enable)}}
+            \bitem{\texttt{void rtosEnableMutexes(bool\_t enable)}}
+            \bitem{\texttt{void rtosEnableTask(bool\_t enable)}}
+        \end{itemize}
 		
 %=======================================================
 
