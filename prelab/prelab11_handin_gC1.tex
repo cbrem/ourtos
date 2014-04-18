@@ -174,8 +174,19 @@ Test & Trans 1 & Trans 2 & Trans 3 & Trans 4 & Trans 5 \\ \hline
 \subsection*{Part 7.2: Black Box Testing}
 
 \textbf{Tests}\\
-\begin{tabular}{c | c{30em} }
+\begin{tabular}{c | p{30em} }
 Test & Description \\ \hline
+1 & Run the RTOS and ensure that serial data is being transmitted to the computer \\
+2 & Record the serial transmission in a log file for each of the following tests. Ensure that the data is in the specified format. Check that the log records the RTOS initialization message and that mutexs are enabled. \\
+3 & Ensure all the SWx start in the off position. Restart the module and ensure that all tasks are disabled in the serial log. \\
+4 & Look at the logs to ensure that the Watchdog triggers after about 1 second. \\
+5 & Look at the logs to ensure that the Watchdog event is followed by a software restart. \\
+6 & Enable the Watchdog Task and restart the module. Press and hold the \textit{mutexDisable} for 1 second. Check in the log for a line saying the demo is in State 3 and that approximately 1 second later the demo is in State 2. Ensure that the demo is in State 2 for all times when the mutexDisableBtn was not pressed. \\
+7 & Enable all tasks and restart the module. Run for 1 minute (use a stopwatch) and record logs. \\
+8 & Look at the logs and ensure all time periods are met for all tasks. Ensure that the scheduler is also meeting its timing. Double check the timestamps which should end at 1 minute. \\
+9 & Look at the logs and ensure that \texttt{shortBlockTask} and \texttt{longBlockTask} run for the correct duration. \\
+10 & Look at the logs and find an instance where \texttt{longBlockTask} changes priority. Ensure that this priority is above the priority of \texttt{shortBlockTask} and that \texttt{shortBlockTask} does not run during the execution of \texttt{longBlockTask}. \\
+11 & If yield is implemented examine the log time stamps to ensure that tasks yield control back to the scheduler on completion.
 \end{tabular}
 
 \vspace*{2em}
