@@ -49,4 +49,24 @@ typedef struct {
   - frame saved last time that the task was interrupted
   - running
   - next time to run
+  - enabled
+  - normal priority
+  - current priority
 } task;
+
+4/17
+
+I/O:
+  * one switch to enable/disable each task
+  * one button to enable/disable mutexes
+
+RTOS API:
+  * void rtosEnableDebug(bool_t enable)
+  * void rtosEnableMutexes(bool_t enable)
+  * void rtosEnableTask(bool_t enable)
+  * void rtosSetSchedulerPeriod(uint16_t period)
+  * void rtosSetTaskArray(task_t[] tasks, uint8_t numTasks)
+  * void rtosAddTask(uint8_t priority, uint16_t period, void (*task) (void))
+  * void rtosAddMutex(uint8_t priority, mutex_t *mutex)
+  * void rtosStart()
+  * void rtosShutdown()

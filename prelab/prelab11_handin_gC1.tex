@@ -58,6 +58,7 @@ Our interrupts will be:
 \item Timer interrupt
 \end{enumerate}
 
+%-----------------------------------------
 \sectPart{Requirements}
 
 \begin{enumerate}
@@ -92,16 +93,37 @@ Our interrupts will be:
 	\item A task (\texttt{shortBlockTask}) shall run once per 2000 ms for at least 100ms, and shall acquire a mutex for 100ms.
 	\item A task (\texttt{longBlockTask}) shall run once per 1900 ms for at least 100ms, and shall acquire a mutex for 300ms.
 	\item When \texttt{longBlockTask} and \texttt{shortBlockTask} vie for a mutex and \texttt{longBlockTask} wins, the RTOS shall raise \texttt{longBlockTask}'s priority in order to avoid deadlock.
+	\item RTOS shall start with mutexs enabled and shall initialize tasks before running.
 	\end{enumerate}
 \end{enumerate}
 
+%-----------------------------------------
+
 \sectPart{State Chart}
 
-Spencer
+\includegraphics[scale=.5]{RTOS_State_Chart.pdf}
 
 \sectPart{Requirements/State-Chart Traceability Table}
 
-Spencer
+NOTE: Because we are implementing an RTOS that majority of our requirements relate to RTOS timing and behavior. RTOS state is not easily encapsulated in a state diagram as its state is based on task timing. The state transition diagram relates to the demonstration and peripherals which function as a result of correct RTOS behavior but do not define the RTOS behavior itself.
+
+\vspace*{1em}
+
+\begin{tabular}{c | c | c | c | c | c | c | c | c}
+Req. & State 1 & State 2 & State 3 & Trans 1 & Trans 2 & Trans 3 & Trans 4 & Trans 5 \\ \hline
+a & - & X & X & - & X & X & X & X \\
+b & - & - & - & - & - & - & - & - \\
+c & - & X & X & - & - & - & - & - \\
+d & - & - & - & - & - & - & - & - \\
+e & - & - & - & - & - & - & - & - \\
+f & - & - & - & - & - & - & - & - \\
+g & - & - & - & - & - & - & - & - \\
+h & - & - & - & - & - & - & - & - \\
+i & - & - & - & - & - & - & - & - \\
+j & X & - & - & X & - & - & - & - \\
+\end{tabular}
+
+%-----------------------------------------
 
 \sectPart{Scheduling}
 
@@ -115,17 +137,43 @@ The RTOS shall implement and preemptive multitasking and use this to schedule ta
     0 & \texttt{kickWatchdog} & 500 & Kicks COP. & Should run with highest priority to avoid tripping COP. \\ \hline
     1 & \texttt{pollSwitches} & 500 & Polls module SW3 to determine which other tasks to enable. & Should run with higher priority than most tasks it enables/disables. \\ \hline
     2 & \texttt{shortBlockTask} & 2000 & Grabs the same mutex that \texttt{longBlockTask} wants. & Should run infrequently enough that it can be observed visually. \\ \hline
-    3 & \texttt{longBlockTask} & 3000 & Grabs the same mutex that \texttt{shortBlockTask} wants. & Should run infrequently enough that it can be observed visually. \\ \hline
+    3 & \texttt{longBlockTask} & 1900 & Grabs the same mutex that \texttt{shortBlockTask} wants. & Should run infrequently enough that it can be observed visually. \\ \hline
 \end{tabular}
+
+%-----------------------------------------
 
 \sectPart{Watchdog/COP}
 
 The \texttt{kickWatchdog} task will kick the watchdog timer whenever it runs. We shall set COPCTL\_CR to 0x7, which will require the watchdog to be kicked every 1.048576 seconds (assuming an 8 MHz bus clock). \\
 Therefore, the watchdog will trip if the scheduler does not run regularly or fails to respect priorities in such a way that \texttt{kickWatchdog} (priority 0) is not run.
 
+%-----------------------------------------
+
 \sectPart{Test Plan}
 
-Connor
+\subsection*{Part 7.1: White Box Testing}
+
+NOTE: Key used to simplify table: M is mutexDisableBtn = 1 and ~M is mutexDisableBtn = 0
+
+\vspace*{2em}
+
+\textbf{Tests}\\
+\begin{tabular}{c | c | c | c | c | c | c}
+Test & Init State & In1 & In2 & In3 & In4 & In5 \\ \hline
+1 & 1 & Any(2) & ~M(2) & M(3) & M(3) & ~M(2) \\
+\end{tabular}
+
+\vspace*{2em}
+
+\textbf{Traceability} \\
+\begin{tabular}{c | c | c | c | c | c}
+Test & Trans 1 & Trans 2 & Trans 3 & Trans 4 & Trans 5 \\ \hline
+1 & X & X & X & X & X \\
+\end{tabular}
+
+\subsection*{Part 7.2: Black Box Testing}
+
+%-----------------------------------------
 
 \sectPart{Hardware}
 
@@ -139,9 +187,18 @@ This hardware shall be connected as shown here:\\
 \vspace{0.25in}
 \includegraphics[scale=0.5]{hardware.png}
 
+%-----------------------------------------
+
 \sectPart{Acceptance Test Plan}
 
 Connor
+
+%-----------------------------------------
+
+\section*{Appendix}
+
+	\subsection*{RTOS API}
+		TODO
 		
 %=======================================================
 
