@@ -88,7 +88,7 @@ Our interrupts will be:
 \bitem{Requirements}
 	\begin{enumerate}
 	\item When \texttt{mutexDisableBtn} button is pressed the mutex shall be disabled with the mutex enabled otherwise.
-	\item When the \texttt{SW3-x} switch is on task x shall be enabled and when the switch is off task x shall be disabled. The exception is task 1, which polls the switches and must be constantly on.
+	\item When the \texttt{SW3-x} switch is on task x shall be enabled and when the switch is off task x shall be disabled with the exception off task 1, which polls the switches and must be constantly on.
 	\item Before the scheduler dispatches a task, it shall print the RTOS's state to serial.
 	\item The scheduler shall run at least every 100ms.
 	\item Buttons shall be polled once per 500 ms to determine which tasks to enable.
@@ -121,14 +121,14 @@ NOTE: Because we are implementing an RTOS that majority of our requirements rela
         \hline
     Req. & State 1 & State 2 & State 3 & Trans 1 & Trans 2 & Trans 3 & Trans 4 & Trans 5 \\ \hline
     a & - & X & X & - & X & X & X & X \\ \hline
-    b & - & - & - & - & - & - & - & - \\ \hline
+    b & - & X & X & - & - & - & - & - \\ \hline
     c & - & X & X & - & - & - & - & - \\ \hline
-    d & - & - & - & - & - & - & - & - \\ \hline
-    e & - & - & - & - & - & - & - & - \\ \hline
-    f & - & - & - & - & - & - & - & - \\ \hline
-    g & - & - & - & - & - & - & - & - \\ \hline
-    h & - & - & - & - & - & - & - & - \\ \hline
-    i & - & - & - & - & - & - & - & - \\ \hline
+    d & - & X & X & - & - & - & - & - \\ \hline
+    e & - & X & X & - & - & - & - & - \\ \hline
+    f & - & X & X & - & - & - & - & - \\ \hline
+    g & - & X & X & - & - & - & - & - \\ \hline
+    h & - & X & X & - & - & - & - & - \\ \hline
+    i & - & X & - & - & - & - & - & - \\ \hline
     j & X & - & - & X & - & - & - & - \\ \hline
     \end{tabular}
 \end{center}
@@ -137,7 +137,7 @@ NOTE: Because we are implementing an RTOS that majority of our requirements rela
 
 \sectPart{Scheduling}
 
-The RTOS shall implement and preemptive multitasking and use this to schedule tasks. It shall use the following priorities and periods:
+The RTOS shall implement and preemptive multitasking with priority ceiling and use this to schedule tasks. It shall use the following priorities and periods:
 
 \vspace{1em}
 
@@ -174,7 +174,7 @@ If the watchdog trips, the RTOS shall shutdown. Then, the demo shall send a mess
 
 \subsection*{Part 7.1: White Box Testing}
 
-NOTE: Key used to simplify table: M is ]\texttt{mutexDisableBtn} = 1 and ~M is \texttt{mutexDisableBtn} = 0
+NOTE: Key used to simplify table: M is \texttt{mutexDisableBtn} = 1 and ~M is \texttt{mutexDisableBtn} = 0
 
 \vspace*{2em}
 
@@ -215,7 +215,7 @@ NOTE: Key used to simplify table: M is ]\texttt{mutexDisableBtn} = 1 and ~M is \
     3 & Ensure all the SW3-x start in the off position. Restart the module and ensure that all tasks are disabled in the serial log. \\ \hline
     4 & Look at the logs to ensure that the Watchdog triggers after about 1 second. \\ \hline
     5 & Look at the logs to ensure that the Watchdog event is followed by a software restart. \\ \hline
-    6 & Enable the Watchdog Task and restart the module. Press and hold the \texttt{mutexDisable} for 1 second. Check in the log for a line saying the demo is in State 3 and that approximately 1 second later the demo is in State 2. Ensure that the demo is in State 2 for all times when the \texttt{mutexDisableBtn} was not pressed. \\ \hline
+    6 & Enable the Watchdog Task and restart the module. Press and hold the \texttt{mutexDisable} for 1 second. Check in the log that while \texttt{mutexDisable} was held the module changed the state from \texttt{State 2} to \texttt{State 3} and changed back after the button was released. \\ \hline
     7 & Enable all tasks and restart the module. Run for 1 minute (use a stopwatch) and record logs. \\ \hline
     8 & Look at the logs and ensure all time periods are met for all tasks. Ensure that the scheduler is also meeting its timing. Double check the timestamps which should end at 1 minute. \\ \hline
     9 & Look at the logs and ensure that \texttt{shortBlockTask} and \texttt{longBlockTask} run for the correct duration. \\ \hline
