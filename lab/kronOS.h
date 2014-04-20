@@ -27,14 +27,14 @@ void rtosShutdown(void);
  */
 void rtosSetSchedulerPeriod(uint16_t period);
 void rtosSetTaskArray(task_t[] tasks, uint8_t numTasks);
-void void rtosAddTask(uint8_t priority, uint16_t period, void (*task) (void));
+void rtosAddTask(uint8_t priority, uint16_t period, void (*task) (void));
         
 /* Additionally, the RTOS will provide a mutex implementation. Mutexs will have
  *  type mutex_t. The RTOS will support the following functions for mutexes:
  */
-rtosAddMutex(uint8_t priority, mutex_t *mutex);
-rtosAcquireMutex(mutex_t *mutex);
-rtosReleaseMutex(mutex_t *mutex);
+void rtosAddMutex(uint8_t priority, mutex_t *mutex);
+void rtosAcquireMutex(mutex_t *mutex);
+void rtosReleaseMutex(mutex_t *mutex);
 
 /* Finally, the user may enable and disable various features and tasks while 
  *  the RTOS is running using the following methods:
