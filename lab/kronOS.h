@@ -68,7 +68,7 @@ void rtosSetTaskArray(task_t[] tasks, uint8_t numTasks);
  * called afterward.
  * This function must be called after calling rtosSetTaskArray.
  */
-void void rtosAddTask(uint8_t priority, uint16_t period, void (*task) (void));
+void rtosAddTask(uint8_t priority, uint16_t period, void (*task) (void));
         
 /*
  * Add a mutex to the RTOS which uses the given priority for priority ceiling.
