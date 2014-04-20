@@ -1,5 +1,5 @@
-/* kronOS
- * 	A lightweight premtive multitasking RTOS with priority ceiling.
+/* 
+ * kronOS - A lightweight, preemptive multitasking RTOS with priority ceiling.
  * 
  * Spencer Barton (sebarton)
  * Connor Brem (cbrem)
