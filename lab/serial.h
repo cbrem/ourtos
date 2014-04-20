@@ -10,7 +10,27 @@
 #ifndef _SERIAL_H
 #define _SERIAL_H
 
+/*==================================
+ * Includes
+ *==================================*/
+
 #include <stdint.h>
+
+/*==================================
+ * MACROS
+ *==================================*/
+
+/*==================================
+ * Exernal Globals
+ *==================================*/
+
+/*==================================
+ * Local Globals
+ *==================================*/
+
+/*==================================
+ * Public Functions
+ *==================================*/
 
 /*
  * Configures serial communications, using the given baud prescale.
@@ -26,5 +46,9 @@ void serialWrite(char[] buffer, uint8_t len);
  * Reads len bytes from serial into the given buffer.
  */
 void serialRead(char[] buffer, uint8_t len);
+
+/*==================================
+ * Private Functions
+ *==================================*/
 
 #endif // _SERIAL_H

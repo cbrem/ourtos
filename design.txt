@@ -70,3 +70,19 @@ RTOS API:
   * void rtosAddMutex(uint8_t priority, mutex_t *mutex)
   * void rtosStart()
   * void rtosShutdown()
+
+4/20
+
+Division of labor:
+
+Connor:
+- RTOS mutex
+- RTOS scheduler
+- Demo tasks
+- Serial Library
+
+Spencer:
+- RTOS timer
+- (RTOS yield)
+- Demo tasks
+- Watchdog
