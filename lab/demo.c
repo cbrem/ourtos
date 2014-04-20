@@ -8,8 +8,8 @@
  * 
  *  See documentation for further details
  *
- * Spencer Barton (sebarton)
  * Connor Brem (cbrem)
+ * Spencer Barton (sebarton)
  * Group C1
  * 18-348 Lab 11
  */

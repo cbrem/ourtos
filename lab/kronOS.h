@@ -1,35 +1,14 @@
 /* 
  * kronOS - A lightweight, preemptive multitasking RTOS with priority ceiling.
  * 
- * Spencer Barton (sebarton)
  * Connor Brem (cbrem)
+ * Spencer Barton (sebarton)
  * Group C1
  * 18-348 Lab 11
  */
 
 #ifndef _KRONOS_H
 #define _KRONOS_H
-
-/*==================================
- * Globals
- *==================================*/
-
-/*==================================
- * Types
- *==================================*/
-
-typedef enum {
-    FALSE,
-    TRUE
-} bool_t;
-
-typedef struct {
-    // TODO
-} task_t;
-
-typedef struct {
-    // TODO
-} mutex_t;
 
 /*==================================
  * Includes
@@ -41,6 +20,19 @@ typedef struct {
 /*==================================
  * MACROS
  *==================================*/
+
+
+/*==================================
+ * Types
+ *==================================*/
+
+typedef struct {
+    // TODO
+} task_t;
+
+typedef struct {
+    // TODO
+} mutex_t;
 
 /*==================================
  * Exernal Globals

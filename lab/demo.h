@@ -8,14 +8,14 @@
  * 
  *  See documentation for further details
  * 
- * Spencer Barton (sebarton)
  * Connor Brem (cbrem)
+ * Spencer Barton (sebarton)
  * Group C1
  * 18-348 Lab 11
  */
 
-#ifndef DEMO_H
-#define DEMO_H
+#ifndef _DEMO_H
+#define _DEMO_H
 
 /*==================================
  * Includes
@@ -33,9 +33,16 @@
 /* some tasks are enabled by hardware switches */
 #define N_ENABLEABLE_TASKS (4)
 
+// TODO task/watchdog timing
+
+// TODO hardware pin defs
+
 /*==================================
  * Exernal Globals
  *==================================*/
+
+// TODO tasks
+// TODO mutex
 
 /*==================================
  * Local Globals
@@ -50,16 +57,37 @@ static boolean* taskEnableBtn[N_ENABLEABLE_TASKS];
  * Public Functions
  *==================================*/
 
+/* 
+ * pollBtns modifies the mutexDisableBtn and taskEnableBtn variables by polling
+ *  the current hardware button state
+ */
+void pollBtns(void);
+
+/* 
+ * watchdogKick kicks the watchdog periodically
+ */
+void watchdogKick(void);
+
+/* 
+ * shortBlockingTask grabs a mutex and holds it for a short time
+ */
+void shortBlockingTask(void);
+
+/* 
+ * longBlockingTask grabs a mutex and holds it for a short long
+ */
+void longBlockingTask(void);
+
 /*==================================
  * Private Functions
  *==================================*/
 
-/* Tasks */
+/* -- Helper functions -------------*/
 
-/* pollBtns modifies the mutexDisableBtn and taskEnableBtn variables by polling
- * the current hardware button state
+/* blockingDelay runs for the given number of milliseconds 
+ * This function is implemented with nop loops so times are approximate
  */
-static void pollBtns(void);
+static blockingDelay(int delayMS);
 
 
 
