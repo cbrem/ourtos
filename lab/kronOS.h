@@ -1,5 +1,5 @@
-/* kronOS
- * 	A lightweight premtive multitasking RTOS with priority ceiling.
+/* 
+ * kronOS - A lightweight, preemptive multitasking RTOS with priority ceiling.
  * 
  * Spencer Barton (sebarton)
  * Connor Brem (cbrem)
@@ -7,41 +7,104 @@
  * 18-348 Lab 11
  */
 
-#ifndef KRONOS_H
-#define KRONOS_H
+#ifndef _KRONOS_H
+#define _KRONOS_H
+
+/*==================================
+ * Globals
+ *==================================*/
+
+/*==================================
+ * Types
+ *==================================*/
+
+typedef enum {
+    FALSE,
+    TRUE
+} bool_t;
+
+typedef struct {
+    // TODO
+} task_t;
+
+typedef struct {
+    // TODO
+} mutex_t;
 
 /*==================================
  * Public Functions
  *==================================*/
 
-/* Users may start and stop the RTOS using: 
+/*
+ * Starts the RTOS.
  */
 void rtosStart(void);
+
+/*
+ * Shuts down a started RTOS.
+ */
 void rtosShutdown(void);
 
-/* The RTOS will internally represent tasks using the type task_t. Users may 
- *  configure the RTOS's task scheduler using the following.
- *  
- * NOTE: These configuration functions should be called before calling 
- *  rtosStart().
+
+/*
+ * Sets the maximum number of milliseconds between runs of the RTOS's
+ * scheduler.
+ * This function must be called before calling rtosStart, and should not be
+ * called afterward.
  */
 void rtosSetSchedulerPeriod(uint16_t period);
+
+/*
+ * Provides a previously allocated array in which the RTOS will store task
+ * state.
+ * This function must be called before calling rtosStart, and should not be
+ * called afterward.
+ */
 void rtosSetTaskArray(task_t[] tasks, uint8_t numTasks);
+
+/*
+ * Adds a task to the RTOS.
+ * This function must be called before calling rtosStart, and should not be
+ * called afterward.
+ * This function must be called after calling rtosSetTaskArray.
+ */
 void void rtosAddTask(uint8_t priority, uint16_t period, void (*task) (void));
         
-/* Additionally, the RTOS will provide a mutex implementation. Mutexs will have
- *  type mutex_t. The RTOS will support the following functions for mutexes:
+/*
+ * Add a mutex to the RTOS which uses the given priority for priority ceiling.
+ * This priority should be strictly higher than the priority of any task which
+ * will use the mutex, and should not conflict with the priorities of any other
+ * mutexes or any other tasks.
+ * This function may only be called before calling rtosStart, and should not be
+ * called afterward.
  */
-rtosAddMutex(uint8_t priority, mutex_t *mutex);
-rtosAcquireMutex(mutex_t *mutex);
-rtosReleaseMutex(mutex_t *mutex);
+void rtosAddMutex(uint8_t priority, mutex_t *mutex);
 
-/* Finally, the user may enable and disable various features and tasks while 
- *  the RTOS is running using the following methods:
+/*
+ * Acquires the given mutex in a task-safe manner.
+ */
+void rtosAcquireMutex(mutex_t *mutex);
+
+/*
+ * Releases the given mutex in a task-safe manner.
+ */
+void rtosReleaseMutex(mutex_t *mutex);
+
+/*
+ * Configures the RTOS to print debug information whenever the scheduler runs.
  */
 void rtosEnableDebug(bool_t enable);
+
+/*
+ * Enables or disables mutexes globally.
+ */
 void rtosEnableMutexes(bool_t enable);
-void rtosEnableTask(bool_t enable);
+
+/*
+ * Enables or disables the task that was originally added at the given
+ * priority.
+ */
+void rtosEnableTask(uint8_t priority, bool_t enable);
 
 /*==================================
  * Private Functions
@@ -49,4 +112,4 @@ void rtosEnableTask(bool_t enable);
 
 // TODO remember to include static keyword
 
-#endif
+#endif // _KRONOS_H

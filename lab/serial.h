@@ -1,11 +1,11 @@
 /* 
- * serial.h
- * 
- * A small serial library.
+ * serial.h - A small serial library.
  */
 
-#IFNDEF _SERIAL_H
-#DEFINE _SERIAL_H
+#ifndef _SERIAL_H
+#define _SERIAL_H
+
+#include <stdint.h>
 
 /*
  * Configures serial communications, using the given baud prescale.
@@ -22,4 +22,4 @@ void serialWrite(char[] buffer, uint8_t len);
  */
 void serialRead(char[] buffer, uint8_t len);
 
-#ENDIF // _SERIAL_H
+#endif // _SERIAL_H
