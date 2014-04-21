@@ -1,8 +1,17 @@
 /* Demo of kronOS
-We plan to build an RTOS. We will implement priority ceiling with mutex and a timer to handle periodic tasks. A serial buffer shall act as a shared resource for the mutex. We shall use serial to output details on current tasks and the state of the various tasks. We will use the timer interrupt to run a scheduler periodically. If we have time we will also implement yield.	
+ *  This file demonstrates the functionality of kronOS. kronOS is a lightweight 
+ *  premtive multitasking RTOS with priority ceiling. 
  * 
- * Spencer Barton (sebarton)
+ *  In the demo a series of tasks run and share a resource. The scheduler prints
+ *  out the task state over serial whenever it runs. A watchdog task is 
+ *  implemented as well as a poll button task.
+ * 
+ *  See documentation for further details
+ *
  * Connor Brem (cbrem)
+ * Spencer Barton (sebarton)
  * Group C1
  * 18-348 Lab 11
  */
+
+#include "demo.h"
