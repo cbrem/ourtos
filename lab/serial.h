@@ -33,9 +33,9 @@
  *==================================*/
 
 /*
- * Configures serial communications, using the given baud prescale.
+ * Configures serial communications, using the given baud rate.
  */
-void serialInit(uint16_t prescale);
+void serialInit(uint16_t baud);
 
 /*
  * Writes len bytes of the given buffer over serial.

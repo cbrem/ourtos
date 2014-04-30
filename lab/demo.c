@@ -15,3 +15,40 @@
  */
 
 #include "demo.h"
+
+/*==================================
+* Public Functions
+*==================================*/
+
+/* ------ Initialization ------ */
+
+void initBtns(void) {
+	int i;
+
+	/* set globals false */
+	mutexDisableBtn = FALSE;
+	for(i = 0; i < N_ENABLEABLE_TASKS; i++) {
+		taskEnableBtn[i] = FALSE;
+	}
+
+}
+
+void initWatchdog(void);
+
+/* ------ Tasks ------ */
+
+void pollBtnsTask(void);
+
+void watchdogKickTask(void);
+
+void shortBlockingTask(void);
+
+void longBlockingTask(void);
+
+/*==================================
+ * Private Functions
+ *==================================*/
+
+/* ------ Helper functions ------*/
+
+static void _blockingDelay(int delayMS);

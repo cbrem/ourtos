@@ -29,13 +29,35 @@
  * MACROS
  *==================================*/
 
-#define N_TASKS
+#define N_TASKS (4)
 /* some tasks are enabled by hardware switches */
-#define N_ENABLEABLE_TASKS (4)
+#define N_ENABLEABLE_TASKS (3)
 
 // TODO task/watchdog timing
 
-// TODO hardware pin defs
+/* hardware pins and switches */
+#define SW3_1  (0x01)
+#define SW3_2  (0x02)
+#define SW3_3  (0x04)
+#define SW3_4  (0x08)
+#define SW3    (0x0F)
+
+#define SET_MUTEX_DISABLE_BTN_OUTPUT (TODO)
+#define MUTEX_DISABLE_BTN (TODO)
+
+/* 
+ * set bits of SWI on PORT B as 0 to enable 
+ * also set pull-up resistors to work properly with CPU module
+ * see MC9S12C128V1 data sheet section 4.3.2.10
+ */
+#define SET_TASK_ENABLE_BTN_OUTPUT ( DDRB &= (~SW3); \
+  									 PUCR |= 0x02;
+  								   )
+#define GET_TASK_ENABLE_BTN1 (PORTB & SW3_1)
+#define GET_TASK_ENABLE_BTN2 (PORTB & SW3_2)
+#define GET_TASK_ENABLE_BTN3 (PORTB & SW3_3)
+#define GET_TASK_ENABLE_BTN4 (PORTB & SW3_4)
+#define GET_TASK_ENABLE_BTNS (PORTB & SW3)
 
 /*==================================
  * Exernal Globals
@@ -57,16 +79,35 @@ static boolean* taskEnableBtn[N_ENABLEABLE_TASKS];
  * Public Functions
  *==================================*/
 
-/* 
- * pollBtns modifies the mutexDisableBtn and taskEnableBtn variables by polling
- *  the current hardware button state
- */
-void pollBtns(void);
+/* ------ Initialization ------ */
 
 /* 
- * watchdogKick kicks the watchdog periodically
+ * initBtns initializes the btns for pollBtnsTask 
+ * - sets mutexDisableBtn and taskEnableBtn to defaults of False
+ * - enables mutex diable btn as input
+ * - enables switches for tasks as input
  */
-void watchdogKick(void);
+void initBtns(void);
+
+/*
+ * initWatchdog initializes the watchdog with the following settings:
+ * TODO
+ */
+// TODO settings, may want arguments
+void initWatchdog(void);
+
+/* ------ Tasks ------ */
+
+/* 
+ * pollBtnsTask modifies the mutexDisableBtn and taskEnableBtn variables by polling
+ *  the current hardware button state
+ */
+void pollBtnsTask(void);
+
+/* 
+ * watchdogKickTask kicks the watchdog periodically
+ */
+void watchdogKickTask(void);
 
 /* 
  * shortBlockingTask grabs a mutex and holds it for a short time
@@ -82,12 +123,12 @@ void longBlockingTask(void);
  * Private Functions
  *==================================*/
 
-/* -- Helper functions -------------*/
+/* ------ Helper functions ------*/
 
 /* blockingDelay runs for the given number of milliseconds 
  * This function is implemented with nop loops so times are approximate
  */
-static blockingDelay(int delayMS);
+static void _blockingDelay(int delayMS);
 
 
 
