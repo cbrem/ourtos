@@ -99,9 +99,9 @@ void initBtns(void);
  * initWatchdog initializes the watchdog with the following settings:
  * - normal mode
  * - run in BDM mode
- * - timer rate set by input var
+ * - timer rate set by macro WATCHDOG_PERIOD
  */
-void initWatchdog(uint8_t watchdogPeriod);
+void initWatchdog(void);
 
 /* ------ Tasks ------ */
 

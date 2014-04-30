@@ -37,7 +37,7 @@ void initBtns(void) {
 
 }
 
-void initWatchdog(uint8_t watchdogPeriod) {
+void initWatchdog() {
 
 	/* normal mode */
 	COPCTL_WCOP = 0;
@@ -46,7 +46,7 @@ void initWatchdog(uint8_t watchdogPeriod) {
 	COPCTL_RSBCK = 0;
 
 	/* set time period */
-	COPCTL_CR = watchdogPeriod;
+	COPCTL_CR = WATCHDOG_PERIOD;
 
 }
 
