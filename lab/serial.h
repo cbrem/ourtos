@@ -14,7 +14,7 @@
  * Includes
  *==================================*/
 
-#include <stdint.h>
+#include "inttypes_MC9S12C128.h"
 
 /*==================================
  * MACROS

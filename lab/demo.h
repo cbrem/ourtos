@@ -21,8 +21,8 @@
  * Includes
  *==================================*/
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "inttypes_MC9S12C128.h"
+#include "boolean.h"
 #include "kronOS.h"
 
 /*==================================
@@ -70,9 +70,9 @@
  *==================================*/
 
 /* Button to disable mutexs */
-static bool mutexDisableBtn;
+static bool_t mutexDisableBtn;
 /* Switches to enable/disable some tasks */
-static bool* taskEnableBtn[N_ENABLEABLE_TASKS];
+static bool_t* taskEnableBtn[N_ENABLEABLE_TASKS];
 
 /*==================================
  * Public Functions
@@ -127,7 +127,7 @@ void longBlockingTask(void);
 /* blockingDelay runs for the given number of milliseconds 
  * This function is implemented with nop loops so times are approximate
  */
-static void _blockingDelay(int delayMS);
+static void _blockingDelay(uint16_t delayMS);
 
 
 
