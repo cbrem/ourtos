@@ -24,8 +24,9 @@
 
 void main(void) {
 
-	initBtns();
-	initWatchdog();
+	_initBtns();
+	_initLEDs();
+	_initWatchdog();
 
 	for (;;)
 	{
@@ -39,12 +40,13 @@ void main(void) {
 
 /* ------ Initialization ------ */
 
-void initBtns(void) {
+void _initBtns(void) {
+	
 	int i;
 
 	/* set mutex disable btn as input */
-	SET_MUTEX_DISABLE_BTN_INPUT;
-	SET_TASK_ENABLE_BTN_INPUT;
+	SET_MUTEX_DISABLE_BTN_INPUT();
+	SET_TASK_ENABLE_BTN_INPUT();
 
 	/* set globals false */
 	mutexDisableBtn = false;
@@ -54,7 +56,14 @@ void initBtns(void) {
 
 }
 
-void initWatchdog() {
+void _initLEDs(void) {
+
+	SET_LEDS_OUTPUT();
+	SET_LEDS(LEDS_OFF);
+
+}
+
+void _initWatchdog(void) {
 
 	/* normal mode */
 	COPCTL_WCOP = 0;
@@ -72,7 +81,7 @@ void initWatchdog() {
 void pollBtnsTask(void) {
 	int i;
 
-	if ( 1 == GET_MUTEX_DISABLE_BTN ) {
+	if ( 1 == GET_MUTEX_DISABLE_BTN() ) {
 		mutexDisableBtn = true;
 	} else {
 		mutexDisableBtn = false;		
@@ -89,7 +98,9 @@ void pollBtnsTask(void) {
 
 }
 
-void watchdogKickTask(void);
+void watchdogKickTask(void) {
+	_FEED_COP();
+}
 
 void shortBlockingTask(void);
 

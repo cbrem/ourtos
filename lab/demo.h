@@ -46,24 +46,29 @@
 /* hardware pins and switches */
 #define SW1_MASK    (0x01)
 #define SW3_MASK    (0x0F)
+#define LED_MASK    (0xF0)
 
 /* set SW1 on Port P as 0 to enable input */
  // TODO may need pullup
-#define SET_MUTEX_DISABLE_BTN_INPUT (DDRP &= ~SW1_MASK) 
-#define GET_MUTEX_DISABLE_BTN (PTP_PTP0) // TODO may need to invert
+#define SET_MUTEX_DISABLE_BTN_INPUT() (DDRP &= ~SW1_MASK) 
+#define GET_MUTEX_DISABLE_BTN() (PTP_PTP0) // TODO may need to invert
 
 /* 
  * set bits of SW3 on PORT B as 0 to enable input
  * also set pull-up resistors to work properly with CPU module
  * see MC9S12C128V1 data sheet section 4.3.2.10
  */
-#define SET_TASK_ENABLE_BTN_INPUT (DDRB &= (~SW3_MASK)); \
- 								  (PUCR |= 0x02)
-#define GET_TASK_ENABLE_BTN0 (PORTB_PTIP0)
-#define GET_TASK_ENABLE_BTN1 (PORTB_PTIP1)
-#define GET_TASK_ENABLE_BTN2 (PORTB_PTIP2)
-#define GET_TASK_ENABLE_BTN3 (PORTB_PTIP3)
+#define SET_TASK_ENABLE_BTN_INPUT() (DDRB &= (~SW3_MASK)); \
+ 								  (PUCR_PUPBE = 1)
 #define GET_TASK_ENABLE_BTN(BTN_N) (PORTB & (1 << BTN_N))
+
+/* LEDs */
+#define SET_LEDS_OUTPUT() (DDRB |= LED_MASK) 
+#define SET_LEDS(val) ( PORTB |= (val << BYTE_LEN_BITS) & LED_MASK )
+#define GET_LEDS() ( (PORTB >> BYTE_LEN_BITS) & (LED_MASK >> BYTE_LEN_BITS) )						 
+
+/* Assorted LED light pattens */
+#define LEDS_OFF (0x0)
 
 /*==================================
  * Exernal Globals
@@ -94,24 +99,6 @@ static bool_t taskEnableBtn[N_ENABLEABLE_TASKS];
  */
 void main(void);
 
-/* ------ Initialization ------ */
-
-/* 
- * initBtns initializes the btns for pollBtnsTask 
- * - sets mutexDisableBtn and taskEnableBtn to defaults of False
- * - enables mutex diable btn as input
- * - enables switches for tasks as input
- */
-void initBtns(void);
-
-/*
- * initWatchdog initializes the watchdog with the following settings:
- * - normal mode
- * - run in BDM mode
- * - timer rate set by macro WATCHDOG_PERIOD
- */
-void initWatchdog(void);
-
 /* ------ Tasks ------ */
 
 /* 
@@ -122,6 +109,7 @@ void pollBtnsTask(void);
 
 /* 
  * watchdogKickTask kicks the watchdog periodically
+ *  Note: the watchdog is called the COP for our board
  */
 void watchdogKickTask(void);
 
@@ -139,13 +127,34 @@ void longBlockingTask(void);
  * Private Functions
  *==================================*/
 
+/* ------ Initialization ------ */
+
+/* 
+ * initBtns initializes the btns for pollBtnsTask 
+ * - sets mutexDisableBtn and taskEnableBtn to defaults of False
+ * - enables mutex diable btn as input
+ * - enables switches for tasks as input
+ */
+void _initBtns(void);
+
+/* 
+ * initLEDs enables the LEDs and starts them OFF
+ */
+void _initLEDs(void);
+
+/*
+ * initWatchdog initializes the watchdog with the following settings:
+ * - normal mode
+ * - run in BDM mode
+ * - timer rate set by macro WATCHDOG_PERIOD
+ */
+void _initWatchdog(void);
+
 /* ------ Helper functions ------*/
 
 /* blockingDelay runs for the given number of milliseconds 
  * This function is implemented with nop loops so times are approximate
  */
 static void _blockingDelay(uint16_t delayMS);
-
-
 
 #endif
