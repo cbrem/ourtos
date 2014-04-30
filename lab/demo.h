@@ -36,7 +36,7 @@
 
 #define N_TASKS (4)
 /* some tasks are enabled by hardware switches */
-#define N_ENABLEABLE_TASKS (3)
+#define N_ENABLEABLE_TASKS (4)
 
 /* Watchdog and Timing Constants */
 #define WATCHDOG_PERIOD (0x7) /* 2^24 cycles ~ 1 sec for 8MHz Clk */
@@ -50,7 +50,7 @@
 /* set SW1 on Port P as 0 to enable input */
  // TODO may need pullup
 #define SET_MUTEX_DISABLE_BTN_INPUT (DDRP &= ~SW1_MASK) 
-#define MUTEX_DISABLE_BTN (PTP_PTP0)
+#define GET_MUTEX_DISABLE_BTN (PTP_PTP0) // TODO may need to invert
 
 /* 
  * set bits of SW3 on PORT B as 0 to enable input
@@ -63,7 +63,7 @@
 #define GET_TASK_ENABLE_BTN1 (PORTB_PTIP1)
 #define GET_TASK_ENABLE_BTN2 (PORTB_PTIP2)
 #define GET_TASK_ENABLE_BTN3 (PORTB_PTIP3)
-#define GET_TASK_ENABLE_BTNS (PORTB & SW3_MASK)
+#define GET_TASK_ENABLE_BTN(BTN_N) (PORTB & (1 << BTN_N))
 
 /*==================================
  * Exernal Globals
@@ -79,7 +79,7 @@
 /* Button to disable mutexs */
 static bool_t mutexDisableBtn;
 /* Switches to enable/disable some tasks */
-static bool_t* taskEnableBtn[N_ENABLEABLE_TASKS];
+static bool_t taskEnableBtn[N_ENABLEABLE_TASKS];
 
 // TODO PCB
 

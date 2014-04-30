@@ -30,7 +30,7 @@ void main(void) {
 	for (;;)
 	{
 		/* infinite loop */
-		
+
 		// TODO temperary
 		_FEED_COP(); /* feeds the dog */
 	}
@@ -47,9 +47,9 @@ void initBtns(void) {
 	SET_TASK_ENABLE_BTN_INPUT;
 
 	/* set globals false */
-	mutexDisableBtn = FALSE;
+	mutexDisableBtn = false;
 	for(i = 0; i < N_ENABLEABLE_TASKS; i++) {
-		taskEnableBtn[i] = FALSE;
+		taskEnableBtn[i] = false;
 	}
 
 }
@@ -63,13 +63,31 @@ void initWatchdog() {
 	COPCTL_RSBCK = 0;
 
 	/* set time period */
-	COPCTL_CR = WATCHDOG_PERIOD;
+	_ENABLE_COP(WATCHDOG_PERIOD);
 
 }
 
 /* ------ Tasks ------ */
 
-void pollBtnsTask(void);
+void pollBtnsTask(void) {
+	int i;
+
+	if ( 1 == GET_MUTEX_DISABLE_BTN ) {
+		mutexDisableBtn = true;
+	} else {
+		mutexDisableBtn = false;		
+	}
+
+	/* poll all task enable btns */
+	for( i = 0; i < N_ENABLEABLE_TASKS; i++) {
+		if ( 1 == GET_TASK_ENABLE_BTN(i) ) {
+			taskEnableBtn[i] == true;
+		} else {
+			taskEnableBtn[i] == false;
+		}
+	}
+
+}
 
 void watchdogKickTask(void);
 
