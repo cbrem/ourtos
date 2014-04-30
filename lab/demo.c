@@ -20,6 +20,23 @@
 * Public Functions
 *==================================*/
 
+/* ------ Main ------ */
+
+void main(void) {
+
+	initBtns();
+	initWatchdog();
+
+	for (;;)
+	{
+		/* infinite loop */
+		
+		// TODO temperary
+		_FEED_COP(); /* feeds the dog */
+	}
+
+}
+
 /* ------ Initialization ------ */
 
 void initBtns(void) {

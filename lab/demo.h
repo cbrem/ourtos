@@ -81,9 +81,18 @@ static bool_t mutexDisableBtn;
 /* Switches to enable/disable some tasks */
 static bool_t* taskEnableBtn[N_ENABLEABLE_TASKS];
 
+// TODO PCB
+
 /*==================================
  * Public Functions
  *==================================*/
+
+/*
+ * main is where the program starts
+ * This function initializes the demo and RTOS and then loops indefinaitly
+ * Exiting this function would be an error
+ */
+void main(void);
 
 /* ------ Initialization ------ */
 
