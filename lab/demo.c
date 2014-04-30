@@ -55,4 +55,4 @@ void longBlockingTask(void);
 
 /* ------ Helper functions ------*/
 
-static void _blockingDelay(int delayMS);
+static void _blockingDelay(uint16_t delayMS);

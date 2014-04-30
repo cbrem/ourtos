@@ -14,6 +14,8 @@
  * Includes
  *==================================*/
 
+#include <hidef.h>  
+#include "derivative.h"
 #include "inttypes_MC9S12C128.h"
 
 /*==================================
@@ -40,12 +42,12 @@ void serialInit(uint16_t baud);
 /*
  * Writes len bytes of the given buffer over serial.
  */
-void serialWrite(char[] buffer, uint8_t len);
+void serialWrite(char buffer[], uint8_t len);
 
 /*
  * Reads len bytes from serial into the given buffer.
  */
-void serialRead(char[] buffer, uint8_t len);
+void serialRead(char buffer[], uint8_t len);
 
 /*==================================
  * Private Functions

@@ -28,10 +28,12 @@
 
 typedef struct {
     // TODO
+    int TODO;
 } task_t;
 
 typedef struct {
     // TODO
+    int TODO;
 } mutex_t;
 
 /*==================================
@@ -73,7 +75,7 @@ void rtosSetSchedulerPeriod(uint16_t period);
  * This function must be called before calling rtosStart, and should not be
  * called afterward.
  */
-void rtosSetTaskArray(task_t[] tasks, uint8_t numTasks);
+void rtosSetTaskArray(task_t tasks[], uint8_t numTasks);
 
 /*
  * Adds a task to the RTOS.

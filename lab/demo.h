@@ -21,6 +21,11 @@
  * Includes
  *==================================*/
 
+#include <hidef.h>  
+#include "derivative.h"
+// TODO include?
+// #pragma LINK_INFO DERIVATIVE "mc9s12c128"
+
 #include "inttypes_MC9S12C128.h"
 #include "boolean.h"
 #include "kronOS.h"
@@ -41,7 +46,7 @@
 
 /* set SW1 on Port P as 0 to enable input */
  // TODO may need pullup
-#define SET_MUTEX_DISABLE_BTN_INPUT (DDRP &= ~SW1_MASK;) 
+#define SET_MUTEX_DISABLE_BTN_INPUT (DDRP &= ~SW1_MASK) 
 #define MUTEX_DISABLE_BTN (PTP_PTP0)
 
 /* 
@@ -49,9 +54,8 @@
  * also set pull-up resistors to work properly with CPU module
  * see MC9S12C128V1 data sheet section 4.3.2.10
  */
-#define SET_TASK_ENABLE_BTN_INPUT ( DDRB &= (~SW3_MASK); \
-  									 PUCR |= 0x02;
-  								   )
+#define SET_TASK_ENABLE_BTN_INPUT (DDRB &= (~SW3_MASK)); \
+ 								  (PUCR |= 0x02)
 #define GET_TASK_ENABLE_BTN0 (PORTB_PTIP0)
 #define GET_TASK_ENABLE_BTN1 (PORTB_PTIP1)
 #define GET_TASK_ENABLE_BTN2 (PORTB_PTIP2)
