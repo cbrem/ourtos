@@ -54,12 +54,12 @@ static bool_t mutexEnabled;
  * Starts the RTOS.
  */
 // TODO allow user control over scheduler period
-void rtosStart(void);
+void kronosStart(void);
 
 /*
  * Shuts down a started RTOS.
  */
-void rtosShutdown(void);
+void kronosShutdown(void);
 
 
 /*
@@ -68,7 +68,7 @@ void rtosShutdown(void);
  * This function must be called before calling rtosStart, and should not be
  * called afterward.
  */
-void rtosSetSchedulerPeriod(uint16_t period);
+void kronosSetSchedulerPeriod(uint16_t period);
 
 /*
  * Provides a previously allocated array in which the RTOS will store task
@@ -76,7 +76,7 @@ void rtosSetSchedulerPeriod(uint16_t period);
  * This function must be called before calling rtosStart, and should not be
  * called afterward.
  */
-void rtosSetTaskArray(task_t tasks[], uint8_t numTasks);
+void kronosSetTaskArray(task_t tasks[], uint8_t numTasks);
 
 /*
  * Adds a task to the RTOS.
@@ -84,7 +84,7 @@ void rtosSetTaskArray(task_t tasks[], uint8_t numTasks);
  * called afterward.
  * This function must be called after calling rtosSetTaskArray.
  */
-void rtosAddTask(uint8_t priority, uint16_t period, void (*task) (void));
+void kronosAddTask(uint8_t priority, uint16_t period, void (*task) (void));
         
 /*
  * Add a mutex to the RTOS which uses the given priority for priority ceiling.
@@ -94,33 +94,33 @@ void rtosAddTask(uint8_t priority, uint16_t period, void (*task) (void));
  * This function may only be called before calling rtosStart, and should not be
  * called afterward.
  */
-void rtosAddMutex(uint8_t priority, mutex_t *mutex);
+void kronosAddMutex(uint8_t priority, mutex_t *mutex);
 
 /*
  * Acquires the given mutex in a task-safe manner.
  */
-void rtosAcquireMutex(mutex_t *mutex);
+void kronosAcquireMutex(mutex_t *mutex);
 
 /*
  * Releases the given mutex in a task-safe manner.
  */
-void rtosReleaseMutex(mutex_t *mutex);
+void kronosReleaseMutex(mutex_t *mutex);
 
 /*
  * Configures the RTOS to print debug information whenever the scheduler runs.
  */
-void rtosEnableDebug(bool_t enable);
+void kronosEnableDebug(bool_t enable);
 
 /*
  * Enables or disables mutexes globally.
  */
-void rtosEnableMutexes(bool_t enable);
+void kronosEnableMutexes(bool_t enable);
 
 /*
  * Enables or disables the task that was originally added at the given
  * priority.
  */
-void rtosEnableTask(uint8_t priority, bool_t enable);
+void kronosEnableTask(uint8_t priority, bool_t enable);
 
 /*==================================
  * Private Functions

@@ -27,7 +27,7 @@ void main(void) {
 	_initBtns();
 	_initLEDs();
 	
-	// TODO rtosAddMutex
+	// TODO kronosAddMutex
 
 	/* starts the watchdog */
 	_initWatchdog();
@@ -69,15 +69,15 @@ void watchdogKickTask(void) {
 }
 
 void shortBlockingTask(void) {
-	rtosAcquireMutex(&blockingMutex);
+	kronosAcquireMutex(&blockingMutex);
 	_blockingDelayMsec(SHORT_BLOCK_TIME);
-	rtosReleaseMutex(&blockingMutex);
+	kronosReleaseMutex(&blockingMutex);
 }
 
 void longBlockingTask(void) {
-	rtosAcquireMutex(&blockingMutex);
+	kronosAcquireMutex(&blockingMutex);
 	_blockingDelayMsec(LONG_BLOCK_TIME);
-	rtosReleaseMutex(&blockingMutex);
+	kronosReleaseMutex(&blockingMutex);
 }
 
 /* ------ Interrupt Service Routines ------ */
