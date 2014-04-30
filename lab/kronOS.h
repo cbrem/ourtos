@@ -15,7 +15,7 @@
  *==================================*/
 
 #include <stdint.h>
-#include "boolean.h"
+#include <stdbool.h>
 
 /*==================================
  * MACROS
@@ -42,7 +42,7 @@ typedef struct {
  * Local Globals
  *==================================*/
 
-static boolean mutexEnabled;
+static bool mutexEnabled;
 
 /*==================================
  * Public Functions
@@ -106,18 +106,18 @@ void rtosReleaseMutex(mutex_t *mutex);
 /*
  * Configures the RTOS to print debug information whenever the scheduler runs.
  */
-void rtosEnableDebug(bool_t enable);
+void rtosEnableDebug(bool enable);
 
 /*
  * Enables or disables mutexes globally.
  */
-void rtosEnableMutexes(bool_t enable);
+void rtosEnableMutexes(bool enable);
 
 /*
  * Enables or disables the task that was originally added at the given
  * priority.
  */
-void rtosEnableTask(uint8_t priority, bool_t enable);
+void rtosEnableTask(uint8_t priority, bool enable);
 
 /*==================================
  * Private Functions

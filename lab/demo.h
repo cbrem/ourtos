@@ -22,7 +22,7 @@
  *==================================*/
 
 #include <stdint.h>
-#include "boolean.h"
+#include <stdbool.h>
 #include "kronOS.h"
 
 /*==================================
@@ -70,9 +70,9 @@
  *==================================*/
 
 /* Button to disable mutexs */
-static boolean mutexDisableBtn;
+static bool mutexDisableBtn;
 /* Switches to enable/disable some tasks */
-static boolean* taskEnableBtn[N_ENABLEABLE_TASKS];
+static bool* taskEnableBtn[N_ENABLEABLE_TASKS];
 
 /*==================================
  * Public Functions

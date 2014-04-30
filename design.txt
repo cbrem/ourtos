@@ -61,9 +61,9 @@ I/O:
   * one button to enable/disable mutexes
 
 RTOS API:
-  * void rtosEnableDebug(bool_t enable)
-  * void rtosEnableMutexes(bool_t enable)
-  * void rtosEnableTask(bool_t enable)
+  * void rtosEnableDebug(bool enable)
+  * void rtosEnableMutexes(bool enable)
+  * void rtosEnableTask(bool enable)
   * void rtosSetSchedulerPeriod(uint16_t period)
   * void rtosSetTaskArray(task_t[] tasks, uint8_t numTasks)
   * void rtosAddTask(uint8_t priority, uint16_t period, void (*task) (void))
