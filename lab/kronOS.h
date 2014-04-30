@@ -53,6 +53,7 @@ static bool_t mutexEnabled;
 /*
  * Starts the RTOS.
  */
+// TODO allow user control over scheduler period
 void rtosStart(void);
 
 /*

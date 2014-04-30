@@ -26,6 +26,10 @@ void main(void) {
 
 	_initBtns();
 	_initLEDs();
+	
+	// TODO rtosAddMutex
+
+	/* starts the watchdog */
 	_initWatchdog();
 
 	for (;;)
@@ -37,6 +41,51 @@ void main(void) {
 	}
 
 }
+
+/* ------ Tasks ------ */
+
+void pollBtnsTask(void) {
+	int i;
+
+	if ( 1 == GET_MUTEX_DISABLE_BTN() ) {
+		mutexDisableBtn = true;
+	} else {
+		mutexDisableBtn = false;		
+	}
+
+	/* poll all task enable btns */
+	for( i = 0; i < N_ENABLEABLE_TASKS; i++) {
+		if ( 1 == GET_TASK_ENABLE_BTN(i) ) {
+			taskEnableBtn[i] == true;
+		} else {
+			taskEnableBtn[i] == false;
+		}
+	}
+
+}
+
+void watchdogKickTask(void) {
+	_FEED_COP();
+}
+
+void shortBlockingTask(void) {
+	rtosAcquireMutex(&blockingMutex);
+	_blockingDelayMsec(SHORT_BLOCK_TIME);
+	rtosReleaseMutex(&blockingMutex);
+}
+
+void longBlockingTask(void) {
+	rtosAcquireMutex(&blockingMutex);
+	_blockingDelayMsec(LONG_BLOCK_TIME);
+	rtosReleaseMutex(&blockingMutex);
+}
+
+/* ------ Interrupt Service Routines ------ */
+
+// TODO watchdog reset vector
+/*==================================
+ * Private Functions
+ *==================================*/
 
 /* ------ Initialization ------ */
 
@@ -76,43 +125,18 @@ void _initWatchdog(void) {
 
 }
 
-/* ------ Tasks ------ */
-
-void pollBtnsTask(void) {
-	int i;
-
-	if ( 1 == GET_MUTEX_DISABLE_BTN() ) {
-		mutexDisableBtn = true;
-	} else {
-		mutexDisableBtn = false;		
-	}
-
-	/* poll all task enable btns */
-	for( i = 0; i < N_ENABLEABLE_TASKS; i++) {
-		if ( 1 == GET_TASK_ENABLE_BTN(i) ) {
-			taskEnableBtn[i] == true;
-		} else {
-			taskEnableBtn[i] == false;
-		}
-	}
-
-}
-
-void watchdogKickTask(void) {
-	_FEED_COP();
-}
-
-void shortBlockingTask(void);
-
-void longBlockingTask(void);
-
-/* ------ Interrupt Service Routines ------ */
-
-// TODO watchdog reset vector
-/*==================================
- * Private Functions
- *==================================*/
-
 /* ------ Helper functions ------*/
 
-static void _blockingDelay(uint16_t delayMS);
+static void _blockingDelayMsec(uint16_t delayMS) {
+	// TODO stole from Koopman
+	uint16_t i;
+
+	for (;delayMS > 0; delayMS--) {
+    	for (i = 0; i < 443; i++) {
+    		asm NOP;
+      		asm NOP;
+      		asm NOP;
+      		asm NOP;
+      	}
+    }
+}

@@ -40,7 +40,28 @@
 
 /* Watchdog and Timing Constants */
 #define WATCHDOG_PERIOD (0x7) /* 2^24 cycles ~ 1 sec for 8MHz Clk */
-// TODO task/watchdog timing
+
+/* task periods (in msec) */
+#define PERIOD_50_MSEC     50
+#define PERIOD_100_MSEC    100
+#define PERIOD_250_MSEC    250
+#define PERIOD_500_MSEC    500
+#define PERIOD_1000_MSEC   1000
+#define PERIOD_1900_MSEC   1900
+#define PERIOD_2000_MSEC   2000
+#define PERIOD_5000_MSEC   5000
+#define PERIOD_10000_MSEC  10000
+
+/* task timing - see documentation for reasoning */
+#define SCHEDULER_PERIOD		(PERIOD_100_MSEC)
+#define POLL_BTN_TASK_PERIOD	(PERIOD_500_MSEC)
+#define WATCHDOG_TASK_PERIOD	(PERIOD_500_MSEC)
+#define SHORT_TASK_PERIOD		(PERIOD_2000_MSEC)
+#define LONG_TASK_PERIOD		(PERIOD_1900_MSEC)
+
+/* task blocking time (in Msec) */
+#define LONG_BLOCK_TIME		(100)
+#define SHORT_BLOCK_TIME	(300)
 
 
 /* hardware pins and switches */
@@ -75,7 +96,8 @@
  *==================================*/
 
 // TODO tasks
-// TODO mutex
+/* mutex for demo purposes only - it does not actual control any resource */
+ mutex_t blockingMutex;
 
 /*==================================
  * Local Globals
@@ -152,9 +174,10 @@ void _initWatchdog(void);
 
 /* ------ Helper functions ------*/
 
-/* blockingDelay runs for the given number of milliseconds 
+/* _blockingDelayMsec runs for the given number of milliseconds 
  * This function is implemented with nop loops so times are approximate
  */
-static void _blockingDelay(uint16_t delayMS);
+// TODO could we do this with another timer?
+static void _blockingDelayMsec(uint16_t delayMS);
 
 #endif
