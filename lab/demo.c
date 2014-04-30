@@ -37,7 +37,18 @@ void initBtns(void) {
 
 }
 
-void initWatchdog(void);
+void initWatchdog(uint8_t watchdogPeriod) {
+
+	/* normal mode */
+	COPCTL_WCOP = 0;
+
+	/* run in BDM mode */
+	COPCTL_RSBCK = 0;
+
+	/* set time period */
+	COPCTL_CR = watchdogPeriod;
+
+}
 
 /* ------ Tasks ------ */
 
@@ -49,6 +60,9 @@ void shortBlockingTask(void);
 
 void longBlockingTask(void);
 
+/* ------ Interrupt Service Routines ------ */
+
+// TODO watchdog reset vector
 /*==================================
  * Private Functions
  *==================================*/

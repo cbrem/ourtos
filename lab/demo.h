@@ -38,7 +38,10 @@
 /* some tasks are enabled by hardware switches */
 #define N_ENABLEABLE_TASKS (3)
 
+/* Watchdog and Timing Constants */
+#define WATCHDOG_PERIOD (0x7) /* 2^24 cycles ~ 1 sec for 8MHz Clk */
 // TODO task/watchdog timing
+
 
 /* hardware pins and switches */
 #define SW1_MASK    (0x01)
@@ -94,10 +97,11 @@ void initBtns(void);
 
 /*
  * initWatchdog initializes the watchdog with the following settings:
- * TODO
+ * - normal mode
+ * - run in BDM mode
+ * - timer rate set by input var
  */
-// TODO settings, may want arguments
-void initWatchdog(void);
+void initWatchdog(uint8_t watchdogPeriod);
 
 /* ------ Tasks ------ */
 
