@@ -25,6 +25,10 @@
 void initBtns(void) {
 	int i;
 
+	/* set mutex disable btn as input */
+	SET_MUTEX_DISABLE_BTN_INPUT;
+	SET_TASK_ENABLE_BTN_INPUT;
+
 	/* set globals false */
 	mutexDisableBtn = FALSE;
 	for(i = 0; i < N_ENABLEABLE_TASKS; i++) {
