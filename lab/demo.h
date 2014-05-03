@@ -109,6 +109,7 @@ static bool_t mutexDisableBtn;
 static bool_t taskEnableBtn[N_ENABLEABLE_TASKS];
 
 // TODO PCB
+// TODO watchdog flags
 
 /*==================================
  * Public Functions

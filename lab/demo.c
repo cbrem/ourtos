@@ -65,6 +65,7 @@ void pollBtnsTask(void) {
 }
 
 void watchdogKickTask(void) {
+	// TODO watchdog flag
 	_FEED_COP();
 }
 
