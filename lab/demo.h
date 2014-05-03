@@ -156,7 +156,7 @@ void watchdogKickTask(void);
 void shortBlockingTask(void);
 
 /* 
- * longBlockingTask grabs a mutex and holds it for a short long
+ * longBlockingTask grabs a mutex and holds it for a long time
  */
 void longBlockingTask(void);
 
