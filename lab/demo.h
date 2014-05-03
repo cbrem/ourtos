@@ -34,12 +34,21 @@
  * MACROS
  *==================================*/
 
+/* Watchdog */
+#define WATCHDOG_PERIOD 		(0x7) /* 2^24 cycles ~ 1 sec for 8MHz Clk */
+#define SET_WATCHDOG_FLGS(id) 	(watchdogFlags |= (1 << id))
+#define CLEAR_WATCHDOG_FLGS() 	(watchdogFlags = 0)
+#define WATCHDOG_FLG_ALL_SET 	(0x7) /* 3 tasks kick the watchdog so one flag bit per task */
+
+/* task IDs */
+#define ID_POLL_BTN		(0)
+#define ID_SHORT_BLK	(1)
+#define ID_LONG_BLK		(2)
+
 #define N_TASKS (4)
 /* some tasks are enabled by hardware switches */
 #define N_ENABLEABLE_TASKS (4)
 
-/* Watchdog and Timing Constants */
-#define WATCHDOG_PERIOD (0x7) /* 2^24 cycles ~ 1 sec for 8MHz Clk */
 
 /* task periods (in msec) */
 #define PERIOD_50_MSEC     50
@@ -62,7 +71,6 @@
 /* task blocking time (in Msec) */
 #define LONG_BLOCK_TIME		(100)
 #define SHORT_BLOCK_TIME	(300)
-
 
 /* hardware pins and switches */
 #define SW1_MASK    (0x01)
@@ -88,6 +96,12 @@
 #define SET_LEDS(val) ( PORTB |= (val << BYTE_LEN_BITS) & LED_MASK )
 #define GET_LEDS() ( (PORTB >> BYTE_LEN_BITS) & (LED_MASK >> BYTE_LEN_BITS) )						 
 
+/* LED codes */
+#define LED_WATCHDOG 	(0x1) /* 0001 */ 
+#define LED_POLL_BTN	(0x2) /* 0010 */ 
+#define LED_SHORT_BLK 	(0x4) /* 0100 */ 
+#define LED_LONG_BLK	(0x8) /* 1000 */ 
+
 /* Assorted LED light pattens */
 #define LEDS_OFF (0x0)
 
@@ -109,7 +123,7 @@ static bool_t mutexDisableBtn;
 static bool_t taskEnableBtn[N_ENABLEABLE_TASKS];
 
 // TODO PCB
-// TODO watchdog flags
+static uint8_t watchdogFlags;
 
 /*==================================
  * Public Functions
