@@ -30,7 +30,7 @@ void main(void) {
 	// TODO kronosAddMutex
 
 	/* starts the watchdog */
-	_initWatchdog();
+	// _initWatchdog();
 
 	for (;;)
 	{
@@ -40,7 +40,7 @@ void main(void) {
 		pollBtnsTask();
 		shortBlockingTask();
 		longBlockingTask();
-		watchdogKickTask();
+		//watchdogKickTask();
 
 	}
 
@@ -75,10 +75,11 @@ void pollBtnsTask(void) {
 
 	/* poll all task enable btns */
 	for( i = 0; i < N_ENABLEABLE_TASKS; i++) {
-		if ( 1 == GET_TASK_ENABLE_BTN(i) ) {
-			taskEnableBtn[i] == true;
+      
+		if ( 0 != GET_TASK_ENABLE_BTN(i) ) {
+			taskEnableBtn[i] = true;
 		} else {
-			taskEnableBtn[i] == false;
+			taskEnableBtn[i] = false;
 		}
 	}
 
