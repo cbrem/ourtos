@@ -162,7 +162,7 @@ static void _blockingDelayMsec(uint16_t delayMS) {
 	uint16_t i;
 
 	for (;delayMS > 0; delayMS--) {
-    	for (i = 0; i < 200; i++) {
+    	for (i = 0; i < CYCLES_PER_MS; i++) {
     		asm NOP;
       		asm NOP;
       		asm NOP;
