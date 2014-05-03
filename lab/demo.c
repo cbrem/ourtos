@@ -36,13 +36,31 @@ void main(void) {
 	{
 		/* infinite loop */
 
-		// TODO temperary
-		_FEED_COP(); /* feeds the dog */
+		// TODO temp test of functionality with cyclic exec
+		pollBtnsTask();
+		shortBlockingTask();
+		longBlockingTask();
+		watchdogKickTask();
+
 	}
 
 }
 
 /* ------ Tasks ------ */
+
+void watchdogKickTask(void) {
+
+	SET_LEDS(LED_WATCHDOG);
+
+	if ( WATCHDOG_FLG_ALL_SET == watchdogFlags ) {
+		_FEED_COP();
+		CLEAR_WATCHDOG_FLGS();
+	} else {
+		/* not all of the watchdog flags are set
+		 * so watchdog cannot be kicked yet 
+		 */
+	}
+}
 
 void pollBtnsTask(void) {
 	int i;
@@ -64,37 +82,35 @@ void pollBtnsTask(void) {
 		}
 	}
 
-}
+	SET_WATCHDOG_FLGS(ID_POLL_BTN);
 
-void watchdogKickTask(void) {
-
-	SET_LEDS(LED_WATCHDOG);
-
-	// TODO watchdog flag
-	_FEED_COP();
 }
 
 void shortBlockingTask(void) {
 	
 	SET_LEDS(LED_SHORT_BLK);
 
-	kronosAcquireMutex(&blockingMutex);
+	//kronosAcquireMutex(&blockingMutex);
 	_blockingDelayMsec(SHORT_BLOCK_TIME);
-	kronosReleaseMutex(&blockingMutex);
+	//kronosReleaseMutex(&blockingMutex);
+
+	SET_WATCHDOG_FLGS(ID_SHORT_BLK);
 }
 
 void longBlockingTask(void) {
 
 	SET_LEDS(LED_LONG_BLK);
 
-	kronosAcquireMutex(&blockingMutex);
+	//kronosAcquireMutex(&blockingMutex);
 	_blockingDelayMsec(LONG_BLOCK_TIME);
-	kronosReleaseMutex(&blockingMutex);
+	//kronosReleaseMutex(&blockingMutex);
+
+	SET_WATCHDOG_FLGS(ID_LONG_BLK);
+
 }
 
 /* ------ Interrupt Service Routines ------ */
 
-// TODO watchdog reset vector
 /*==================================
  * Private Functions
  *==================================*/
@@ -132,6 +148,8 @@ void _initWatchdog(void) {
 	/* run in BDM mode */
 	COPCTL_RSBCK = 0;
 
+	CLEAR_WATCHDOG_FLGS();
+
 	/* set time period */
 	_ENABLE_COP(WATCHDOG_PERIOD);
 
@@ -144,7 +162,7 @@ static void _blockingDelayMsec(uint16_t delayMS) {
 	uint16_t i;
 
 	for (;delayMS > 0; delayMS--) {
-    	for (i = 0; i < 443; i++) {
+    	for (i = 0; i < 200; i++) {
     		asm NOP;
       		asm NOP;
       		asm NOP;
