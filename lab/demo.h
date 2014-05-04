@@ -23,8 +23,6 @@
 
 #include <hidef.h>  
 #include "derivative.h"
-// TODO include?
-// #pragma LINK_INFO DERIVATIVE "mc9s12c128"
 
 #include "inttypes_MC9S12C128.h"
 #include "boolean.h"
@@ -36,8 +34,6 @@
 
 /* Assorted */
 #define N_TASKS (4)
-/* some tasks are enabled by hardware switches */
-#define N_ENABLEABLE_TASKS (4)
 #define CYCLES_PER_MS (200)
 
 /* Watchdog */
@@ -109,9 +105,11 @@
  * Exernal Globals
  *==================================*/
 
-// TODO tasks
+/* task array */
+task_t PCB[N_TASKS];
+
 /* mutex for demo purposes only - it does not actual control any resource */
- mutex_t blockingMutex;
+mutex_t blockingMutex;
 
 /*==================================
  * Local Globals
@@ -120,9 +118,8 @@
 /* Button to disable mutexs */
 static bool_t mutexDisableBtn;
 /* Switches to enable/disable some tasks */
-static bool_t taskEnableBtn[N_ENABLEABLE_TASKS];
+static bool_t taskEnableBtn[N_TASKS];
 
-// TODO PCB
 static uint8_t watchdogFlags; // TODO include in task object?
 
 /*==================================
@@ -159,6 +156,11 @@ void shortBlockingTask(void);
  * longBlockingTask grabs a mutex and holds it for a long time
  */
 void longBlockingTask(void);
+
+/*
+ * watchdogISR sets the watchdog LEDs and hangs until a hard reset
+ */
+void interrupt 2 watchdogISR( void );
 
 /*==================================
  * Private Functions

@@ -84,5 +84,5 @@ Connor:
 Spencer:
 - RTOS timer
 - (RTOS yield)
-- Demo tasks
-- Watchdog
+/- Demo tasks
+/- Watchdog

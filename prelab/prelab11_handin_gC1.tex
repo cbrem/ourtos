@@ -25,9 +25,9 @@
 \newcommand{\assignment}{PreLab 11}
 \newcommand{\duedate}{April 18, 2014}
 \newcommand{\header}{\noindent \textbf{ECE348 \assignment, Spring 2014 \\
-					 Group C1 \\ 
-					 Spencer Barton sebarton \\
-					 \duedate} \vspace{0.10in} \hrule}
+                     Group C1 \\ 
+                     Spencer Barton sebarton \\
+                     \duedate} \vspace{0.10in} \hrule}
 
 \begin{document}
     
@@ -40,7 +40,7 @@
 \sectPart{Description}
 
 \paragraph*{}
-We plan to build an RTOS. We will implement priority ceiling with mutex and a timer to handle periodic tasks. A serial buffer shall act as a shared resource for the mutex. We shall use serial to output details on current tasks and the state of the various tasks. We will use the timer interrupt to run a scheduler periodically. If we have time we will also implement yield.	
+We plan to build an RTOS. We will implement priority ceiling with mutex and a timer to handle periodic tasks. A serial buffer shall act as a shared resource for the mutex. We shall use serial to output details on current tasks and the state of the various tasks. We will use the timer interrupt to run a scheduler periodically. If we have time we will also implement yield.    
 
 \paragraph*{}
 We shall include the following items:
@@ -63,13 +63,13 @@ Our interrupts will be:
 
 \begin{enumerate}
 \bitem{System Inputs}
-	\begin{enumerate}
-	\bitem{\texttt{mutexDisableBtn}} Boolean based off of button on board (\texttt{PB1}). When asserted this button disables mutex. Default state is unasserted.
-	\bitem{\texttt{taskEnableBtn[0:3]}} Boolean based off of \texttt{SW3-[0:3]}. When asserted this switch enables a task. When off the task is disabled. The exception is task 1, which polls the switches and must be constantly on.
-	\end{enumerate}
+    \begin{enumerate}
+    \bitem{\texttt{mutexDisableBtn}} Boolean based off of button on board (\texttt{PB1}). When asserted this button disables mutex. Default state is unasserted.
+    \bitem{\texttt{taskEnableBtn[0:3]}} Boolean based off of \texttt{SW3-[0:3]}. When asserted this switch enables a task. When off the task is disabled. The exception is task 1, which polls the switches and must be constantly on.
+    \end{enumerate}
 \bitem{System Outputs}
-	\begin{enumerate}
-	\bitem{Serial} The Scheduler shall expose internal task state via serial. It shall write to serial after each scheduling event. The format shall be as follows:
+    \begin{enumerate}
+    \bitem{Serial} The Scheduler shall expose internal task state via serial. It shall write to serial after each scheduling event. The format shall be as follows:
         \begin{verbatim}
  Task | Priority | Running | Ready to Run | Scheduled to Run
  -----+----------+---------+--------------+-----------------
@@ -77,27 +77,27 @@ Our interrupts will be:
  3    | 0        | true    | false        | true
  5    | 5        | true    | false        | false
         \end{verbatim}
-	\end{enumerate}
+    \end{enumerate}
 \bitem{State Variables}
-	\begin{enumerate}
-	\bitem{mutexEnabled} Boolean state variable to keep track of mutex state.
-	\end{enumerate}
+    \begin{enumerate}
+    \bitem{mutexEnabled} Boolean state variable to keep track of mutex state.
+    \end{enumerate}
 
 \newpage
 
 \bitem{Requirements}
-	\begin{enumerate}
-	\item When \texttt{mutexDisableBtn} button is pressed the mutex shall be disabled with the mutex enabled otherwise.
-	\item When the \texttt{SW3-x} switch is on task x shall be enabled and when the switch is off task x shall be disabled with the exception off task 1, which polls the switches and must be constantly on.
-	\item Before the scheduler dispatches a task, it shall print the RTOS's state to serial.
-	\item The scheduler shall run at least every 100ms.
-	\item Buttons shall be polled once per 500 ms to determine which tasks to enable.
-	\item The watchdog shall be kicked once per 500 ms, and shall be configured to trip and restart the RTOS if not kicked for 1000ms.
-	\item A task (\texttt{shortBlockTask}) shall run once per 2000 ms for at least 100ms, and shall acquire a mutex for 100ms.
-	\item A task (\texttt{longBlockTask}) shall run once per 1900 ms for at least 100ms, and shall acquire a mutex for 300ms.
-	\item When \texttt{longBlockTask} and \texttt{shortBlockTask} vie for a mutex and \texttt{longBlockTask} wins, the RTOS shall raise \texttt{longBlockTask}'s priority in order to avoid deadlock.
-	\item RTOS shall start with mutexs enabled and shall initialize tasks before running.
-	\end{enumerate}
+    \begin{enumerate}
+    \item When \texttt{mutexDisableBtn} button is pressed the mutex shall be disabled with the mutex enabled otherwise.
+    \item When the \texttt{SW3-x} switch is on task x shall be enabled and when the switch is off task x shall be disabled with the exception off task 1, which polls the switches and must be constantly on.
+    \item Before the scheduler dispatches a task, it shall print the RTOS's state to serial.
+    \item The scheduler shall run at least every 100ms.
+    \item Buttons shall be polled once per 500 ms to determine which tasks to enable.
+    \item The watchdog shall be kicked once per 500 ms, and shall be configured to trip and restart the RTOS if not kicked for 1000ms.
+    \item A task (\texttt{shortBlockTask}) shall run once per 2000 ms for at least 100ms, and shall acquire a mutex for 100ms.
+    \item A task (\texttt{longBlockTask}) shall run once per 1900 ms for at least 100ms, and shall acquire a mutex for 300ms.
+    \item When \texttt{longBlockTask} and \texttt{shortBlockTask} vie for a mutex and \texttt{longBlockTask} wins, the RTOS shall raise \texttt{longBlockTask}'s priority in order to avoid deadlock.
+    \item RTOS shall start with mutexs enabled and shall initialize tasks before running.
+    \end{enumerate}
 \end{enumerate}
 
 %-----------------------------------------
@@ -288,8 +288,8 @@ The acceptance tests will all involve a Python script which interprets packets w
 
 \section*{Appendix}
 
-	\subsection*{RTOS API}
-		
+    \subsection*{RTOS API}
+        
         Users may start and stop the RTOS using:
         \begin{itemize}
             \bitem{\texttt{void rtosStart(void)}}
@@ -318,7 +318,7 @@ The acceptance tests will all involve a Python script which interprets packets w
             \bitem{\texttt{void rtosEnableMutexes(bool\_t enable)}}
             \bitem{\texttt{void rtosEnableTask(bool\_t enable)}}
         \end{itemize}
-		
+        
 %=======================================================
 
 \end{document}

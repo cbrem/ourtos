@@ -24,25 +24,27 @@
 
 void main(void) {
 
-	_initBtns();
-	_initLEDs();
-	
-	// TODO kronosAddMutex
+    _initBtns();
+    _initLEDs();
+    
+    // TODO kronosAddMutex
+    // TODO kronosEnableMutexes
+    // TODO kronosEnableDebug
 
-	/* starts the watchdog */
-	_initWatchdog();
+    /* starts the watchdog */
+    _initWatchdog();
 
-	for (;;)
-	{
-		/* infinite loop */
+    for (;;)
+    {
+        /* infinite loop */
 
-		// TODO temp test of functionality with cyclic exec
-		pollBtnsTask();
-		shortBlockingTask();
-		longBlockingTask();
-		watchdogKickTask();
+        // TODO temp test of functionality with cyclic exec
+        pollBtnsTask();
+        shortBlockingTask();
+        longBlockingTask();
+        watchdogKickTask();
 
-	}
+    }
 
 }
 
@@ -50,65 +52,75 @@ void main(void) {
 
 void watchdogKickTask(void) {
 
-	SET_LEDS(LED_WATCHDOG_KICK);
+    SET_LEDS(LED_WATCHDOG_KICK);
 
-	if ( WATCHDOG_FLG_ALL_SET == watchdogFlags ) {
-		_FEED_COP();
-		CLEAR_WATCHDOG_FLGS();
-	} else {
-		/* not all of the watchdog flags are set
-		 * so watchdog cannot be kicked yet 
-		 */
-	}
+    if ( WATCHDOG_FLG_ALL_SET == watchdogFlags ) {
+        _FEED_COP();
+
+        /* watchdog clear must be atomic so that tasks setting flags
+         * are not intermingled with clearing the flags.
+         */
+        DisableInterrupts;
+        CLEAR_WATCHDOG_FLGS();
+        EnableInterrupts;
+
+    } else {
+        /* not all of the watchdog flags are set
+         * so watchdog cannot be kicked yet 
+         */
+    }
 }
 
 void pollBtnsTask(void) {
-	int i;
+    int i;
 
-	SET_LEDS(LED_POLL_BTN);
+    SET_LEDS(LED_POLL_BTN);
 
-	if ( 1 == GET_MUTEX_DISABLE_BTN() ) {
-		mutexDisableBtn = true;
-	} else {
-		mutexDisableBtn = false;		
-	}
+    if ( 1 == GET_MUTEX_DISABLE_BTN() ) {
+        mutexDisableBtn = true;
+        // TODO need these variables?
+        // kronosEnableMutexes(true) /* atomic */
+    } else {
+        mutexDisableBtn = false;        
+        // kronosEnableMutexes(false) /* atomic */
+    }
 
-	/* poll all task enable btns */
-	for( i = 0; i < N_ENABLEABLE_TASKS; i++) {
+    /* poll all task enable btns */
+    for( i = 0; i < N_TASKS; i++) {
       
-		if ( 0 != GET_TASK_ENABLE_BTN(i) ) {
-			taskEnableBtn[i] = true;
-		} else {
-			taskEnableBtn[i] = false;
-		}
-	}
+        if ( 0 != GET_TASK_ENABLE_BTN(i) ) {
+            taskEnableBtn[i] = true;
+            // kronosEnableTask(i, true);
+        } else {
+            taskEnableBtn[i] = false;
+            // kronosEnableTask(i, false);
+        }
+    }
 
-    // TODO btn control tasks
-
-	SET_WATCHDOG_FLGS(ID_POLL_BTN);
+    SET_WATCHDOG_FLGS(ID_POLL_BTN);
 
 }
 
 void shortBlockingTask(void) {
-	
-	SET_LEDS(LED_SHORT_BLK);
+    
+    SET_LEDS(LED_SHORT_BLK);
 
-	//kronosAcquireMutex(&blockingMutex);
-	_blockingDelayMsec(SHORT_BLOCK_TIME);
-	//kronosReleaseMutex(&blockingMutex);
+    //kronosAcquireMutex(&blockingMutex);
+    _blockingDelayMsec(SHORT_BLOCK_TIME);
+    //kronosReleaseMutex(&blockingMutex);
 
-	SET_WATCHDOG_FLGS(ID_SHORT_BLK);
+    SET_WATCHDOG_FLGS(ID_SHORT_BLK);
 }
 
 void longBlockingTask(void) {
 
-	SET_LEDS(LED_LONG_BLK);
+    SET_LEDS(LED_LONG_BLK);
 
-	//kronosAcquireMutex(&blockingMutex);
-	_blockingDelayMsec(LONG_BLOCK_TIME);
-	//kronosReleaseMutex(&blockingMutex);
+    //kronosAcquireMutex(&blockingMutex);
+    _blockingDelayMsec(LONG_BLOCK_TIME);
+    //kronosReleaseMutex(&blockingMutex);
 
-	SET_WATCHDOG_FLGS(ID_LONG_BLK);
+    SET_WATCHDOG_FLGS(ID_LONG_BLK);
 
 }
 
@@ -133,55 +145,54 @@ void interrupt 2 watchdogISR( void ) {
 /* ------ Initialization ------ */
 
 void _initBtns(void) {
-	
-	int i;
+    
+    int i;
 
-	/* set mutex disable btn as input */
-	SET_MUTEX_DISABLE_BTN_INPUT();
-	SET_TASK_ENABLE_BTN_INPUT();
+    /* set mutex disable btn as input */
+    SET_MUTEX_DISABLE_BTN_INPUT();
+    SET_TASK_ENABLE_BTN_INPUT();
 
-	/* set globals false */
-	mutexDisableBtn = false;
-	for(i = 0; i < N_ENABLEABLE_TASKS; i++) {
-		taskEnableBtn[i] = false;
-	}
+    /* set globals false */
+    mutexDisableBtn = false;
+    for(i = 0; i < N_TASKS; i++) {
+        taskEnableBtn[i] = false;
+    }
 
 }
 
 void _initLEDs(void) {
 
-	SET_LEDS_OUTPUT();
-	SET_LEDS(LED_OFF);
+    SET_LEDS_OUTPUT();
+    SET_LEDS(LED_OFF);
 
 }
 
 void _initWatchdog(void) {
 
-	/* normal mode */
-	COPCTL_WCOP = 0;
+    /* normal mode */
+    COPCTL_WCOP = 0;
 
-	/* run in BDM mode */
-	COPCTL_RSBCK = 0;
+    /* run in BDM mode */
+    COPCTL_RSBCK = 0;
 
-	CLEAR_WATCHDOG_FLGS();
+    CLEAR_WATCHDOG_FLGS();
 
-	/* set time period */
-	_ENABLE_COP(WATCHDOG_PERIOD);
+    /* set time period */
+    _ENABLE_COP(WATCHDOG_PERIOD);
 
 }
 
 /* ------ Helper functions ------*/
 
 static void _blockingDelayMsec(uint16_t delayMS) {
-	// TODO stole from Koopman
-	uint16_t i;
+    uint16_t i;
 
-	for (;delayMS > 0; delayMS--) {
-    	for (i = 0; i < CYCLES_PER_MS; i++) {
-    		asm NOP;
-      		asm NOP;
-      		asm NOP;
-      		asm NOP;
-      	}
+    for (;delayMS > 0; delayMS--) {
+        for (i = 0; i < CYCLES_PER_MS; i++) {
+            asm NOP;
+              asm NOP;
+              asm NOP;
+              asm NOP;
+          }
     }
 }

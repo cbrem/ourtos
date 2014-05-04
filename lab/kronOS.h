@@ -113,6 +113,7 @@ void kronosEnableDebug(bool_t enable);
 
 /*
  * Enables or disables mutexes globally.
+ * // TODO lable all relevant things Atomic
  */
 void kronosEnableMutexes(bool_t enable);
 
@@ -126,6 +127,8 @@ void kronosEnableTask(uint8_t priority, bool_t enable);
  * Private Functions
  *==================================*/
 
-// TODO remember to include static keyword
+static void _initTimer() {
+    
+}
 
 #endif // _KRONOS_H
