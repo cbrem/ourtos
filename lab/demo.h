@@ -98,11 +98,12 @@
 #define GET_LEDS() ( (PORTB >> BYTE_LEN_BITS) & (LED_MASK >> BYTE_LEN_BITS) )                        
 
 /* Assorted LED light pattens  - 1 is ON, 0 is OFF */
-#define LEDS_OFF (0x0)
-#define LED_WATCHDOG    (0xF) /* 1111 */ 
-#define LED_POLL_BTN    (0x2) /* 0010 */ 
-#define LED_SHORT_BLK   (0x4) /* 0100 */ 
-#define LED_LONG_BLK    (0x8) /* 1000 */ 
+#define LED_OFF             (0x0) /* 0000 */
+#define LED_WATCHDOG        (0xF) /* 1111 */ 
+#define LED_WATCHDOG_KICK   (0x1) /* 0001 */                     
+#define LED_POLL_BTN        (0x2) /* 0010 */ 
+#define LED_SHORT_BLK       (0x4) /* 0100 */ 
+#define LED_LONG_BLK        (0x8) /* 1000 */ 
 
 /*==================================
  * Exernal Globals
@@ -122,7 +123,7 @@ static bool_t mutexDisableBtn;
 static bool_t taskEnableBtn[N_ENABLEABLE_TASKS];
 
 // TODO PCB
-static uint8_t watchdogFlags;
+static uint8_t watchdogFlags; // TODO include in task object?
 
 /*==================================
  * Public Functions
