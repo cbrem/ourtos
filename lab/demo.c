@@ -30,7 +30,7 @@ void main(void) {
 	// TODO kronosAddMutex
 
 	/* starts the watchdog */
-	// _initWatchdog();
+	_initWatchdog();
 
 	for (;;)
 	{
@@ -40,7 +40,7 @@ void main(void) {
 		pollBtnsTask();
 		shortBlockingTask();
 		longBlockingTask();
-		//watchdogKickTask();
+		watchdogKickTask();
 
 	}
 
@@ -50,7 +50,7 @@ void main(void) {
 
 void watchdogKickTask(void) {
 
-	SET_LEDS(LED_WATCHDOG);
+	SET_LEDS(LED_WATCHDOG_KICK);
 
 	if ( WATCHDOG_FLG_ALL_SET == watchdogFlags ) {
 		_FEED_COP();
@@ -83,6 +83,8 @@ void pollBtnsTask(void) {
 		}
 	}
 
+    // TODO btn control tasks
+
 	SET_WATCHDOG_FLGS(ID_POLL_BTN);
 
 }
@@ -112,6 +114,18 @@ void longBlockingTask(void) {
 
 /* ------ Interrupt Service Routines ------ */
 
+void interrupt 2 watchdogISR( void ) {
+    
+    SET_LEDS_OUTPUT();
+    SET_LEDS(LED_WATCHDOG);
+
+    for(;;) {
+        /* Hang in error state */
+    }
+    // TODO restart?
+
+}
+
 /*==================================
  * Private Functions
  *==================================*/
@@ -137,7 +151,7 @@ void _initBtns(void) {
 void _initLEDs(void) {
 
 	SET_LEDS_OUTPUT();
-	SET_LEDS(LEDS_OFF);
+	SET_LEDS(LED_OFF);
 
 }
 
