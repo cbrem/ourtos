@@ -79,6 +79,8 @@
  * also set pull-up resistors to work properly with CPU module
  * see MC9S12C128V1 data sheet section 4.3.2.10
  */
+// TODO: can we define multi-line macros like this?
+// or should we use a do-while(0) statement?
 #define SET_TASK_ENABLE_BTN_INPUT() (DDRB &= (~SW3_MASK)); \
  								  (PUCR_PUPBE = 1)
 #define GET_TASK_ENABLE_BTN(BTN_N) (PORTB & (1 << BTN_N))
@@ -97,7 +99,7 @@
 
 // TODO tasks
 /* mutex for demo purposes only - it does not actual control any resource */
- mutex_t blockingMutex;
+mutex_t blockingMutex;
 
 /*==================================
  * Local Globals
