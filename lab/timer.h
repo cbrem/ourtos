@@ -19,10 +19,21 @@
 #include "derivative.h"
 #include "inttypes_MC9S12C128.h"
 
+/*==================================
+ * Macros
+ *==================================*/
+
+#define TIMER_INTERRUPT_VECTOR (16)
+
+// TODO: timer prescale? timer increment? or derive these from Period?
+
+/*==================================
+ * Types
+ *==================================*/
+
 /*
  * Timer overflow frequencies which this library supports.
  */
-// TODO: section for enums?
 typedef enum {
     PERIOD_1000_HZ,
     PERIOD_100_HZ,
@@ -31,12 +42,32 @@ typedef enum {
 } period_t;
 
 /*==================================
+ * Local Globals
+ *==================================*/
+
+ static uint32_t currentTime;
+
+/*==================================
  * Public Functions
  *==================================*/
 
 /*
- * Configures serial communications, using the given baud prescale.
+ * Configures the timer to overflow with the given period.
  */
 void timerInit(period_t period);
 
-#endif // _SERIAL_H
+/*
+ * Gets the time since timerInit was called, in ms.
+ *
+ * NOTE: This function may yield invalid results if interrupted.
+ * Users should ensure that interrupts are disabled when calling it.
+ */
+uint32_t timerGetCurrent(void);
+
+/*
+ * Call this function from within the timer overflow ISR in order to ensure
+ * that the current time stays valid.
+ */
+void timerUpdateCurrent(void);
+
+#endif // _TIMER_H
