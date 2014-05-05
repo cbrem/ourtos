@@ -16,7 +16,7 @@
 
 #include <hidef.h>
 #include "derivative.h"
-#include "inttypes_MC9S12C128.h"
+#include "inttypesMC9S12C128.h"
 #include "boolean.h"
 #include "fn.h"
 #include "timer.h"

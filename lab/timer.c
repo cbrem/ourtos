@@ -35,6 +35,14 @@ uint32_t timerGetCurrentMsec(void) {
     return _timeCurrentMsec;
 }
 
+void timerEnableInterrupt() {
+    TSCR1_TEN = 1;
+}
+
+void timerDisableInterrupt() {
+    TSCR1_TEN = 0;
+}
+
 void timerUpdateCurrent(void) {
     /* increment timer based on 8.24 fixed point calculation */
     _timeCountMsec += _timeIncrement;

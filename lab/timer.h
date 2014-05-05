@@ -17,7 +17,7 @@
 #include <hidef.h>
 #include "modclock.h" // Sets bus clock to 8 MHZ.
 #include "derivative.h"
-#include "inttypes_MC9S12C128.h"
+#include "inttypesMC9S12C128.h"
 
 /*==================================
  * Macros
@@ -82,6 +82,16 @@ static uint32_t _timeIncrement;
  * Sets the bus clock to run at 8MHz
  */
 void timerInit(freq_t freq);
+
+/*
+ * Enables the timer overflow interrupt.
+ */
+void timerEnableInterrupt(void);
+
+/*
+ * Disables the timer overflow interrupt.
+ */
+void timerDisableInterrupt(void);
 
 /*
  * Gets the time since timerInit was called, in ms.
