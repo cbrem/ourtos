@@ -10,6 +10,6 @@
 #include "kronOS.h"
 
 // myTOS, yourTOS, ourTOS!
-
-// void interrupt 16 TimerHandler(void) 
+// clockSetup();       // run module at 8 MHz
+// void interrupt 16 _timerISR(void) 
 

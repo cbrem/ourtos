@@ -23,6 +23,7 @@
 
 #include <hidef.h>  
 #include "derivative.h"
+#include "modclock.h" // to set module to 8 MHz
 
 #include "inttypes_MC9S12C128.h"
 #include "boolean.h"
@@ -46,6 +47,21 @@
 #define ID_POLL_BTN     (0)
 #define ID_SHORT_BLK    (1)
 #define ID_LONG_BLK     (2)
+
+/* 
+ * task priorities 
+ * priorities are ordered 0-4 with 0 being the highest priority. 
+ * In order to use priority ceiling a priority slot is left above short task and
+ *  long task. This slot is for the mutex so that when either of these tasks 
+ *  inherits the mutex it rises to priority above the other task that needs the
+ *  mutex.
+ */
+// TODO leave room for the scheduler to have priority?
+#define PRIORITY_WATCHDOG   (0)
+#define PRIORITY_POLL_BTN   (1)
+#define PRIORITY_MUTEX      (2)
+#define PRIORITY_SHORT      (3)
+#define PRIORITY_LONG       (4)
 
 /* task periods (in msec) */
 #define PERIOD_50_MSEC     50
@@ -105,8 +121,10 @@
  * Exernal Globals
  *==================================*/
 
-/* task array */
-task_t PCB[N_TASKS];
+/* task array 
+ *  add 1 to include main loop as lowest priority task
+ */
+task_t PCB[N_TASKS + 1]; // TODO call something different?
 
 /* mutex for demo purposes only - it does not actual control any resource */
 mutex_t blockingMutex;
@@ -157,14 +175,16 @@ void shortBlockingTask(void);
  */
 void longBlockingTask(void);
 
-/*
- * watchdogISR sets the watchdog LEDs and hangs until a hard reset
- */
-void interrupt 2 watchdogISR( void );
-
 /*==================================
  * Private Functions
  *==================================*/
+
+/* ------ Interrupt Service Routines ------ */
+
+/*
+ * watchdogISR sets the watchdog LEDs and hangs until a hard reset
+ */
+void interrupt 2 _watchdogISR(void);
 
 /* ------ Initialization ------ */
 

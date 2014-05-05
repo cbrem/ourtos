@@ -24,6 +24,9 @@
 
 void main(void) {
 
+    /* from modclock - set the module to 8MHz */
+    clockSetup();
+   
     _initBtns();
     _initLEDs();
     
@@ -98,7 +101,6 @@ void pollBtnsTask(void) {
 
     /* poll all task enable btns */
     for( i = 0; i < N_TASKS; i++) {
-      
         if ( 0 != GET_TASK_ENABLE_BTN(i) ) {
             taskEnableBtn[i] = true;
             // kronosEnableTask(i, true);
@@ -135,9 +137,13 @@ void longBlockingTask(void) {
 
 }
 
+/*==================================
+ * Private Functions
+ *==================================*/
+
 /* ------ Interrupt Service Routines ------ */
 
-void interrupt 2 watchdogISR( void ) {
+void interrupt 2 _watchdogISR( void ) {
     
     SET_LEDS_OUTPUT();
     SET_LEDS(LED_WATCHDOG);
@@ -148,10 +154,6 @@ void interrupt 2 watchdogISR( void ) {
     // TODO restart?
 
 }
-
-/*==================================
- * Private Functions
- *==================================*/
 
 /* ------ Initialization ------ */
 
@@ -195,7 +197,7 @@ void _initWatchdog(void) {
 
 /* ------ Helper functions ------*/
 
-static void _blockingDelayMsec(uint16_t delayMS) {
+void _blockingDelayMsec(uint16_t delayMS) {
     uint16_t i;
 
     for (;delayMS > 0; delayMS--) {

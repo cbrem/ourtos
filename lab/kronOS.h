@@ -46,6 +46,10 @@ typedef struct {
 
 static bool_t mutexEnabled;
 
+/* time variables - these are updated in timer ISR */
+static uint32_t timeMsec; /* current time in msec */
+static uint32_t timeCounter; /* 8.24 fixed point counter to keep track of time in msec*/
+
 /*==================================
  * Public Functions
  *==================================*/
@@ -53,7 +57,6 @@ static bool_t mutexEnabled;
 /*
  * Starts the RTOS.
  */
-// TODO allow user control over scheduler period
 void kronosStart(void);
 
 /*
@@ -69,6 +72,12 @@ void kronosShutdown(void);
  * called afterward.
  */
 void kronosSetSchedulerPeriod(uint16_t period);
+
+/*
+ * TODO where to place precomputed timer value?
+ * TODO let user control timer? - this is hardware dependent
+ */
+void kronosSetTimerPeriod(uint8_t prescaler);
 
 /*
  * Provides a previously allocated array in which the RTOS will store task
@@ -127,8 +136,31 @@ void kronosEnableTask(uint8_t priority, bool_t enable);
  * Private Functions
  *==================================*/
 
-static void _initTimer() {
-    
-}
+/*
+ * _initTimer sets the global time variables timeMsec and timeCounter to zero
+ *  enables the timer, enables timer interrupt and sets the prescaler to the 
+ *  given value
+ */
+static void _initTimer(uint8_t prescaler);
+
+/*
+ * getCurrentTimeMsec returns the current time in msec
+ *  This function disables interrupts
+ */
+static uint32_t _getCurrentTimeMsec(void);
+
+/*
+ * _timerISR is triggered on a timer overflow which occurs at 
+ *  the set period. This function increments the current time 
+ *  as well as performs the task switching.
+ *
+ * Task Switching
+ *  The ISR looks for the next highest priority task that is ready to run
+ *  (as set by the scheduler) and sets this as the current task. It 
+ *  switches the stack pointer to point to the new current task, backs-up
+ *  the old stack-pointer and then uses RTI to restore state and begin
+ *  executing the new task.
+ */
+static void interrupt 16 _timerISR(void);
 
 #endif // _KRONOS_H
