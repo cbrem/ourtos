@@ -73,13 +73,6 @@ void kronosShutdown(void) {
 	// TODO
 }
 
-<<<<<<< HEAD
-	/* enable timer */
-	TSCR1_TEN = 1;
-
-	/* set timer overflow interrupt */
-	TSCR2_TOI = 1;
-=======
 /*
  * Acquires the given mutex in a task-safe manner.
  */
@@ -93,7 +86,6 @@ void kronosAcquireMutex(mutex_t *mutex) {
 void kronosReleaseMutex(mutex_t *mutex) {
 	// TODO
 }
->>>>>>> 3204716ae4a9bba7a12c7fe12ba8a8e933a69278
 
 /* ----- Functions for a started/stopped kronOS ----- */
 
@@ -104,15 +96,6 @@ void kronosEnableDebug(bool_t enable) {
 	// TODO
 }
 
-<<<<<<< HEAD
-static uint32_t _getCurrentTimeMsec(void) {
-	uint32_t timeTmp;
-
-	/* need atomic access */
-	DisableInterrupts;
-	timeTmp = timeMsec;
-	EnableInterrupts;
-=======
 /*
  * Enables or disables mutexes globally.
  * // TODO lable all relevant things Atomic
@@ -120,7 +103,6 @@ static uint32_t _getCurrentTimeMsec(void) {
 void kronosEnableMutexes(bool_t enable) {
 	// TODO
 }
->>>>>>> 3204716ae4a9bba7a12c7fe12ba8a8e933a69278
 
 /*
  * Enables or disables the task that was originally added at the given

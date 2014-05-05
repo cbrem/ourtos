@@ -34,7 +34,7 @@
  *==================================*/
 
 /* Assorted */
-#define N_TASKS (4) // TODO include main
+#define N_TASKS (4)
 #define CYCLES_PER_MS (200)
 
 /* Watchdog */
@@ -89,8 +89,15 @@
 #define LED_MASK    (0xF0)
 
 /* set SW1 on Port P as 0 to enable input with pull-up*/
-#define SET_MUTEX_DISABLE_BTN_INPUT() (DDRP = 0); \
-                                      (PERP = 0xFF) 
+
+/* see http://stackoverflow.com/questions/1067226/c-multi-line-macro-do-while0-vs-scope-block
+ * for explaination on multiline macros
+ */
+#define SET_MUTEX_DISABLE_BTN_INPUT() \
+                                    do { \
+                                        (DDRP = 0); \
+                                        (PERP = 0xFF); \
+                                    } while(0)
 #define GET_MUTEX_DISABLE_BTN() ( (~PTP) & 1 )
 
 /* 
@@ -98,16 +105,20 @@
  * also set pull-up resistors to work properly with CPU module
  * see MC9S12C128V1 data sheet section 4.3.2.10
  */
-// TODO: can we define multi-line macros like this?
-// or should we use a do-while(0) statement?
-#define SET_TASK_ENABLE_BTN_INPUT() (DDRB &= (~SW3_MASK)); \
-                                  (PUCR_PUPBE = 1)
+#define SET_TASK_ENABLE_BTN_INPUT() \
+                                    do { \ 
+                                        (DDRB &= (~SW3_MASK)); \
+                                        (PUCR_PUPBE = 1); \                                        
+                                    } while(0)
 #define GET_TASK_ENABLE_BTN(BTN_N) (PORTB & (1 << BTN_N))
 
 /* LEDs */
 #define SET_LEDS_OUTPUT() (DDRB |= LED_MASK) 
-#define SET_LEDS(val) (PORTB &= ~LED_MASK); \
-                      (PORTB |= (~val << BYTE_LEN_BITS) & LED_MASK )
+#define SET_LEDS(val) \
+                        do { \
+                            (PORTB &= ~LED_MASK); \
+                            (PORTB |= (~val << BYTE_LEN_BITS) & LED_MASK ); \
+                        } while(0)
 #define GET_LEDS() ( (PORTB >> BYTE_LEN_BITS) & (LED_MASK >> BYTE_LEN_BITS) )                        
 
 /* Assorted LED light pattens  - 1 is ON, 0 is OFF */
