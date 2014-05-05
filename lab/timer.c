@@ -9,7 +9,7 @@
 
 void timerInit(period_t period) {
     /* Reset current time. */
-    currentTime = 0;
+    _currentTime = 0;
 
     /* enable timer */
     TSCR1_TN = 1;
@@ -23,7 +23,7 @@ void timerInit(period_t period) {
 }
 
 uint32_t timerGetCurrent() {
-    return currentTime;
+    return _currentTime;
 }
 
 void timerUpdateCurrent(void) {

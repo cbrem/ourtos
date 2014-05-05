@@ -45,7 +45,7 @@ typedef enum {
  * Local Globals
  *==================================*/
 
- static uint32_t currentTime;
+ static uint32_t _currentTime;
 
 /*==================================
  * Public Functions

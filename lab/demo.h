@@ -37,8 +37,8 @@
 
 /* Watchdog */
 #define WATCHDOG_PERIOD         (0x7) /* 2^24 cycles ~ 1 sec for 8MHz Clk */
-#define SET_WATCHDOG_FLGS(id)   (watchdogFlags |= (1 << id))
-#define CLEAR_WATCHDOG_FLGS()   (watchdogFlags = 0)
+#define SET_WATCHDOG_FLGS(id)   (_watchdogFlags |= (1 << id))
+#define CLEAR_WATCHDOG_FLGS()   (_watchdogFlags = 0)
 #define WATCHDOG_FLG_ALL_SET    (0x7) /* 3 tasks kick the watchdog so one flag bit per task */
 
 /* task IDs */
@@ -134,11 +134,11 @@ mutex_t blockingMutex;
  *==================================*/
 
 /* Button to disable mutexs */
-static bool_t mutexDisableBtn;
+static bool_t _mutexDisableBtn;
 /* Switches to enable/disable some tasks */
-static bool_t taskEnableBtn[N_TASKS];
+static bool_t _taskEnableBtn[N_TASKS];
 
-static uint8_t watchdogFlags; // TODO include in task object?
+static uint8_t _watchdogFlags; // TODO include in task object?
 
 /*==================================
  * Public Functions
@@ -154,7 +154,7 @@ void main(void);
 /* ------ Tasks ------ */
 
 /* 
- * pollBtnsTask modifies the mutexDisableBtn and taskEnableBtn variables by polling
+ * pollBtnsTask modifies the _mutexDisableBtn and _taskEnableBtn variables by polling
  *  the current hardware button state
  */
 void pollBtnsTask(void);
@@ -190,7 +190,7 @@ void interrupt 2 _watchdogISR(void);
 
 /* 
  * initBtns initializes the btns for pollBtnsTask 
- * - sets mutexDisableBtn and taskEnableBtn to defaults of False
+ * - sets _mutexDisableBtn and _taskEnableBtn to defaults of False
  * - enables mutex diable btn as input
  * - enables switches for tasks as input
  */

@@ -64,13 +64,13 @@ typedef struct {
  * Local Globals
  *==================================*/
 
-static bool_t mutexEnabled;
+static bool_t _mutexEnabled;
 
-// TODO: is it okay for this to be static?
-static task_t taskArray[];
+static task_t _taskArray[];
+static uint8_t _numTasks;
 
 // TODO: this could be an enum...
-static boot_t started;
+static boot_t _started;
 
 /*==================================
  * Public Functions
