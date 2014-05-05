@@ -20,7 +20,7 @@ void serialInit(baud_t baud) {
     SCIBDL prescale & 0xFF;
     SCIBDH = (prescale >> 8) & 0xFF;
 
-    // Configure for 8 bit, one stop bit, no parity.
+    /* Configure for 8 bit, one stop bit, no parity. */
     SCICR1 = 0x00;
     SCICR2 = 0x00;
 }
