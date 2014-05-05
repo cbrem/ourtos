@@ -17,7 +17,7 @@ void serialInit(baud_t baud) {
     prescale = _prescaleForBaud(baud);
 
     // TODO: put these in macros?
-    SCIBDL prescale & 0xFF;
+    SCIBDL = prescale & 0xFF;
     SCIBDH = (prescale >> 8) & 0xFF;
 
     /* Configure for 8 bit, one stop bit, no parity. */
@@ -25,33 +25,35 @@ void serialInit(baud_t baud) {
     SCICR2 = 0x00;
 }
 
-void serialWrite(char buffer[], uint8_t len) {
-    int i;
+void serialWrite(byte_t buffer[], uint8_t len) {
+    uint8_t i;
 
     for (i = 0; i < len; i++) {
         _serialWriteByte(buffer[i]);
     }
 }
 
-void serialRead(char buffer[], uint8_t len) {
+void serialRead(byte_t buffer[], uint8_t len) {
+    uint8_t i;
+
     for (i = 0; i < len; i++) {
         buffer[i] = _serialReadByte();
     }
 }
 
-byte_t _serialReadByte() {
-  SCICR2_RE = ENABLE;
+static byte_t _serialReadByte() {
+  SCICR2_RE = 0x1;
   while(!SCISR1_RDRF);
   return SCIDRL;
 }
 
-void _serialWriteByte(char byte) {
+static void _serialWriteByte(byte_t byte) {
     SCICR2_TE = 0x1;
     while (!SCISR1_TDRE);
     SCIDRL = byte;
 }
 
-uint16_t _prescaleForBaud(baud_t baud) {
+static uint16_t _prescaleForBaud(baud_t baud) {
     switch(baud) { 
     case BAUD_300:   return 0x0683;
     case BAUD_600:   return 0x0341;
