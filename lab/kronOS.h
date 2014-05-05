@@ -21,6 +21,14 @@
  * MACROS
  *==================================*/
 
+/* timer */
+#define TIMER_PRESCALER (0) /* prescaler bus_clk / 1 */
+/* 
+ * 32-bit value to increment timer counter on each timer overflow
+ * This value is based on an 8MHz clk with prescaler 1/1 and 
+ * a counter variable that is 8.24 fixed point msec.
+ */
+#define TIMER_COUNTER_INCR (0x083126E9) // 137438953
 
 /*==================================
  * Types
@@ -71,13 +79,7 @@ void kronosShutdown(void);
  * This function must be called before calling rtosStart, and should not be
  * called afterward.
  */
-void kronosSetSchedulerPeriod(uint16_t period);
-
-/*
- * TODO where to place precomputed timer value?
- * TODO let user control timer? - this is hardware dependent
- */
-void kronosSetTimerPeriod(uint8_t prescaler);
+void kronosSetSchedulerPeriod(uint16_t period); // TODO restrict to set periods
 
 /*
  * Provides a previously allocated array in which the RTOS will store task
@@ -141,7 +143,7 @@ void kronosEnableTask(uint8_t priority, bool_t enable);
  *  enables the timer, enables timer interrupt and sets the prescaler to the 
  *  given value
  */
-static void _initTimer(uint8_t prescaler);
+static void _initTimer();
 
 /*
  * getCurrentTimeMsec returns the current time in msec

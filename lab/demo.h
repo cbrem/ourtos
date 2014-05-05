@@ -23,8 +23,6 @@
 
 #include <hidef.h>  
 #include "derivative.h"
-#include "modclock.h" // to set module to 8 MHz
-
 #include "inttypes_MC9S12C128.h"
 #include "boolean.h"
 #include "kronOS.h"

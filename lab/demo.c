@@ -91,21 +91,16 @@ void pollBtnsTask(void) {
     SET_LEDS(LED_POLL_BTN);
 
     if ( 1 == GET_MUTEX_DISABLE_BTN() ) {
-        mutexDisableBtn = true;
-        // TODO need these variables?
         // kronosEnableMutexes(true) /* atomic */
     } else {
-        mutexDisableBtn = false;        
         // kronosEnableMutexes(false) /* atomic */
     }
 
     /* poll all task enable btns */
     for( i = 0; i < N_TASKS; i++) {
         if ( 0 != GET_TASK_ENABLE_BTN(i) ) {
-            taskEnableBtn[i] = true;
             // kronosEnableTask(i, true);
         } else {
-            taskEnableBtn[i] = false;
             // kronosEnableTask(i, false);
         }
     }
