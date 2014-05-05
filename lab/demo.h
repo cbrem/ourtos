@@ -22,7 +22,6 @@
  *==================================*/
 
 #include <hidef.h>  
-#include "modclock.h"
 #include "derivative.h"
 #include "inttypes_MC9S12C128.h"
 #include "boolean.h"

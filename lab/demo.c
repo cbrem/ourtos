@@ -23,9 +23,6 @@
 /* ------ Main ------ */
 
 void main(void) {
-
-    /* from modclock - set the module to 8MHz */
-    clockSetup();
    
     _initBtns();
     _initLEDs();
