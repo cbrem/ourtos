@@ -46,10 +46,10 @@ void kronosEnableTask(uint8_t priority, bool_t enable);
 static void _initTimer(void) {
 
 	/* enable timer */
-	TSCR1_TN = 1;
+	TSCR1_TEN = 1;
 
 	/* set timer overflow interrupt */
-	TSCR2_TOF = 1;
+	TSCR2_TOI = 1;
 
 	/* set timer prescaler */
 	TSCR2_PR = TIMER_PRESCALER;
@@ -62,7 +62,7 @@ static uint32_t _getCurrentTimeMsec(void) {
 	/* need atomic access */
 	DisableInterrupts;
 	timeTmp = timeMsec;
-	EnableInterruprs;
+	EnableInterrupts;
 
 	return timeTmp;
 }

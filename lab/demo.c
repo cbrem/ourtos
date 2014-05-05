@@ -30,9 +30,12 @@ void main(void) {
     _initBtns();
     _initLEDs();
     
+    // TODO: remove
+    initSerial(BAUD_115200);
+    
     /* set-up the RTOS */
     // TODO kronosSetSchedulerPeriod(SCHEDULER_PERIOD);
-    // TODO kronosSetTaskArray(PCB, N_TASKS);
+    // TODO kronosSetTaskArray(taskArray, N_TASKS);
     // TODO kronosAddTask(PRIORITY_WATCHDOG, WATCHDOG_TASK_PERIOD, &watchdogKickTask);
     // TODO kronosAddTask(PRIORITY_POLL_BTN, POLL_BTN_TASK_PERIOD, &pollBtnsTask);
     // TODO kronosAddTask(PRIORITY_SHORT, SHORT_TASK_PERIOD, &shortBlockingTask);
@@ -57,6 +60,8 @@ void main(void) {
         shortBlockingTask();
         longBlockingTask();
         watchdogKickTask();
+        
+        serialWrite("Hello?\n");
 
     }
 

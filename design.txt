@@ -47,6 +47,7 @@ Global Data:
 typedef struct {
   - function pointer
   - frame saved last time that the task was interrupted
+  - SP
   - running
   - next time to run
   - enabled

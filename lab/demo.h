@@ -22,17 +22,19 @@
  *==================================*/
 
 #include <hidef.h>  
+#include "modclock.h"
 #include "derivative.h"
 #include "inttypes_MC9S12C128.h"
 #include "boolean.h"
 #include "kronOS.h"
+#include "serial.h"
 
 /*==================================
  * MACROS
  *==================================*/
 
 /* Assorted */
-#define N_TASKS (4)
+#define N_TASKS (4) // TODO include main
 #define CYCLES_PER_MS (200)
 
 /* Watchdog */
@@ -54,7 +56,6 @@
  *  inherits the mutex it rises to priority above the other task that needs the
  *  mutex.
  */
-// TODO leave room for the scheduler to have priority?
 #define PRIORITY_WATCHDOG   (0)
 #define PRIORITY_POLL_BTN   (1)
 #define PRIORITY_MUTEX      (2)
@@ -122,7 +123,7 @@
 /* task array 
  *  add 1 to include main loop as lowest priority task
  */
-task_t PCB[N_TASKS + 1]; // TODO call something different?
+task_t taskArray[N_TASKS]; 
 
 /* mutex for demo purposes only - it does not actual control any resource */
 mutex_t blockingMutex;
@@ -136,7 +137,7 @@ static bool_t mutexDisableBtn;
 /* Switches to enable/disable some tasks */
 static bool_t taskEnableBtn[N_TASKS];
 
-static uint8_t watchdogFlags; // TODO include in task object?
+static uint8_t watchdogFlags;
 
 /*==================================
  * Public Functions
@@ -212,7 +213,6 @@ void _initWatchdog(void);
 /* _blockingDelayMsec runs for the given number of milliseconds 
  * This function is implemented with nop loops so times are approximate
  */
-// TODO could we do this with another timer?
 static void _blockingDelayMsec(uint16_t delayMS);
 
 #endif
