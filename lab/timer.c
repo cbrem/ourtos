@@ -11,15 +11,20 @@ void timerInit(period_t period) {
     /* Reset current time. */
     _currentTime = 0;
 
-    /* enable timer */
-    TSCR1_TN = 1;
-
     /* set timer overflow interrupt */
-    TSCR2_TOF = 1;
+    TSCR2_TOI = 1;
 
     /* set timer prescaler */
     // TODO: this should be a function of period
     TSCR2_PR = 0;
+}
+
+void timerEnableInterrupt() {
+    TSCR1_TEN = 1;
+}
+
+void timerDisableInterrupt() {
+    TSCR1_TEN = 0;
 }
 
 uint32_t timerGetCurrent() {

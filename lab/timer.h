@@ -57,6 +57,16 @@ typedef enum {
 void timerInit(period_t period);
 
 /*
+ * Enables the timer overflow interrupt.
+ */
+void timerEnableInterrupt(void);
+
+/*
+ * Disables the timer overflow interrupt.
+ */
+void timerDisableInterrupt(void);
+
+/*
  * Gets the time since timerInit was called, in ms.
  *
  * NOTE: This function may yield invalid results if interrupted.
