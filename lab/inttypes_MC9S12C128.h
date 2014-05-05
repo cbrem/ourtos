@@ -1,7 +1,9 @@
 /*
- * intTypes.h - a few macros for more explicit types, 
- *  included because stdint not available
- *  WARNING this is chip dependent - we are using MC9S12C128
+ * intTypes.h - A few macros for more explicit types, 
+ *  included because stdint not available.
+ *  WARNING: These are chip/compiler dependent.
+ *  We are using a Motorola MC9S12C128 microcontroller with the Freescale
+ *  CodeWarrior S12(X) compiler.
  */
 
 #ifndef _INTTYPES_MC9S12C128_H
@@ -17,6 +19,8 @@ typedef unsigned long uint32_t;
 
 typedef char byte_t;
 typedef unsigned char ubyte_t;
+typedef int word_t;
+typedef unsigned int word_t;
 
 #define WORD_LEN_BITS (8)
 #define BYTE_LEN_BITS (4)
