@@ -20,6 +20,12 @@
 * Public Functions
 *==================================*/
 
+// TODO remove
+static void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
+    // TODO
+    TFLG2 = 0x80;  // Clear TOF; acknowledge interrupt
+}
+
 /* ------ Main ------ */
 
 void main(void) {
@@ -28,7 +34,8 @@ void main(void) {
     _initLEDs();
     
     // TODO: remove
-    initSerial(BAUD_115200);
+    serialInit(BAUD_115200);
+    timerInit(FREQ_8_MHZ);
     
     /* set-up the RTOS */
     // TODO kronosSetSchedulerPeriod(SCHEDULER_PERIOD);

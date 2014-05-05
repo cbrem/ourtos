@@ -26,7 +26,10 @@
 #include "inttypes_MC9S12C128.h"
 #include "boolean.h"
 #include "kronOS.h"
+
+ // TODO remove
 #include "serial.h"
+#include "timer.h"
 
 /*==================================
  * MACROS
