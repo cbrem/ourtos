@@ -15,14 +15,16 @@
  *==================================*/
 
 #include "inttypes_MC9S12C128.h"
-#include "frame_MC9S12C128.h"
 #include "boolean.h"
+#include "fn.h"
+#include "timer.h"
 
 /*==================================
  * MACROS
  *==================================*/
 
-#define TIMER_INTERRUPT_VECTOR (16)
+/* Bytes of stack space per task */
+#define TASK_STACK_SIZE 64
 
 /*==================================
  * Types
@@ -34,8 +36,8 @@
  * The type if exposed to users only for memory-allocation purposes.
  */
 typedef struct {
-    void (*task) (void);
-    frame_t frame;
+    fn_t task;
+    byte_t[TASK_STACK_SIZE] stack;
     bool_t running;
     bool_t enabled;
     uint8_t normalPriority;
@@ -88,8 +90,12 @@ void kronosInit(task_t tasks[], uint8_t numTasks);
 /*
  * Starts the RTOS.
  */
-// TODO allow user control over scheduler period
 void kronosStart(void);
+
+/*
+ * Sets the maximum period between runs of the RTOS's scheduler.
+ */
+void kronosSetSchedulerPeriod(period_t period);
 
 /*
  * Adds a task to the RTOS.
@@ -97,10 +103,9 @@ void kronosStart(void);
  * called afterward.
  * This function must be called after calling rtosSetTaskArray.
  * Returns true if the task was successfully added, false otherwise (e.g. if
- * this is not a valid priority, if the period was shorter than the scheduler
- * period, etc.).
+ * this is not a valid priority).
  */
-bool_t kronosAddTask(uint8_t priority, uint16_t period, void (*task) (void));
+bool_t kronosAddTask(uint8_t priority, period_t period, fn_t);
         
 /*
  * Add a mutex to the RTOS which uses the given priority for priority ceiling.
@@ -134,20 +139,13 @@ void kronosReleaseMutex(mutex_t *mutex);
 /* ----- Functions for a started/stopped kronOS ----- */
 
 /*
- * Sets the maximum number of milliseconds between runs of the RTOS's
- * scheduler.
- * Returns true if the scheduler period was successfully set to the given
- * value, false if this was not possible.
- */
-bool_t kronosSetSchedulerPeriod(uint16_t period);
-
-/*
  * Configures the RTOS to print debug information whenever the scheduler runs.
  */
 void kronosEnableDebug(bool_t enable);
 
 /*
  * Enables or disables mutexes globally.
+ * // TODO lable all relevant things Atomic
  */
 void kronosEnableMutexes(bool_t enable);
 
@@ -162,19 +160,20 @@ void kronosEnableTask(uint8_t priority, bool_t enable);
  *==================================*/
 
 /*
- * Determines which task should be set to run next.
- * Returns this task's (normal) priority.
+ * Returns the (normal) priority of the highest-priority task that is ready
+ * to run.
  */
-void _scheduler(void);
-
-/*==================================
- * Interrupts
- *==================================*/
+static uint8_t _scheduler(void);
 
 /*
- * Handles a timer overflow event.
+ * Runs whenever a timer overflow interrupt fires.
+ * It calls the scheduler to find the highest-priority task which is ready to
+ * run. Then, it switches the stack pointer to point to the new current task,
+ * backs-up the old stack-pointer, and uses RTI to restore state and begin
+ * executing the new task.
+ *
+ * NOTE: Implementation is very platform dependent.
  */
-// TODO: should this be in the header file? should any private functions?
-void interrupt (TIMER_INTERRUPT_VECTOR) _timerInterruptHandler(void);
+static void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void);
 
 #endif // _KRONOS_H
