@@ -27,12 +27,23 @@ void main(void) {
     _initBtns();
     _initLEDs();
     
-    // TODO kronosAddMutex
-    // TODO kronosEnableMutexes
-    // TODO kronosEnableDebug
+    /* set-up the RTOS */
+    // TODO kronosSetSchedulerPeriod(SCHEDULER_PERIOD);
+    // TODO kronosSetTaskArray(PCB, N_TASKS);
+    // TODO kronosAddTask(PRIORITY_WATCHDOG, WATCHDOG_TASK_PERIOD, &watchdogKickTask);
+    // TODO kronosAddTask(PRIORITY_POLL_BTN, POLL_BTN_TASK_PERIOD, &pollBtnsTask);
+    // TODO kronosAddTask(PRIORITY_SHORT, SHORT_TASK_PERIOD, &shortBlockingTask);
+    // TODO kronosAddTask(PRIORITY_LONG, LONG_TASK_PERIOD, &longBlockingTask);
+    // TODO kronosAddMutex(PRIORITY_MUTEX, &blockingMutex);
+    // TODO kronosEnableMutexes(true);
+    // TODO kronosEnableDebug(true);
 
     /* starts the watchdog */
     _initWatchdog();
+
+    /* start the RTOS */
+    // TODO kronosStart();
+
 
     for (;;)
     {
