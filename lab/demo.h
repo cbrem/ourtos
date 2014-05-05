@@ -23,9 +23,6 @@
 
 #include <hidef.h>  
 #include "derivative.h"
-// TODO include?
-// #pragma LINK_INFO DERIVATIVE "mc9s12c128"
-
 #include "inttypes_MC9S12C128.h"
 #include "boolean.h"
 #include "kronOS.h"
@@ -34,12 +31,35 @@
  * MACROS
  *==================================*/
 
+/* Assorted */
 #define N_TASKS (4)
-/* some tasks are enabled by hardware switches */
-#define N_ENABLEABLE_TASKS (4)
+#define CYCLES_PER_MS (200)
 
-/* Watchdog and Timing Constants */
-#define WATCHDOG_PERIOD (0x7) /* 2^24 cycles ~ 1 sec for 8MHz Clk */
+/* Watchdog */
+#define WATCHDOG_PERIOD         (0x7) /* 2^24 cycles ~ 1 sec for 8MHz Clk */
+#define SET_WATCHDOG_FLGS(id)   (watchdogFlags |= (1 << id))
+#define CLEAR_WATCHDOG_FLGS()   (watchdogFlags = 0)
+#define WATCHDOG_FLG_ALL_SET    (0x7) /* 3 tasks kick the watchdog so one flag bit per task */
+
+/* task IDs */
+#define ID_POLL_BTN     (0)
+#define ID_SHORT_BLK    (1)
+#define ID_LONG_BLK     (2)
+
+/* 
+ * task priorities 
+ * priorities are ordered 0-4 with 0 being the highest priority. 
+ * In order to use priority ceiling a priority slot is left above short task and
+ *  long task. This slot is for the mutex so that when either of these tasks 
+ *  inherits the mutex it rises to priority above the other task that needs the
+ *  mutex.
+ */
+// TODO leave room for the scheduler to have priority?
+#define PRIORITY_WATCHDOG   (0)
+#define PRIORITY_POLL_BTN   (1)
+#define PRIORITY_MUTEX      (2)
+#define PRIORITY_SHORT      (3)
+#define PRIORITY_LONG       (4)
 
 /* task periods (in msec) */
 #define PERIOD_50_MSEC     50
@@ -53,26 +73,24 @@
 #define PERIOD_10000_MSEC  10000
 
 /* task timing - see documentation for reasoning */
-#define SCHEDULER_PERIOD		(PERIOD_100_MSEC)
-#define POLL_BTN_TASK_PERIOD	(PERIOD_500_MSEC)
-#define WATCHDOG_TASK_PERIOD	(PERIOD_500_MSEC)
-#define SHORT_TASK_PERIOD		(PERIOD_2000_MSEC)
-#define LONG_TASK_PERIOD		(PERIOD_1900_MSEC)
+#define SCHEDULER_PERIOD        (PERIOD_100_MSEC)
+#define POLL_BTN_TASK_PERIOD    (PERIOD_500_MSEC)
+#define WATCHDOG_TASK_PERIOD    (PERIOD_500_MSEC)
+#define SHORT_TASK_PERIOD       (PERIOD_2000_MSEC)
+#define LONG_TASK_PERIOD        (PERIOD_1900_MSEC)
 
 /* task blocking time (in Msec) */
-#define LONG_BLOCK_TIME		(100)
-#define SHORT_BLOCK_TIME	(300)
-
+#define LONG_BLOCK_TIME     (300)
+#define SHORT_BLOCK_TIME    (100)
 
 /* hardware pins and switches */
-#define SW1_MASK    (0x01)
 #define SW3_MASK    (0x0F)
 #define LED_MASK    (0xF0)
 
-/* set SW1 on Port P as 0 to enable input */
- // TODO may need pullup
-#define SET_MUTEX_DISABLE_BTN_INPUT() (DDRP &= ~SW1_MASK) 
-#define GET_MUTEX_DISABLE_BTN() (PTP_PTP0) // TODO may need to invert
+/* set SW1 on Port P as 0 to enable input with pull-up*/
+#define SET_MUTEX_DISABLE_BTN_INPUT() (DDRP = 0); \
+                                      (PERP = 0xFF) 
+#define GET_MUTEX_DISABLE_BTN() ( (~PTP) & 1 )
 
 /* 
  * set bits of SW3 on PORT B as 0 to enable input
@@ -82,22 +100,32 @@
 // TODO: can we define multi-line macros like this?
 // or should we use a do-while(0) statement?
 #define SET_TASK_ENABLE_BTN_INPUT() (DDRB &= (~SW3_MASK)); \
- 								  (PUCR_PUPBE = 1)
+                                  (PUCR_PUPBE = 1)
 #define GET_TASK_ENABLE_BTN(BTN_N) (PORTB & (1 << BTN_N))
 
 /* LEDs */
 #define SET_LEDS_OUTPUT() (DDRB |= LED_MASK) 
-#define SET_LEDS(val) ( PORTB |= (val << BYTE_LEN_BITS) & LED_MASK )
-#define GET_LEDS() ( (PORTB >> BYTE_LEN_BITS) & (LED_MASK >> BYTE_LEN_BITS) )						 
+#define SET_LEDS(val) (PORTB &= ~LED_MASK); \
+                      (PORTB |= (~val << BYTE_LEN_BITS) & LED_MASK )
+#define GET_LEDS() ( (PORTB >> BYTE_LEN_BITS) & (LED_MASK >> BYTE_LEN_BITS) )                        
 
-/* Assorted LED light pattens */
-#define LEDS_OFF (0x0)
+/* Assorted LED light pattens  - 1 is ON, 0 is OFF */
+#define LED_OFF             (0x0) /* 0000 */
+#define LED_WATCHDOG        (0xF) /* 1111 */ 
+#define LED_WATCHDOG_KICK   (0x1) /* 0001 */                     
+#define LED_POLL_BTN        (0x2) /* 0010 */ 
+#define LED_SHORT_BLK       (0x4) /* 0100 */ 
+#define LED_LONG_BLK        (0x8) /* 1000 */ 
 
 /*==================================
  * Exernal Globals
  *==================================*/
 
-// TODO tasks
+/* task array 
+ *  add 1 to include main loop as lowest priority task
+ */
+task_t PCB[N_TASKS + 1]; // TODO call something different?
+
 /* mutex for demo purposes only - it does not actual control any resource */
 mutex_t blockingMutex;
 
@@ -108,9 +136,9 @@ mutex_t blockingMutex;
 /* Button to disable mutexs */
 static bool_t mutexDisableBtn;
 /* Switches to enable/disable some tasks */
-static bool_t taskEnableBtn[N_ENABLEABLE_TASKS];
+static bool_t taskEnableBtn[N_TASKS];
 
-// TODO PCB
+static uint8_t watchdogFlags; // TODO include in task object?
 
 /*==================================
  * Public Functions
@@ -143,13 +171,20 @@ void watchdogKickTask(void);
 void shortBlockingTask(void);
 
 /* 
- * longBlockingTask grabs a mutex and holds it for a short long
+ * longBlockingTask grabs a mutex and holds it for a long time
  */
 void longBlockingTask(void);
 
 /*==================================
  * Private Functions
  *==================================*/
+
+/* ------ Interrupt Service Routines ------ */
+
+/*
+ * watchdogISR sets the watchdog LEDs and hangs until a hard reset
+ */
+void interrupt 2 _watchdogISR(void);
 
 /* ------ Initialization ------ */
 

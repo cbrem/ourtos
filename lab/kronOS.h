@@ -24,7 +24,7 @@
  *==================================*/
 
 /* Bytes of stack space per task */
-#define TASK_STACK_SIZE 64
+#define TASK_STACK_SIZE (64)
 
 /*==================================
  * Types
