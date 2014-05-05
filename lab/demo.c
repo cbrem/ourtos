@@ -35,11 +35,7 @@ void main(void) {
 
     _initBtns();
     _initLEDs();
-    
-    // TODO: remove
-    serialInit(BAUD_115200);
-    timerInit(FREQ_8_MHZ);
-    
+        
     /* set-up the RTOS */
     // TODO kronosSetSchedulerPeriod(SCHEDULER_PERIOD);
     // TODO kronosSetTaskArray(taskArray, N_TASKS);

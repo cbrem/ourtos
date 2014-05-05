@@ -38,13 +38,14 @@
  * The type if exposed to users only for memory-allocation purposes.
  */
 typedef struct {
-    fn_t task;
     byte_t stack[TASK_STACK_SIZE];
+    uint32_t nextRunTime;
+    fn_t task;
+    uint16_t stackPtr;
     bool_t running;
     bool_t enabled;
     uint8_t normalPriority;
     uint8_t currentPriority;
-    uint32_t nextRunTime;
 } task_t;
 
 /*

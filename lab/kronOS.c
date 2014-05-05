@@ -80,6 +80,9 @@ static uint8_t _scheduler(void) {
 }
 
 static void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
-	// TODO
-	TFLG2 = 0x80;  // Clear TOF; acknowledge interrupt
+
+	/* acknowledge interrupt */
+	TFLG2_TOF = 1;
+
+	/
 }
