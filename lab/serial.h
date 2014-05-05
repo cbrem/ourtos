@@ -25,6 +25,7 @@
 typedef enum {
     BAUD_300,
     BAUD_600,
+    BAUD_1200,
     BAUD_2400,
     BAUD_4800,
     BAUD_9600,
@@ -59,12 +60,12 @@ void serialInit(baud_t baud);
 /*
  * Writes len bytes of the given buffer over serial.
  */
-void serialWrite(char buffer[], uint8_t len);
+void serialWrite(byte_t buffer[], uint8_t len);
 
 /*
  * Reads len bytes from serial into the given buffer.
  */
-void serialRead(char buffer[], uint8_t len);
+void serialRead(byte_t buffer[], uint8_t len);
 
 /*==================================
  * Private Functions
@@ -74,18 +75,19 @@ void serialRead(char buffer[], uint8_t len);
  * Reads one byte from serial.
  * Blocks until the byte arrives.
  */
- byte_t _serialReadByte();
+ static byte_t _serialReadByte(void);
 
 /*
  * Writes one byte over serial.
  * Before writing, waits for serial buffer to clear.
  * Makes no guarantees about the state of the buffer after writing.
  */
-void _serialWriteByte(char byte);
+static void _serialWriteByte(byte_t byte);
 
 /*
  * Returns the prescale value which will yield the given baud.
  */
-uint16_t _prescaleForBaud(baud_t baud);
+static uint16_t _prescaleForBaud(baud_t baud);
 
 #endif // _SERIAL_H
+

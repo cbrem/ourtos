@@ -17,7 +17,8 @@
  *==================================*/
 
 void kronosInit(task_t tasks[], uint8_t numTasks) {
-	// TODO
+	_tasks = tasks;
+	_numTasks = numTasks;
 }
 
 /* ----- Functions for a stopped kronOS ----- */
@@ -73,7 +74,7 @@ void kronosEnableTask(uint8_t priority, bool_t enable) {
  *==================================*/
 
 static uint8_t _scheduler(void) {
-	// TODO
+	
 	return 0;
 }
 

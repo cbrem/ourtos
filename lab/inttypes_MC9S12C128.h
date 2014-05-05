@@ -17,12 +17,11 @@ typedef unsigned int  uint16_t;
 typedef   signed long  int32_t;
 typedef unsigned long uint32_t;
 
-typedef char byte_t;
-typedef unsigned char ubyte_t;
-typedef int word_t;
+typedef unsigned char byte_t;
 typedef unsigned int word_t;
 
 #define WORD_LEN_BITS (8)
 #define BYTE_LEN_BITS (4)
 
 #endif // _INTTYPES_MC9S12C128_H
+
