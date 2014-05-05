@@ -7,6 +7,8 @@
  * 18-348 Lab 11
  */
 
+#include "timer.h"
+
 /*==================================
  * Public Functions
  *==================================*/
@@ -19,17 +21,17 @@ void timerInit(freq_t freq) {
     _timeCurrentMsec = 0;
     _timeCountMsec = 0;
 
-    /* enable timer */
-    TSCR1_TN = 1;
-
     /* set timer overflow interrupt */
-    TSCR2_TOF = 1;
+    TSCR2_TOI = 1;
 
     /* set timer prescaler */
-    TSCR2_PR = _freq2Prescaler(period);
+    TSCR2_PR = _freq2Prescaler(freq);
+
+    /* enable timer */
+    TSCR1_TEN = 1;
 }
 
-uint32_t timerGetCurrentMsec() {
+uint32_t timerGetCurrentMsec(void) {
     return _timeCurrentMsec;
 }
 
@@ -48,7 +50,7 @@ void timerUpdateCurrent(void) {
  * Private Functions
  *==================================*/
 
-static uint8_t _periodPrescaler(freq_t freq) {
+static uint8_t _freq2Prescaler(freq_t freq) {
     uint8_t prescaler = 0;
 
     switch(freq) {

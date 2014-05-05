@@ -16,8 +16,8 @@
  * Public Functions
  *==================================*/
 
-void kronosInit(task_t tasks[], uint8_t numTasks) {
-	_tasks = tasks;
+void kronosInit(task_t taskArray[], uint8_t numTasks) {
+	_taskArray = taskArray;
 	_numTasks = numTasks;
 }
 
@@ -27,11 +27,12 @@ void kronosStart(void) {
 	// TODO
 }
 
-void kronosSetSchedulerPeriod(period_t period) {
+void kronosSetSchedulerFreq(freq_t freq) {
 	// TODO
+	timerInit(freq);
 }
 
-bool_t kronosAddTask(uint8_t priority, period_t period, taskFn_t) {
+bool_t kronosAddTask(uint8_t priority, uint16_t period, fn_t fnPtr) {
 	// TODO
 	return false;
 }

@@ -22,14 +22,17 @@
 
 // TODO remove
 static void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
-    // TODO
     TFLG2 = 0x80;  // Clear TOF; acknowledge interrupt
+    timerUpdateCurrent();
 }
 
 /* ------ Main ------ */
 
 void main(void) {
    
+    // TODO remove
+    static uint32_t curTime = 0;
+
     _initBtns();
     _initLEDs();
     
@@ -64,8 +67,7 @@ void main(void) {
         shortBlockingTask();
         longBlockingTask();
         watchdogKickTask();
-        
-        serialWrite("Hello?\n");
+        curTime = timerGetCurrentMsec();
 
     }
 
@@ -77,7 +79,7 @@ void watchdogKickTask(void) {
 
     SET_LEDS(LED_WATCHDOG_KICK);
 
-    if ( WATCHDOG_FLG_ALL_SET == watchdogFlags ) {
+    if ( WATCHDOG_FLG_ALL_SET == _watchdogFlags ) {
         _FEED_COP();
 
         /* watchdog clear must be atomic so that tasks setting flags
@@ -163,17 +165,9 @@ void interrupt 2 _watchdogISR( void ) {
 
 void _initBtns(void) {
     
-    int i;
-
     /* set mutex disable btn as input */
     SET_MUTEX_DISABLE_BTN_INPUT();
     SET_TASK_ENABLE_BTN_INPUT();
-
-    /* set globals false */
-    mutexDisableBtn = false;
-    for(i = 0; i < N_TASKS; i++) {
-        taskEnableBtn[i] = false;
-    }
 
 }
 

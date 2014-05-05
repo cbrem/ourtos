@@ -25,7 +25,7 @@
 #include "derivative.h"
 #include "inttypes_MC9S12C128.h"
 #include "boolean.h"
-#include "kronOS.h"
+// TODO #include "kronOS.h"
 
  // TODO remove
 #include "serial.h"
@@ -97,9 +97,9 @@
  */
 #define SET_MUTEX_DISABLE_BTN_INPUT() \
                                     do { \
-                                        (DDRP = 0); \
-                                        (PERP = 0xFF); \
-                                    } while(0)
+                                        DDRP = 0; \
+                                        PERP = 0xFF; \
+                                    } while (0)
 #define GET_MUTEX_DISABLE_BTN() ( (~PTP) & 1 )
 
 /* 
@@ -108,19 +108,19 @@
  * see MC9S12C128V1 data sheet section 4.3.2.10
  */
 #define SET_TASK_ENABLE_BTN_INPUT() \
-                                    do { \ 
-                                        (DDRB &= (~SW3_MASK)); \
-                                        (PUCR_PUPBE = 1); \                                        
-                                    } while(0)
+                                    do { \
+                                        DDRB &= (~SW3_MASK); \
+                                        PUCR_PUPBE = 1; \
+                                    } while (0)
 #define GET_TASK_ENABLE_BTN(BTN_N) (PORTB & (1 << BTN_N))
 
 /* LEDs */
 #define SET_LEDS_OUTPUT() (DDRB |= LED_MASK) 
 #define SET_LEDS(val) \
                         do { \
-                            (PORTB &= ~LED_MASK); \
-                            (PORTB |= (~val << BYTE_LEN_BITS) & LED_MASK ); \
-                        } while(0)
+                            PORTB &= ~LED_MASK; \
+                            PORTB |= (~val << BYTE_LEN_BITS) & LED_MASK; \
+                        } while (0)
 #define GET_LEDS() ( (PORTB >> BYTE_LEN_BITS) & (LED_MASK >> BYTE_LEN_BITS) )                        
 
 /* Assorted LED light pattens  - 1 is ON, 0 is OFF */
@@ -138,20 +138,14 @@
 /* task array 
  *  add 1 to include main loop as lowest priority task
  */
-task_t taskArray[N_TASKS]; 
+// TODO task_t taskArray[N_TASKS]; 
 
 /* mutex for demo purposes only - it does not actual control any resource */
-mutex_t blockingMutex;
+// TODO mutex_t blockingMutex;
 
 /*==================================
  * Local Globals
  *==================================*/
-
-/* Button to disable mutexs */
-static bool_t _mutexDisableBtn;
-
-/* Switches to enable/disable some tasks */
-static bool_t _taskEnableBtn[N_TASKS];
 
 /* each task sets a flag for the watchdog */
 static uint8_t _watchdogFlags;

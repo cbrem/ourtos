@@ -11,8 +11,6 @@ speed of 2 MHz.
 */
 #include <hidef.h>      /* common defines and macros */
 #include <MC9S12C128.h>     /* derivative information */
-#pragma LINK_INFO DERIVATIVE "mc9s12c128"
-
 
 /* Initialize the PLL clk and modify oscillator clk speed */
 void clockSetup(void);

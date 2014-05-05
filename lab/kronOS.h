@@ -39,7 +39,7 @@
  */
 typedef struct {
     fn_t task;
-    byte_t[TASK_STACK_SIZE] stack;
+    byte_t stack[TASK_STACK_SIZE];
     bool_t running;
     bool_t enabled;
     uint8_t normalPriority;
@@ -68,11 +68,11 @@ typedef struct {
 
 static bool_t _mutexEnabled;
 
-static task_t _taskArray[];
+static task_t* _taskArray;
 static uint8_t _numTasks;
 
 // TODO: this could be an enum...
-static boot_t _started;
+static bool_t _started;
 
 /*==================================
  * Public Functions
@@ -97,7 +97,7 @@ void kronosStart(void);
 /*
  * Sets the maximum period between runs of the RTOS's scheduler.
  */
-void kronosSetSchedulerPeriod(period_t period);
+void kronosSetSchedulerFreq(freq_t freq);
 
 /*
  * Adds a task to the RTOS.
@@ -107,7 +107,7 @@ void kronosSetSchedulerPeriod(period_t period);
  * Returns true if the task was successfully added, false otherwise (e.g. if
  * this is not a valid priority).
  */
-bool_t kronosAddTask(uint8_t priority, period_t period, fn_t);
+bool_t kronosAddTask(uint8_t priority, uint16_t period, fn_t fnPtr);
         
 /*
  * Add a mutex to the RTOS which uses the given priority for priority ceiling.
