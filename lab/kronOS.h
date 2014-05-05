@@ -18,29 +18,41 @@
 #include "derivative.h"
 #include "inttypes_MC9S12C128.h"
 #include "boolean.h"
+#include "fn.h"
+#include "timer.h"
 
 /*==================================
  * MACROS
  *==================================*/
 
-/* timer */
-#define TIMER_PRESCALER (0) /* prescaler bus_clk / 1 */
-/* 
- * 32-bit value to increment timer counter on each timer overflow
- * This value is based on an 8MHz clk with prescaler 1/1 and 
- * a counter variable that is 8.24 fixed point msec.
- */
-#define TIMER_COUNTER_INCR (0x083126E9) // 137438953
+/* Bytes of stack space per task */
+#define TASK_STACK_SIZE (64)
 
 /*==================================
  * Types
  *==================================*/
 
+/*
+ * The kronOS's internal representation of a task's state.
+ * Users should not manipulate value of this type.
+ * The type if exposed to users only for memory-allocation purposes.
+ */
 typedef struct {
-    // TODO
-    int TODO;
+    fn_t task;
+    byte_t[TASK_STACK_SIZE] stack;
+    bool_t running;
+    bool_t enabled;
+    uint8_t normalPriority;
+    uint8_t currentPriority;
+    uint32_t nextRunTime;
 } task_t;
 
+/*
+ * A mutex.
+ *
+ * NOTE: A mutex will function as intended only for tasks which are scheduled
+ * by the kronOS to which the mutex belongs.
+ */
 typedef struct {
     // TODO
     int TODO;
@@ -56,13 +68,26 @@ typedef struct {
 
 static bool_t mutexEnabled;
 
-/* time variables - these are updated in timer ISR */
-static uint32_t timeMsec; /* current time in msec */
-static uint32_t timeCounter; /* 8.24 fixed point counter to keep track of time in msec*/
+// TODO: is it okay for this to be static?
+static task_t taskArray[];
+
+// TODO: this could be an enum...
+static boot_t started;
 
 /*==================================
  * Public Functions
  *==================================*/
+
+/*
+ * Set the RTOS to its initial state.
+ * This function must be called before calling any other kronOS functions.
+ * Provides the RTOS with an array, where it will store information about
+ * tasks' state.
+ * Also, sets the maximum number of tasks that this RTOS can support.
+ */
+void kronosInit(task_t tasks[], uint8_t numTasks);
+
+/* ----- Functions for a stopped kronOS ----- */
 
 /*
  * Starts the RTOS.
@@ -70,34 +95,19 @@ static uint32_t timeCounter; /* 8.24 fixed point counter to keep track of time i
 void kronosStart(void);
 
 /*
- * Shuts down a started RTOS.
+ * Sets the maximum period between runs of the RTOS's scheduler.
  */
-void kronosShutdown(void);
-
-
-/*
- * Sets the maximum number of milliseconds between runs of the RTOS's
- * scheduler.
- * This function must be called before calling rtosStart, and should not be
- * called afterward.
- */
-void kronosSetSchedulerPeriod(uint16_t period); // TODO restrict to set periods
-
-/*
- * Provides a previously allocated array in which the RTOS will store task
- * state.
- * This function must be called before calling rtosStart, and should not be
- * called afterward.
- */
-void kronosSetTaskArray(task_t tasks[], uint8_t numTasks);
+void kronosSetSchedulerPeriod(period_t period);
 
 /*
  * Adds a task to the RTOS.
  * This function must be called before calling rtosStart, and should not be
  * called afterward.
  * This function must be called after calling rtosSetTaskArray.
+ * Returns true if the task was successfully added, false otherwise (e.g. if
+ * this is not a valid priority).
  */
-void kronosAddTask(uint8_t priority, uint16_t period, void (*task) (void));
+bool_t kronosAddTask(uint8_t priority, period_t period, fn_t);
         
 /*
  * Add a mutex to the RTOS which uses the given priority for priority ceiling.
@@ -106,8 +116,17 @@ void kronosAddTask(uint8_t priority, uint16_t period, void (*task) (void));
  * mutexes or any other tasks.
  * This function may only be called before calling rtosStart, and should not be
  * called afterward.
+ * Returns true if the mutex was successfully added, false otherwise (e.g. if
+ * this is not a valid priority).
  */
-void kronosAddMutex(uint8_t priority, mutex_t *mutex);
+bool_t kronosAddMutex(uint8_t priority, mutex_t *mutex);
+
+/* ----- Functions for a started kronOS ----- */
+
+/*
+ * Shuts down a started RTOS.
+ */
+void kronosShutdown(void);
 
 /*
  * Acquires the given mutex in a task-safe manner.
@@ -118,6 +137,8 @@ void kronosAcquireMutex(mutex_t *mutex);
  * Releases the given mutex in a task-safe manner.
  */
 void kronosReleaseMutex(mutex_t *mutex);
+
+/* ----- Functions for a started/stopped kronOS ----- */
 
 /*
  * Configures the RTOS to print debug information whenever the scheduler runs.
@@ -141,30 +162,20 @@ void kronosEnableTask(uint8_t priority, bool_t enable);
  *==================================*/
 
 /*
- * _initTimer sets the global time variables timeMsec and timeCounter to zero
- *  enables the timer, enables timer interrupt and sets the prescaler to the 
- *  given value
+ * Returns the (normal) priority of the highest-priority task that is ready
+ * to run.
  */
-static void _initTimer();
+static uint8_t _scheduler(void);
 
 /*
- * getCurrentTimeMsec returns the current time in msec
- *  This function disables interrupts
- */
-static uint32_t _getCurrentTimeMsec(void);
-
-/*
- * _timerISR is triggered on a timer overflow which occurs at 
- *  the set period. This function increments the current time 
- *  as well as performs the task switching.
+ * Runs whenever a timer overflow interrupt fires.
+ * It calls the scheduler to find the highest-priority task which is ready to
+ * run. Then, it switches the stack pointer to point to the new current task,
+ * backs-up the old stack-pointer, and uses RTI to restore state and begin
+ * executing the new task.
  *
- * Task Switching
- *  The ISR looks for the next highest priority task that is ready to run
- *  (as set by the scheduler) and sets this as the current task. It 
- *  switches the stack pointer to point to the new current task, backs-up
- *  the old stack-pointer and then uses RTI to restore state and begin
- *  executing the new task.
+ * NOTE: Implementation is very platform dependent.
  */
-static void interrupt 16 _timerISR(void);
+static void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void);
 
 #endif // _KRONOS_H

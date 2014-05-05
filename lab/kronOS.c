@@ -7,55 +7,104 @@
  * 18-348 Lab 11
  */
 
+// TODO: somehow track which priorities actually have associated
+// values. because we shouldn't try to run tasks that are null!
+
 #include "kronOS.h"
 
-// myTOS, yourTOS, ourTOS!
-
- /*==================================
+/*==================================
  * Public Functions
  *==================================*/
 
-void kronosStart(void);
+void kronosInit(task_t tasks[], uint8_t numTasks) {
+	// TODO
+}
 
-void kronosShutdown(void);
+/* ----- Functions for a stopped kronOS ----- */
 
-void kronosSetSchedulerPeriod(uint16_t period);
+/*
+ * Starts the RTOS.
+ */
+void kronosStart(void) {
+	// TODO
+}
 
-void kronosSetTimerPeriod(uint8_t prescaler);
+/*
+ * Sets the maximum period between runs of the RTOS's scheduler.
+ */
+void kronosSetSchedulerPeriod(period_t period) {
+	// TODO
+}
 
-void kronosSetTaskArray(task_t tasks[], uint8_t numTasks);
-
-void kronosAddTask(uint8_t priority, uint16_t period, void (*task) (void));
+/*
+ * Adds a task to the RTOS.
+ * This function must be called before calling rtosStart, and should not be
+ * called afterward.
+ * This function must be called after calling rtosSetTaskArray.
+ * Returns true if the task was successfully added, false otherwise (e.g. if
+ * this is not a valid priority).
+ */
+bool_t kronosAddTask(uint8_t priority, period_t period, taskFn_t) {
+	// TODO
+	return false;
+}
         
-void kronosAddMutex(uint8_t priority, mutex_t *mutex);
+/*
+ * Add a mutex to the RTOS which uses the given priority for priority ceiling.
+ * This priority should be strictly higher than the priority of any task which
+ * will use the mutex, and should not conflict with the priorities of any other
+ * mutexes or any other tasks.
+ * This function may only be called before calling rtosStart, and should not be
+ * called afterward.
+ * Returns true if the mutex was successfully added, false otherwise (e.g. if
+ * this is not a valid priority).
+ */
+bool_t kronosAddMutex(uint8_t priority, mutex_t *mutex) {
+	// TODO
+	return false;
+}
 
-void kronosAcquireMutex(mutex_t *mutex);
+/* ----- Functions for a started kronOS ----- */
 
-void kronosReleaseMutex(mutex_t *mutex);
+/*
+ * Shuts down a started RTOS.
+ */
+void kronosShutdown(void) {
+	// TODO
+}
 
-void kronosEnableDebug(bool_t enable);
-
-void kronosEnableMutexes(bool_t enable);
-
-void kronosEnableTask(uint8_t priority, bool_t enable);
-
-/*==================================
- * Private Functions
- *==================================*/
-
-static void _initTimer(void) {
-
+<<<<<<< HEAD
 	/* enable timer */
 	TSCR1_TEN = 1;
 
 	/* set timer overflow interrupt */
 	TSCR2_TOI = 1;
-
-	/* set timer prescaler */
-	TSCR2_PR = TIMER_PRESCALER;
-
+=======
+/*
+ * Acquires the given mutex in a task-safe manner.
+ */
+void kronosAcquireMutex(mutex_t *mutex) {
+	// TODO
 }
 
+/*
+ * Releases the given mutex in a task-safe manner.
+ */
+void kronosReleaseMutex(mutex_t *mutex) {
+	// TODO
+}
+>>>>>>> 3204716ae4a9bba7a12c7fe12ba8a8e933a69278
+
+/* ----- Functions for a started/stopped kronOS ----- */
+
+/*
+ * Configures the RTOS to print debug information whenever the scheduler runs.
+ */
+void kronosEnableDebug(bool_t enable) {
+	// TODO
+}
+
+<<<<<<< HEAD
 static uint32_t _getCurrentTimeMsec(void) {
 	uint32_t timeTmp;
 
@@ -63,12 +112,33 @@ static uint32_t _getCurrentTimeMsec(void) {
 	DisableInterrupts;
 	timeTmp = timeMsec;
 	EnableInterrupts;
+=======
+/*
+ * Enables or disables mutexes globally.
+ * // TODO lable all relevant things Atomic
+ */
+void kronosEnableMutexes(bool_t enable) {
+	// TODO
+}
+>>>>>>> 3204716ae4a9bba7a12c7fe12ba8a8e933a69278
 
-	return timeTmp;
+/*
+ * Enables or disables the task that was originally added at the given
+ * priority.
+ */
+void kronosEnableTask(uint8_t priority, bool_t enable) {
+	// TODO
 }
 
-static void interrupt 16 _timerISR(void) {
+/*==================================
+ * Private Functions
+ *==================================*/
 
-	
+static uint8_t _scheduler(void) {
+	// TODO
+	return 0;
 }
 
+static void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
+	// TODO
+}
