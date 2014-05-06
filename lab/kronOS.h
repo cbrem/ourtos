@@ -238,7 +238,7 @@ static void _idle(void);
  * This function is meant for debugging purposes only.
  * Returns len of buffer.
  */
-static uint16_t _debugPrint(uint8_t scheduledTask);
+static void _debugPrint(uint8_t scheduledTask);
 
 /*
  * Runs whenever a timer overflow interrupt fires.

@@ -139,6 +139,8 @@ mutex_t blockingMutex;
  * Local Globals
  *==================================*/
 
+// TODO move local globals to c files
+
 /* each task sets a flag for the watchdog */
 static uint8_t _watchdogFlags;
 

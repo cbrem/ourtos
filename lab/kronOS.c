@@ -258,8 +258,9 @@ static void _idle() {
 	{ asm RTI; }
 }
 
-static uint16_t _debugPrint(uint8_t scheduledTask) {
-	return sprintf(_debugMessageFormat, _debugMessageBuffer, scheduledTask);
+static void _debugPrint(uint8_t scheduledTask) {
+	sprintf(_debugMessageBuffer, _debugMessageFormat, scheduledTask);
+	serialWrite(_debugMessageBuffer, DEBUG_MESSAGE_SIZE + 1);
 }
 
 static void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
