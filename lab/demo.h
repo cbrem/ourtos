@@ -28,7 +28,7 @@
 #include "kronOS.h"
 
 /*==================================
- * MACROS
+ * MACROS / Inline Functions
  *==================================*/
 
 /* Assorted */
@@ -87,16 +87,13 @@
 #define SW3_MASK    (0x0F)
 #define LED_MASK    (0xF0)
 
-/* set SW1 on Port P as 0 to enable input with pull-up*/
-
-/* see http://stackoverflow.com/questions/1067226/c-multi-line-macro-do-while0-vs-scope-block
- * for explaination on multiline macros
+/* set SW1 on Port P as 0 to enable input with pull-ups
+ * NOTE inline functions are used instead of multi-line macros
  */
-#define SET_MUTEX_DISABLE_BTN_INPUT() \
-                                    do { \
-                                        DDRP = 0; \
-                                        PERP = 0xFF; \
-                                    } while (0)
+inline void SET_MUTEX_DISABLE_BTN_INPUT(void) {
+    DDRP = 0;
+    PERP = 0xFF;
+}
 #define GET_MUTEX_DISABLE_BTN() ( (~PTP) & 1 )
 
 /* 
@@ -104,21 +101,19 @@
  * also set pull-up resistors to work properly with CPU module
  * see MC9S12C128V1 data sheet section 4.3.2.10
  */
-#define SET_TASK_ENABLE_BTN_INPUT() \
-                                    do { \
-                                        DDRB &= (~SW3_MASK); \
-                                        PUCR_PUPBE = 1; \
-                                    } while (0)
+inline void SET_TASK_ENABLE_BTN_INPUT(void) {
+    DDRB &= (~SW3_MASK);
+    PUCR_PUPBE = 1;
+}
 #define GET_TASK_ENABLE_BTN(BTN_N) (PORTB & (1 << BTN_N))
 
 /* LEDs */
 #define SET_LEDS_OUTPUT() (DDRB |= LED_MASK) 
-#define SET_LEDS(val) \
-                        do { \
-                            PORTB &= ~LED_MASK; \
-                            PORTB |= (~val << BYTE_LEN_BITS) & LED_MASK; \
-                        } while (0)
-#define GET_LEDS() ( (PORTB >> BYTE_LEN_BITS) & (LED_MASK >> BYTE_LEN_BITS) )                        
+inline void SET_LEDS(uint8_t val) {
+    PORTB &= ~LED_MASK;
+    PORTB |= (~val << NIB_LEN_BITS) & LED_MASK;
+}
+#define GET_LEDS() ( (PORTB >> NIB_LEN_BITS) & (LED_MASK >> NIB_LEN_BITS) )
 
 /* Assorted LED light pattens  - 1 is ON, 0 is OFF */
 #define LED_OFF             (0x0) /* 0000 */
