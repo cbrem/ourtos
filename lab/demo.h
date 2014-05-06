@@ -88,9 +88,9 @@
 #define LED_MASK    (0xF0)
 
 /* set SW1 on Port P as 0 to enable input with pull-ups
- * NOTE inline functions are used instead of multi-line macros
+ * NOTE functions are used instead of multi-line macros
  */
-inline void SET_MUTEX_DISABLE_BTN_INPUT(void) {
+static void SET_MUTEX_DISABLE_BTN_INPUT(void) {
     DDRP = 0;
     PERP = 0xFF;
 }
@@ -101,7 +101,7 @@ inline void SET_MUTEX_DISABLE_BTN_INPUT(void) {
  * also set pull-up resistors to work properly with CPU module
  * see MC9S12C128V1 data sheet section 4.3.2.10
  */
-inline void SET_TASK_ENABLE_BTN_INPUT(void) {
+static void SET_TASK_ENABLE_BTN_INPUT(void) {
     DDRB &= (~SW3_MASK);
     PUCR_PUPBE = 1;
 }
@@ -109,7 +109,7 @@ inline void SET_TASK_ENABLE_BTN_INPUT(void) {
 
 /* LEDs */
 #define SET_LEDS_OUTPUT() (DDRB |= LED_MASK) 
-inline void SET_LEDS(uint8_t val) {
+static void SET_LEDS(uint8_t val) {
     PORTB &= ~LED_MASK;
     PORTB |= (~val << NIB_LEN_BITS) & LED_MASK;
 }
