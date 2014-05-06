@@ -35,7 +35,7 @@
  */
 #define MAIN_LOOP_PRIORITY (_maxPriority)
 
-#define DEBUG_MESSAGE_SIZE (256)
+#define DEBUG_MSG_BUF_SIZE (256)
 
 #define LOW_BYTE(val)   ( (uint16_t)val & 0xFF )
 #define HIGH_BYTE(val)  ( ((uint16_t)val >> 8) & 0xFF )
@@ -50,7 +50,7 @@ static byte_t *_debugMsgTop = "=================================================
 static byte_t *_debugMsgTaskID = "Current Task ID: %02d\n\n";
 static byte_t *_debugMsgHeader =    "| Priority | CurPriority | Usage | TimeNext | Period | Running | Enabled |\n";
 static byte_t *_debugMsgHeaderBar = "+----------+-------------+-------+----------+--------+---------+---------+\n";
-static byte_t *_debugMsgTaskLine =  "|       %02d |          %02d |  task | %08d | %06d |       %01d |       %01d |\n";
+static byte_t *_debugMsgTaskLine =  "|       %02d |          %02d |  task |   %06d | %06d |       %01d |       %01d |\n";
 static byte_t *_debugMsgMutexLine = "|       %02d |           - | mutex |        - |      - |       - |       - |\n";
 static byte_t *_debugMsgNoneLine =  "|       %02d |           - |  none |        - |      - |       - |       - |\n";
 
@@ -124,7 +124,7 @@ static bool_t _started;
 
 static uint8_t _currentTask;
 
-static byte_t _debugMsgBuf[DEBUG_MESSAGE_SIZE + 1];
+static byte_t _debugMsgBuf[DEBUG_MSG_BUF_SIZE];
 
 /*==================================
  * Public Functions

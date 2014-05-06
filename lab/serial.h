@@ -51,12 +51,12 @@ void serialInit(baud_t baud);
 /*
  * Writes len bytes of the given buffer over serial.
  */
-void serialWrite(byte_t buffer[], uint8_t len);
+void serialWrite(byte_t buffer[], uint16_t len);
 
 /*
  * Reads len bytes from serial into the given buffer.
  */
-void serialRead(byte_t buffer[], uint8_t len);
+void serialRead(byte_t buffer[], uint16_t len);
 
 /*==================================
  * Private Functions
