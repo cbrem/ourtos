@@ -7,8 +7,8 @@
 
 typedef enum
 {
-    false,
-    true 
+    false = 0,
+    true = 1 
 } bool_t; 
 
 #endif // _BOOLEAN_H

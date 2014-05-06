@@ -20,51 +20,33 @@
 * Public Functions
 *==================================*/
 
-// TODO remove
-static void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
-    TFLG2 = 0x80;  // Clear TOF; acknowledge interrupt
-    timerUpdateCurrent();
-}
-
 /* ------ Main ------ */
 
 void main(void) {
-   
-    // TODO remove
-    static uint32_t curTime = 0;
 
     _initBtns();
     _initLEDs();
         
     /* set-up the RTOS */
-    // TODO kronosSetSchedulerPeriod(SCHEDULER_PERIOD);
-    // TODO kronosSetTaskArray(taskArray, N_TASKS);
-    // TODO kronosAddTask(PRIORITY_WATCHDOG, WATCHDOG_TASK_PERIOD, &watchdogKickTask);
-    // TODO kronosAddTask(PRIORITY_POLL_BTN, POLL_BTN_TASK_PERIOD, &pollBtnsTask);
-    // TODO kronosAddTask(PRIORITY_SHORT, SHORT_TASK_PERIOD, &shortBlockingTask);
-    // TODO kronosAddTask(PRIORITY_LONG, LONG_TASK_PERIOD, &longBlockingTask);
-    // TODO kronosAddMutex(PRIORITY_MUTEX, &blockingMutex);
-    // TODO kronosEnableMutexes(true);
-    // TODO kronosEnableDebug(true);
+    kronosSetSchedulerPeriod(SCHEDULER_PERIOD);
+    kronosSetTaskArray(taskArray, MAX_PRIORTY);
+    kronosAddTask(PRIORITY_WATCHDOG, WATCHDOG_TASK_PERIOD, &watchdogKickTask);
+    kronosAddTask(PRIORITY_POLL_BTN, POLL_BTN_TASK_PERIOD, &pollBtnsTask);
+    kronosAddTask(PRIORITY_SHORT, SHORT_TASK_PERIOD, &shortBlockingTask);
+    kronosAddTask(PRIORITY_LONG, LONG_TASK_PERIOD, &longBlockingTask);
+    kronosAddMutex(PRIORITY_MUTEX, &blockingMutex);
+    kronosEnableMutexes(true);
+    kronosEnableDebug(true);
 
     /* starts the watchdog */
     _initWatchdog();
 
-    /* start the RTOS */
-    // TODO kronosStart();
-
+    /* start the RTOS. This enables interrupts. */
+    kronosStart();
 
     for (;;)
     {
         /* infinite loop */
-
-        // TODO temp test of functionality with cyclic exec
-        pollBtnsTask();
-        shortBlockingTask();
-        longBlockingTask();
-        watchdogKickTask();
-        curTime = timerGetCurrentMsec();
-
     }
 
 }
@@ -94,23 +76,30 @@ void watchdogKickTask(void) {
 
 void pollBtnsTask(void) {
     int i;
+    bool_t taskEnabled[N_TASKS];
 
     SET_LEDS(LED_POLL_BTN);
 
     if ( 1 == GET_MUTEX_DISABLE_BTN() ) {
-        // kronosEnableMutexes(true) /* atomic */
+        kronosEnableMutexes(true);
     } else {
-        // kronosEnableMutexes(false) /* atomic */
+        kronosEnableMutexes(false);
     }
 
     /* poll all task enable btns */
     for( i = 0; i < N_TASKS; i++) {
         if ( 0 != GET_TASK_ENABLE_BTN(i) ) {
-            // kronosEnableTask(i, true);
+            taskEnabled[i] = true;
         } else {
-            // kronosEnableTask(i, false);
+            taskEnabled[i] = false;
         }
     }
+
+    /* disable or enable tasks based upon btn */
+    kronosEnableTask(PRIORITY_WATCHDOG, taskEnabled[0]);
+    kronosEnableTask(PRIORITY_POLL_BTN, taskEnabled[1]);
+    kronosEnableTask(PRIORITY_SHORT, taskEnabled[2]);
+    kronosEnableTask(PRIORITY_LONG, taskEnabled[3]);
 
     SET_WATCHDOG_FLGS(ID_POLL_BTN);
 
@@ -147,14 +136,14 @@ void longBlockingTask(void) {
 
 void interrupt 2 _watchdogISR( void ) {
     
+    kronosStop();
+    
     SET_LEDS_OUTPUT();
     SET_LEDS(LED_WATCHDOG);
 
     for(;;) {
         /* Hang in error state */
     }
-    // TODO restart?
-
 }
 
 /* ------ Initialization ------ */

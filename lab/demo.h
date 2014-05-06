@@ -25,11 +25,7 @@
 #include "derivative.h"
 #include "inttypesMC9S12C128.h"
 #include "boolean.h"
-// TODO #include "kronOS.h"
-
- // TODO remove
-#include "serial.h"
-#include "timer.h"
+#include "kronOS.h"
 
 /*==================================
  * MACROS
@@ -37,6 +33,7 @@
 
 /* Assorted */
 #define N_TASKS (4)
+#define MAX_PRIORTY (5)
 #define CYCLES_PER_MS (200)
 
 /* Watchdog */
@@ -138,10 +135,10 @@
 /* task array 
  *  add 1 to include main loop as lowest priority task
  */
-// TODO task_t taskArray[N_TASKS]; 
+task_t taskArray[MAX_PRIORTY]; 
 
 /* mutex for demo purposes only - it does not actual control any resource */
-// TODO mutex_t blockingMutex;
+mutex_t blockingMutex;
 
 /*==================================
  * Local Globals

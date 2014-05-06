@@ -19,6 +19,7 @@
 #include "inttypesMC9S12C128.h"
 #include "boolean.h"
 #include "fn.h"
+#include "serial.h"
 #include "timer.h"
 
 /*==================================
@@ -27,6 +28,11 @@
 
 /* Bytes of stack space per task */
 #define TASK_STACK_SIZE (64)
+
+/* The scheduler schedules task _maxPriority to mean that the main loop should
+ * run.
+ */
+#define MAIN_LOOP_INDEX (_maxPriority)
 
 /*==================================
  * Types
@@ -79,9 +85,21 @@ typedef uint8_t mutex_t;
  *==================================*/
 
 static bool_t _mutexesEnabled;
+
 static task_t* _taskArray;
+
 static uint8_t _maxPriority;
+
+/* garabage stack for use during ISR */
+static uint8_t _ISRstack[TASK_STACK_SIZE];
+
+/* main loop stack pointer to enable running of main loop 
+ * when nothing else wants to run.
+*/
+uint8_t* _mainLoopStackPtr;
+
 static bool_t _started;
+
 static uint8_t _currentTask;
 
 /*==================================
@@ -214,5 +232,15 @@ static void _debugPrint(void);
  * NOTE: Implementation is very platform dependent.
  */
 static void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void);
+
+/* 
+ * _updateTaskTimes iterates through the tasks and subtracts 
+ * elapsed time from time to run. Time to run represents how far in the 
+ * future the task should run. A positive value for time to run 
+ * means the funtion is set to run in the future while a negative
+ * value means that the task is overdue to run. Elapsed time is the
+ * amount of time since the prior run of the scheduler.
+ */
+static void _updateTaskTimes(int32_t elapsedTime);
 
 #endif // _KRONOS_H
