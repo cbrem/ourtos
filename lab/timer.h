@@ -90,11 +90,13 @@ void timerInit(freq_t freq);
 
 /*
  * Enables the timer overflow interrupt.
+ * This is atomic and does not disable interrupts.
  */
 void timerEnableInterrupt(void);
 
 /*
  * Disables the timer overflow interrupt.
+ * This is atomic and does not disable interrupts.
  */
 void timerDisableInterrupt(void);
 

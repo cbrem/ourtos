@@ -81,9 +81,13 @@ void pollBtnsTask(void) {
     SET_LEDS(LED_POLL_BTN);
 
     if ( 1 == GET_MUTEX_DISABLE_BTN() ) {
+        DisableInterrupts;
         kronosEnableMutexes(true);
+        EnableInterrupts;
     } else {
+        DisableInterrupts;
         kronosEnableMutexes(false);
+        EnableInterrupts;
     }
 
     /* poll all task enable btns */
@@ -96,10 +100,12 @@ void pollBtnsTask(void) {
     }
 
     /* disable or enable tasks based upon btn */
+    DisableInterrupts;
     kronosEnableTask(PRIORITY_WATCHDOG, taskEnabled[0]);
     kronosEnableTask(PRIORITY_POLL_BTN, taskEnabled[1]);
     kronosEnableTask(PRIORITY_SHORT, taskEnabled[2]);
     kronosEnableTask(PRIORITY_LONG, taskEnabled[3]);
+    EnableInterrupts;
 
     SET_WATCHDOG_FLGS(ID_POLL_BTN);
 
@@ -109,9 +115,15 @@ void shortBlockingTask(void) {
     
     SET_LEDS(LED_SHORT_BLK);
 
-    //kronosAcquireMutex(&blockingMutex);
+    DisableInterrupts;
+    kronosAcquireMutex(&blockingMutex);
+    EnableInterrupts;
+
     _blockingDelayMsec(SHORT_BLOCK_TIME);
-    //kronosReleaseMutex(&blockingMutex);
+    
+    DisableInterrupts;
+    kronosReleaseMutex(&blockingMutex);
+    EnableInterrupts;
 
     SET_WATCHDOG_FLGS(ID_SHORT_BLK);
 }
@@ -120,9 +132,15 @@ void longBlockingTask(void) {
 
     SET_LEDS(LED_LONG_BLK);
 
-    //kronosAcquireMutex(&blockingMutex);
+    DisableInterrupts;
+    kronosAcquireMutex(&blockingMutex);
+    EnableInterrupts;
+
     _blockingDelayMsec(LONG_BLOCK_TIME);
-    //kronosReleaseMutex(&blockingMutex);
+    
+    DisableInterrupts;
+    kronosReleaseMutex(&blockingMutex);
+    EnableInterrupts;
 
     SET_WATCHDOG_FLGS(ID_LONG_BLK);
 

@@ -35,10 +35,12 @@ uint32_t timerGetCurrentMsec(void) {
 }
 
 void timerEnableInterrupt() {
+    /* atomic */
     TSCR1_TEN = 1;
 }
 
 void timerDisableInterrupt() {
+    /* atomic */
     TSCR1_TEN = 0;
 }
 

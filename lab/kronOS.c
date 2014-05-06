@@ -283,17 +283,21 @@ static void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
 		
 		if ( false == _taskArray[taskIndex].running ) {
 			/* Create launch stack if not currently running
-			 * This operation sets the stack pointer
+			 * This operation sets the stack pointer.
 			 */
 			_createNewStack(taskIndex);
+			_taskArray[i].running = true;
 		}
 		
 		/* grab stack ptr */
 		stackPtrTmp = _taskArray[taskIndex].stackPtr;
-		/* task is now runing */
-		_taskArray[taskIndex].running = true;
 		
-		/* update next run time to be 1 period away */
+		/* Update next run time to be 1 period away.
+		 * If timeToNextRun was more than 1 period away before then
+		 * it stays negative which means that the task will 
+		 * attempt to run again as soon as possible. This also
+		 * signals that the task missed at least one prior deadline. 
+		 */
 		_taskArray[taskIndex].timeToNextRun += _taskArray[taskIndex].period;
 
 	}
@@ -310,6 +314,29 @@ static void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
 	 * state (as set by the create stack function) if the task
 	 * is being initialized. 
 	 */
+}
+
+static void _createNewStack(uint8_t priority) {
+	uint8_t stackPtr = TASK_STACK_SIZE;
+
+	/* set-up the return fuction lowest on the stack
+	 * This is the function that the task returns to upon
+	 * completion.
+	 */
+	_taskArray[i].stack[stackPtr - 1] = LOW_BYTE(&_idle);
+	_taskArray[i].stack[stackPtr - 2] = HIGH_BYTE(&_idle);
+
+	/* set-up the function pointer. This is placed such that it becomes 
+	 * the return function for the RTI from the timer ISR
+	 */
+	_taskArray[i].stack[stackPtr - 3] = LOW_BYTE(&_taskArray[i].task);
+	_taskArray[i].stack[stackPtr - 4] = HIGH_BYTE(&_taskArray[i].task);
+
+	/* set the various task struct elems. The stack pointer is the 
+	 * location in the task's stack pointing to the top of the dummy 
+	 * register values which are used in the timer ISR RTI.
+	 */
+	_taskArray[i].stackPtr = &_taskArray[i].stack[stackPtr - RTI_DUMY_REG_BYTES];
 }
 
 static void _updateTaskTimes(int32_t elapsedTime) {

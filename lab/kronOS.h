@@ -34,6 +34,11 @@
  */
 #define MAIN_LOOP_INDEX (_maxPriority)
 
+#define LOW_BYTE(val)   ( (uint16_t)val & 0xFF )
+#define HIGH_BYTE(val)  ( ((uint16_t)val >> 8) & 0xFF )
+
+#define RTI_DUMY_REG_BYTES (11)
+
 /*==================================
  * Types
  *==================================*/
@@ -44,16 +49,16 @@
  * The type if exposed to users only for memory-allocation purposes.
  */
 typedef struct {
-    usage_t usage;                  // The usage of this priority.
-    byte_t stack[TASK_STACK_SIZE];  // Stack for this task.
-    int32_t timeToNextRun;          // Time to next run in ms.
-    uint16_t period;                // Number of ms between task runs.
-    fn_t task;                      // Pointer to the function to run.
-    uint16_t stackPtr;              // Saved stack pointer.
-    bool_t running;                 // It is currently running?
-    bool_t enabled;                 // Should it ever run?
-    uint8_t normalPriority;         // Priority when not holding mutexes.
-    uint8_t currentPriority;        // Priority, possibly elevated by mutexes.
+    usage_t usage;                  /* The usage of this priority. */
+    byte_t stack[TASK_STACK_SIZE];  /* Stack for this task. */
+    int32_t timeToNextRun;          /* Time to next run in ms. */
+    uint16_t period;                /* Number of ms between task runs. */
+    fn_t task;                      /* Pointer to the function to run. */
+    uint16_t stackPtr;              /* Saved stack pointer. */
+    bool_t running;                 /* It is currently running? */
+    bool_t enabled;                 /* Should it ever run? */
+    uint8_t normalPriority;         /* Priority when not holding mutexes. */
+    uint8_t currentPriority;        /* Priority, possibly elevated by mutexes. */
 } task_t;
 
 /*
@@ -232,6 +237,27 @@ static void _debugPrint(void);
  * NOTE: Implementation is very platform dependent.
  */
 static void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void);
+
+/* 
+ * Initializes a new stack for a new task at given priority.
+ * Stuffs the task with a return function for the completion of the task
+ * as well as a return function for the timerISR RTI to start execution
+ * of the task. Also updates the stack pointer.
+ * The stack looks like:
+ *
+ *  BTM | &_idle LOW BYTE   (for task completion)
+ *      | &_idle HIGH BYTE
+ *      | &task  LOW BYTE   (for timerISR RTI)
+ *      | &task  HIGH BYTE
+ *      | dummy reg         (for timerISR RTI)
+ *      | dummy reg
+ *      | dummy reg
+ *      | dummy reg
+ *      | dummy reg
+ *      | dummy reg
+ *  SP->| dummy reg
+ */
+static void _createNewStack(uint8_t priority);
 
 /* 
  * _updateTaskTimes iterates through the tasks and subtracts 
