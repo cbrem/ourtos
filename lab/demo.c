@@ -23,19 +23,18 @@
 /* ------ Main ------ */
 
 void main(void) {
+    bool_t errCode; // TODO do something with this
 
     _initBtns();
     _initLEDs();
         
     /* set-up the RTOS */
-    kronosSetSchedulerFreq(SCHEDULER_FREQ);
-    kronosSetTaskArray(taskArray, MAX_PRIORTY);
-    kronosAddTask(PRIORITY_WATCHDOG, WATCHDOG_TASK_PERIOD, &watchdogKickTask);
-    kronosAddTask(PRIORITY_POLL_BTN, POLL_BTN_TASK_PERIOD, &pollBtnsTask);
-    kronosAddTask(PRIORITY_SHORT, SHORT_TASK_PERIOD, &shortBlockingTask);
-    kronosAddTask(PRIORITY_LONG, LONG_TASK_PERIOD, &longBlockingTask);
-    kronosAddMutex(PRIORITY_MUTEX, &blockingMutex);
-    kronosEnableMutexes(true);
+    kronosInit(taskArray, MAX_PRIORTY, SCHEDULER_FREQ);
+    errCode = kronosAddTask(PRIORITY_WATCHDOG, WATCHDOG_TASK_PERIOD, &watchdogKickTask);
+    errCode = kronosAddTask(PRIORITY_POLL_BTN, POLL_BTN_TASK_PERIOD, &pollBtnsTask);
+    errCode = kronosAddTask(PRIORITY_SHORT, SHORT_TASK_PERIOD, &shortBlockingTask);
+    errCode = kronosAddTask(PRIORITY_LONG, LONG_TASK_PERIOD, &longBlockingTask);
+    errCode = kronosAddMutex(PRIORITY_MUTEX, &blockingMutex);
     kronosEnableDebug(true);
 
     /* starts the watchdog */
@@ -154,7 +153,7 @@ void longBlockingTask(void) {
 
 void interrupt 2 _watchdogISR( void ) {
     
-    kronosStop();
+    kronosShutdown();
 
     SET_LEDS_OUTPUT();
     SET_LEDS(LED_WATCHDOG);

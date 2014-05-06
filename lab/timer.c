@@ -57,7 +57,7 @@ void timerUpdateCurrent(void) {
 
 int32_t timerElapsedTime(void) {
     /* this cast is the undefined behavior */
-    uint32_t curTime = timerGetCurrentMsec()
+    uint32_t curTime = timerGetCurrentMsec();
     int32_t elapsedTime = (int32_t)(curTime - _lastTimestamp);
     /* update the global last timestamp */
     _lastTimestamp = curTime;

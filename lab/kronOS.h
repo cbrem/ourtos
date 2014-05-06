@@ -15,6 +15,7 @@
  *==================================*/
 
 #include <hidef.h>
+#include <stdio.h>
 #include "derivative.h"
 #include "inttypesMC9S12C128.h"
 #include "boolean.h"
@@ -45,29 +46,11 @@
  * Constants
  *==================================*/
 
-const static char *_debugMessageFormat = "Current task ID: %02X\n";
+static char *_debugMessageFormat = "Current task ID: %02X\n";
 
 /*==================================
  * Types
  *==================================*/
-
-/*
- * The kronOS's internal representation of a task's state.
- * Users should not manipulate value of this type.
- * The type if exposed to users only for memory-allocation purposes.
- */
-typedef struct {
-    usage_t usage;                  /* The usage of this priority. */
-    byte_t stack[TASK_STACK_SIZE];  /* Stack for this task. */
-    int32_t timeToNextRun;          /* Time to next run in ms. */
-    uint16_t period;                /* Number of ms between task runs. */
-    fn_t task;                      /* Pointer to the function to run. */
-    uint16_t stackPtr;              /* Saved stack pointer. */
-    bool_t running;                 /* It is currently running? */
-    bool_t enabled;                 /* Should it ever run? */
-    uint8_t normalPriority;         /* Priority when not holding mutexes. */
-    uint8_t currentPriority;        /* Priority, possibly elevated by mutexes. */
-} task_t;
 
 /*
  * The usage of a priority.
@@ -77,6 +60,24 @@ typedef enum {
     USAGE_TASK,
     USAGE_MUTEX
 } usage_t;
+
+/*
+ * The kronOS's internal representation of a task's state.
+ * Users should not manipulate value of this type.
+ * The type if exposed to users only for memory-allocation purposes.
+ */
+typedef struct {
+    usage_t usage;                  /* The usage of this priority. */
+    uint8_t stack[TASK_STACK_SIZE];  /* Stack for this task. */
+    int32_t timeToNextRun;          /* Time to next run in ms. */
+    uint16_t period;                /* Number of ms between task runs. */
+    fn_t task;                      /* Pointer to the function to run. */
+    uint8_t* stackPtr;              /* Saved stack pointer. */
+    bool_t running;                 /* It is currently running? */
+    bool_t enabled;                 /* Should it ever run? */
+    uint8_t normalPriority;         /* Priority when not holding mutexes. */
+    uint8_t currentPriority;        /* Priority, possibly elevated by mutexes. */
+} task_t;
 
 /*
  * A mutex.
@@ -98,6 +99,7 @@ typedef uint8_t mutex_t;
  *==================================*/
 
 static bool_t _mutexesEnabled;
+static bool_t _debug;
 
 static task_t* _taskArray;
 
@@ -234,8 +236,9 @@ static void _idle(void);
 /*
  * Print information about the state of the RTOS over serial.
  * This function is meant for debugging purposes only.
+ * Returns len of buffer.
  */
-static void _debugPrint(void);
+static uint16_t _debugPrint(uint8_t scheduledTask);
 
 /*
  * Runs whenever a timer overflow interrupt fires.

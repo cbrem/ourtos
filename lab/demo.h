@@ -73,7 +73,7 @@
 #define PERIOD_10000_MSEC  10000
 
 /* task timing - see documentation for reasoning */
-#define SCHEDULER_PERIOD        (PERIOD_100_MSEC)
+#define SCHEDULER_FREQ          (FREQ_8_MHZ)
 #define POLL_BTN_TASK_PERIOD    (PERIOD_500_MSEC)
 #define WATCHDOG_TASK_PERIOD    (PERIOD_500_MSEC)
 #define SHORT_TASK_PERIOD       (PERIOD_2000_MSEC)
@@ -92,7 +92,7 @@
 /* see http://stackoverflow.com/questions/1067226/c-multi-line-macro-do-while0-vs-scope-block
  * for explaination on multiline macros
  */
-#define SET_MUTEX_DISABLE_BTN_INPUT() \ // TODO move to inline
+#define SET_MUTEX_DISABLE_BTN_INPUT() \
                                     do { \
                                         DDRP = 0; \
                                         PERP = 0xFF; \

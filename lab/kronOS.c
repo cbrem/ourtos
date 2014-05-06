@@ -50,6 +50,7 @@ void kronosInit(task_t taskArray[], uint8_t maxPriority, freq_t freq) {
 	 */
 	_maxPriority = maxPriority;
 	_started = false;
+	_debug = false;
 	_mutexesEnabled = true;
 	_currentTask = MAIN_LOOP_INDEX;
 
@@ -73,7 +74,7 @@ void kronosStart() {
 	timerEnableInterrupt();
 
 	/* Loop until the users stops the RTOS. At this point, return. */
-	while (true) {
+	for (;;) {
 		DisableInterrupts;
 		if (!_started) { break; }
 		EnableInterrupts;
@@ -157,7 +158,7 @@ void kronosAcquireMutex(mutex_t *mutex) {
 	/* Promote the current task (i.e. the task that called this function) to
 	 * the priority associated with the mutex.
 	 */
-	_taskArray[_currentTask].currentPriority = priorty;
+	_taskArray[_currentTask].currentPriority = priority;
 }
 
 void kronosReleaseMutex(mutex_t *mutex) {
@@ -165,8 +166,9 @@ void kronosReleaseMutex(mutex_t *mutex) {
 	 * normal priority.
 	 * Note that we do not care if mutexes are currently disabled.
 	 */
+	(void)mutex; // TODO mutex set-up may not be best
 	_taskArray[_currentTask].currentPriority =
-		_taskArray[_currentTask].normal;	
+		_taskArray[_currentTask].normalPriority;	
 }
 
 /* ----- Functions for a started/stopped kronOS ----- */
@@ -189,7 +191,7 @@ void kronosEnableTask(uint8_t priority, bool_t enable) {
 		return;
 	}
 
-	_taskArray[priority].enabled != enable;
+	_taskArray[priority].enabled = enable;
 }
 
 /*==================================
@@ -237,12 +239,12 @@ static void _idle() {
 	/* Record that current task is no longer running. */
 	DisableInterrupts;
 	_taskArray[_currentTask].running = false;
-	EnableInterrupts.
+	EnableInterrupts;
 
 	/* As long as _started is true (i.e. the timer isr is enabled),
 	 * wait for it to interrupt us.
 	 */
-	while (true) {
+	for (;;) {
 		DisableInterrupts;
 		if (!_started) { break; }
 		EnableInterrupts;
@@ -252,15 +254,12 @@ static void _idle() {
 	/* If _started becomes false (i.e. the timer isr is stopped),
 	 * RTI into the main loop.
 	 */
-	// TODO: is this maybe right...?
-	{
-		asm LDS _mainLoopStackPointer;
-		asm RTI;
-	}
+	{ asm LDS _mainLoopStackPtr; } 
+	{ asm RTI; }
 }
 
-static void _debugPrint(uint8_t scheduledTask) {
-	sprintf(_debugBuffer, debugMessageBuffer, scheduledTask);
+static uint16_t _debugPrint(uint8_t scheduledTask) {
+	return sprintf(_debugMessageFormat, _debugMessageBuffer, scheduledTask);
 }
 
 static void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
@@ -270,6 +269,7 @@ static void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
 	 */
 	static uint8_t* stackPtrTmp;
 	static uint8_t scheduledTask;
+	static int32_t elapsedTime;
 
 	/* acknowledge interrupt */
 	TFLG2_TOF = 1;
@@ -297,7 +297,8 @@ static void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
 	timerUpdateCurrent();
 
 	/* update task timing - note that this requires interrupts be disabled */
-	_updateTaskTimes(timerElapsedTime());
+	elapsedTime = timerElapsedTime();
+	_updateTaskTimes(elapsedTime);
 
 	/* Run the scheduler every time through the ISR
 	 * The scheduler determines which task to run once the 
@@ -366,27 +367,27 @@ static void _createNewStack(uint8_t priority) {
 	 * This is the function that the task returns to upon
 	 * completion.
 	 */
-	_taskArray[i].stack[stackPtr - 1] = LOW_BYTE(&_idle);
-	_taskArray[i].stack[stackPtr - 2] = HIGH_BYTE(&_idle);
+	_taskArray[priority].stack[stackPtr - 1] = LOW_BYTE(&_idle);
+	_taskArray[priority].stack[stackPtr - 2] = HIGH_BYTE(&_idle);
 
 	/* set-up the function pointer. This is placed such that it becomes 
 	 * the return function for the RTI from the timer ISR
 	 */
-	_taskArray[i].stack[stackPtr - 3] = LOW_BYTE(&_taskArray[i].task);
-	_taskArray[i].stack[stackPtr - 4] = HIGH_BYTE(&_taskArray[i].task);
+	_taskArray[priority].stack[stackPtr - 3] = LOW_BYTE(&_taskArray[priority].task);
+	_taskArray[priority].stack[stackPtr - 4] = HIGH_BYTE(&_taskArray[priority].task);
 
 	/* set the various task struct elems. The stack pointer is the 
 	 * location in the task's stack pointing to the top of the dummy 
 	 * register values which are used in the timer ISR RTI.
 	 */
-	_taskArray[i].stackPtr = &_taskArray[i].stack[stackPtr - RTI_DUMY_REG_BYTES];
+	_taskArray[priority].stackPtr = &_taskArray[priority].stack[stackPtr - RTI_DUMY_REG_BYTES];
 }
 
 static void _updateTaskTimes(int32_t elapsedTime) {
 	int i;
 
 	/* iter throught valid tasks and subratract elapsedTime */
-	for( i = 0; i < _numTasks; i++ ) {
+	for( i = 0; i < _maxPriority; i++ ) {
 		if ( USAGE_TASK == _taskArray[i].usage ) {
 			_taskArray[i].timeToNextRun -= elapsedTime;
 		}
