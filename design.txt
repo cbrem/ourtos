@@ -77,13 +77,13 @@ RTOS API:
 Division of labor:
 
 Connor:
-- RTOS mutex
+/- RTOS mutex
 - RTOS scheduler
-- Demo tasks
-- Serial Library
+/- Demo tasks
+/- Serial Library
 
 Spencer:
-- RTOS timer
+/- RTOS timer
 - (RTOS yield)
 /- Demo tasks
 /- Watchdog

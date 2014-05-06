@@ -28,8 +28,6 @@ void timerInit(freq_t freq) {
     /* set timer prescaler */
     TSCR2_PR = _freq2Prescaler(freq);
 
-    /* enable timer */
-    TSCR1_TEN = 1;
 }
 
 uint32_t timerGetCurrentMsec(void) {
@@ -37,10 +35,12 @@ uint32_t timerGetCurrentMsec(void) {
 }
 
 void timerEnableInterrupt() {
+    /* atomic */
     TSCR1_TEN = 1;
 }
 
 void timerDisableInterrupt() {
+    /* atomic */
     TSCR1_TEN = 0;
 }
 
