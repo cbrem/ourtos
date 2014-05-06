@@ -70,7 +70,19 @@ typedef struct {
 static bool_t _mutexEnabled;
 
 static task_t* _taskArray;
+
 static uint8_t _numTasks;
+#define MAIN_LOOP_INDEX (_numTasks)
+
+static uint8_t _currentTask;
+
+/* garabage stack for use during ISR */
+uint8_t _ISRstack[TASK_STACK_SIZE];
+
+/* main loop stack pointer to enable running of main loop 
+ * when nothing else wants to run.
+*/
+uint8_t* _mainLoopStackPtr;
 
 // TODO: this could be an enum...
 static bool_t _started;
@@ -178,5 +190,15 @@ static uint8_t _scheduler(void);
  * NOTE: Implementation is very platform dependent.
  */
 static void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void);
+
+/* 
+ * _updateTaskTimes iterates through the tasks and subtracts 
+ * elapsed time from time to run. Time to run represents how far in the 
+ * future the task should run. A positive value for time to run 
+ * means the funtion is set to run in the future while a negative
+ * value means that the task is overdue to run. Elapsed time is the
+ * amount of time since the prior run of the scheduler.
+ */
+static void _updateTaskTimes(int32_t elapsedTime);
 
 #endif // _KRONOS_H

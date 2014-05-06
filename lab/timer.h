@@ -32,7 +32,9 @@
 #define FREQ_2_MHZ_PRESCALER 	(2)
 #define FREQ_1_MHZ_PRESCALER 	(3)
 
-/* time increments per freq - all are 32 bit */
+/* time increments per freq - all are 32 bit
+ * for 8.24 fixed point representation 
+ */
 #define FREQ_8_MHZ_INCR (0x083126E9)
 #define FREQ_4_MHZ_INCR (0x10624DD2)
 #define FREQ_2_MHZ_INCR (0x20C49BA5)
@@ -73,6 +75,9 @@ static uint32_t _timeCountMsec;
 /* timeIncrement is the value to increment the timer counter by each rollover */
 static uint32_t _timeIncrement;
 
+/* timestamp for use in elapsed time */
+static uint32_t _lastTimestamp;
+
 /*==================================
  * Public Functions
  *==================================*/
@@ -106,6 +111,17 @@ uint32_t timerGetCurrentMsec(void);
  * that the current time stays valid.
  */
 void timerUpdateCurrent(void);
+
+/*
+ * timerElapsedTime returns the elapsed time since last calling this function
+ * This function relies on _lastTimestamp global. Behavior of this 
+ * function is undefined if not sampled frequently enough.
+ *
+ * NOTE: This function may yield invalid results if interrupted.
+ * Users should ensure that interrupts are disabled when calling it.
+ */
+ // TODO fix undefined behavior
+int32_t timerElapsedTime(void);
 
 /*==================================
  * Private Functions

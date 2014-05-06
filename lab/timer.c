@@ -17,9 +17,10 @@ void timerInit(freq_t freq) {
     /* from modclock - set the module to 8MHz */
     clockSetup();
 
-    /* Reset current time and time count. */
+    /* Reset current time, time count and last time stamp */
     _timeCurrentMsec = 0;
     _timeCountMsec = 0;
+    _lastTimestamp = 0;
 
     /* set timer overflow interrupt */
     TSCR2_TOI = 1;
@@ -52,6 +53,15 @@ void timerUpdateCurrent(void) {
     
     /* _timeCountMsec is masked to remove the seconds which are now in the tineCurrentMsec var */
     _timeCountMsec &= TIME_COUNT_FRAC_SEC_MASK;
+}
+
+int32_t timerElapsedTime(void) {
+    /* this cast is the undefined behavior */
+    uint32_t curTime = timerGetCurrentMsec()
+    int32_t elapsedTime = (int32_t)(curTime - _lastTimestamp);
+    /* update the global last timestamp */
+    _lastTimestamp = curTime;
+    return elapsedTime;
 }
 
 /*==================================
