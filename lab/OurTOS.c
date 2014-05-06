@@ -261,7 +261,7 @@ static void _idle() {
 /* ---------- debug print --------------- */
 
 static void _debugPrint(uint8_t scheduledTask) {
-	uint16_t len;
+	static uint16_t len = DEBUG_MSG_BUF_SIZE; /* to avoid stack smashing */
 
 	/* print top bar */
 	len = sprintf(_debugMsgBuf, _debugMsgTop);
@@ -283,7 +283,7 @@ static void _debugPrint(uint8_t scheduledTask) {
 }
 
 void _debugPrintTaskArray(void) {
-	uint8_t priority
+	uint8_t priority;
 	uint16_t len;
 
 	/* print each task info on a newline */
