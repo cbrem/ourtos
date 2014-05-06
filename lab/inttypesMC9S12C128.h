@@ -20,8 +20,9 @@ typedef unsigned long uint32_t;
 typedef unsigned char byte_t;
 typedef unsigned int word_t;
 
-#define WORD_LEN_BITS (8)
-#define BYTE_LEN_BITS (4)
+#define WORD_LEN_BITS (16)
+#define BYTE_LEN_BITS (8)
+#define NIB_LEN_BITS (4)
 
 #endif // _INTTYPES_MC9S12C128_H
 

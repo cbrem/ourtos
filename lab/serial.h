@@ -18,10 +18,13 @@
 #include "derivative.h"
 #include "inttypesMC9S12C128.h"
 
+/*==================================
+ * Types
+ *==================================*/
+
 /*
  * Baud rates which this serial library supports.
  */
-// TODO: section for enums?
 typedef enum {
     BAUD_300,
     BAUD_600,
@@ -35,18 +38,6 @@ typedef enum {
     BAUD_56000,
     BAUD_115200
 } baud_t;
-
-/*==================================
- * MACROS
- *==================================*/
-
-/*==================================
- * Exernal Globals
- *==================================*/
-
-/*==================================
- * Local Globals
- *==================================*/
 
 /*==================================
  * Public Functions
