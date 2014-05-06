@@ -261,6 +261,7 @@ static void _idle() {
 
 static void _debugPrint(uint8_t scheduledTask) {
 	sprintf(_debugBuffer, debugMessageBuffer, scheduledTask);
+	serialWrite(_debugBuffer, DEBUG_MESSAGE_SIZE + 1);
 }
 
 static void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
