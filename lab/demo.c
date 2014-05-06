@@ -23,42 +23,30 @@
 /* ------ Main ------ */
 
 void main(void) {
-   
-    // TODO remove
-    static uint32_t curTime = 0;
 
     _initBtns();
     _initLEDs();
         
     /* set-up the RTOS */
-    // TODO kronosSetSchedulerPeriod(SCHEDULER_PERIOD);
-    // TODO kronosSetTaskArray(taskArray, MAX_PRIORTY);
-    // TODO kronosAddTask(PRIORITY_WATCHDOG, WATCHDOG_TASK_PERIOD, &watchdogKickTask);
-    // TODO kronosAddTask(PRIORITY_POLL_BTN, POLL_BTN_TASK_PERIOD, &pollBtnsTask);
-    // TODO kronosAddTask(PRIORITY_SHORT, SHORT_TASK_PERIOD, &shortBlockingTask);
-    // TODO kronosAddTask(PRIORITY_LONG, LONG_TASK_PERIOD, &longBlockingTask);
-    // TODO kronosAddMutex(PRIORITY_MUTEX, &blockingMutex);
-    // TODO kronosEnableMutexes(true);
-    // TODO kronosEnableDebug(true);
+    kronosSetSchedulerPeriod(SCHEDULER_PERIOD);
+    kronosSetTaskArray(taskArray, MAX_PRIORTY);
+    kronosAddTask(PRIORITY_WATCHDOG, WATCHDOG_TASK_PERIOD, &watchdogKickTask);
+    kronosAddTask(PRIORITY_POLL_BTN, POLL_BTN_TASK_PERIOD, &pollBtnsTask);
+    kronosAddTask(PRIORITY_SHORT, SHORT_TASK_PERIOD, &shortBlockingTask);
+    kronosAddTask(PRIORITY_LONG, LONG_TASK_PERIOD, &longBlockingTask);
+    kronosAddMutex(PRIORITY_MUTEX, &blockingMutex);
+    kronosEnableMutexes(true);
+    kronosEnableDebug(true);
 
     /* starts the watchdog */
     _initWatchdog();
 
     /* start the RTOS. This enables interrupts. */
-    // TODO kronosStart();
-
+    kronosStart();
 
     for (;;)
     {
         /* infinite loop */
-
-        // TODO temp test of functionality with cyclic exec
-        pollBtnsTask();
-        shortBlockingTask();
-        longBlockingTask();
-        watchdogKickTask();
-        curTime = timerGetCurrentMsec();
-
     }
 
 }
@@ -148,14 +136,14 @@ void longBlockingTask(void) {
 
 void interrupt 2 _watchdogISR( void ) {
     
+    kronosStop();
+    
     SET_LEDS_OUTPUT();
     SET_LEDS(LED_WATCHDOG);
 
     for(;;) {
         /* Hang in error state */
     }
-    // TODO restart?
-
 }
 
 /* ------ Initialization ------ */

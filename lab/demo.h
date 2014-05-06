@@ -25,11 +25,7 @@
 #include "derivative.h"
 #include "inttypesMC9S12C128.h"
 #include "boolean.h"
-// TODO #include "kronOS.h"
-
- // TODO remove
-#include "serial.h"
-#include "timer.h"
+#include "kronOS.h"
 
 /*==================================
  * MACROS

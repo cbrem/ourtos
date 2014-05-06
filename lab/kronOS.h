@@ -19,6 +19,7 @@
 #include "inttypesMC9S12C128.h"
 #include "boolean.h"
 #include "fn.h"
+#include "serial.h"
 #include "timer.h"
 
 /*==================================
