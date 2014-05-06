@@ -1,5 +1,5 @@
 /* 
- * kronOS - A lightweight, preemptive multitasking RTOS with priority ceiling.
+ * OurTOS - A lightweight, preemptive multitasking RTOS with priority ceiling.
  * 
  * Connor Brem (cbrem)
  * Spencer Barton (sebarton)
@@ -7,8 +7,8 @@
  * 18-348 Lab 11
  */
 
-#ifndef _KRONOS_H
-#define _KRONOS_H
+#ifndef _OURTOS_H
+#define _OURTOS_H
 
 /*==================================
  * Includes
@@ -62,7 +62,7 @@ typedef enum {
 } usage_t;
 
 /*
- * The kronOS's internal representation of a task's state.
+ * The OurTOS's internal representation of a task's state.
  * Users should not manipulate value of this type.
  * The type if exposed to users only for memory-allocation purposes.
  */
@@ -83,7 +83,7 @@ typedef struct {
  * A mutex.
  *
  * NOTE: A mutex will function as intended only for tasks which are scheduled
- * by the kronOS to which the mutex belongs.
+ * by the OurTOS to which the mutex belongs.
  *
  * NOTE: If a task acquires a mutex, it must release the mutex before it
  * finishes running.
@@ -125,7 +125,7 @@ static char _debugMessageBuffer[DEBUG_MESSAGE_SIZE + 1];
 
 /*
  * Set the RTOS to its initial state.
- * This function must be called before calling any other kronOS functions.
+ * This function must be called before calling any other OurTOS functions.
  * Provides the RTOS with an array, where it will store information about
  * tasks' state.
  *
@@ -136,45 +136,45 @@ static char _debugMessageBuffer[DEBUG_MESSAGE_SIZE + 1];
  *
  * Also sets the maximum period between runs of the RTOS's scheduler.
  */
-void kronosInit(task_t taskAray[], uint8_t maxPriority, freq_t freq);
+void ourtosInit(task_t taskAray[], uint8_t maxPriority, freq_t freq);
 
-/* ----- Functions for a stopped kronOS ----- */
+/* ----- Functions for a stopped OurTOS ----- */
 
 /*
  * Starts the RTOS.
- * This function will block until kronosShutdown is called from within a task.
+ * This function will block until ourtosShutdown is called from within a task.
  * This function will enable interrupts.
  */
-void kronosStart(void);
+void ourtosStart(void);
 
 /*
  * Adds a task to the RTOS.
- * This function must be called after calling kronosInit.
+ * This function must be called after calling ourtosInit.
  * Returns true if the task was successfully added, false otherwise (e.g. if
  * this is not a valid priority).
  * Clobbers any existing task of mutex at this priority.
  */
-bool_t kronosAddTask(uint8_t priority, uint16_t period, fn_t task);
+bool_t ourtosAddTask(uint8_t priority, uint16_t period, fn_t task);
         
 /*
  * Add a mutex to the RTOS which uses the given priority for priority ceiling.
  * This priority should be strictly higher than the priority of any task which
  * will use the mutex, and should not conflict with the priorities of any other
  * mutexes or any other tasks.
- * This function may only be called before calling kronosStart, and should not be
+ * This function may only be called before calling ourtosStart, and should not be
  * called afterward.
  * Returns true if the mutex was successfully added, false otherwise (e.g. if
  * this is not a valid priority).
  * Clobbers any existing task or mutex at this priority.
  */
-bool_t kronosAddMutex(uint8_t priority, mutex_t *mutex);
+bool_t ourtosAddMutex(uint8_t priority, mutex_t *mutex);
 
-/* ----- Functions for a started kronOS ----- */
+/* ----- Functions for a started OurTOS ----- */
 
 /*
  * Shuts down a started RTOS.
  */
-void kronosShutdown(void);
+void ourtosShutdown(void);
 
 /*
  * Acquires the given mutex in a task-safe manner.
@@ -182,7 +182,7 @@ void kronosShutdown(void);
  * A mutex is invalid if its priority in the RTOS is replaced by another task.
  * Acquiring such a mutex is a no-op.
  */
-void kronosAcquireMutex(mutex_t *mutex);
+void ourtosAcquireMutex(mutex_t *mutex);
 
 /*
  * Releases the given mutex in a task-safe manner.
@@ -190,15 +190,15 @@ void kronosAcquireMutex(mutex_t *mutex);
  * A mutex is invalid if its priority in the RTOS is replaced by another task.
  * Releasing such a mutex is a no-op.
  */
-void kronosReleaseMutex(mutex_t *mutex);
+void ourtosReleaseMutex(mutex_t *mutex);
 
-/* ----- Functions for a started/stopped kronOS ----- */
+/* ----- Functions for a started/stopped OurTOS ----- */
 
 /*
  * Configures the RTOS to print debug information whenever the scheduler runs.
  * Interrupts must be disabled in order to use this function safely.
  */
-void kronosEnableDebug(bool_t enable);
+void ourtosEnableDebug(bool_t enable);
 
 /*
  * Enables or disables mutexes globally.
@@ -207,14 +207,14 @@ void kronosEnableDebug(bool_t enable);
  * tasks already holding mutexes are not affected.
  * Interrupts must be disabled in order to use this function safely.
  */
-void kronosEnableMutexes(bool_t enable);
+void ourtosEnableMutexes(bool_t enable);
 
 /*
  * Enables or disables the task that was originally added at the given
  * priority.
  * Interrupts must be disabled in order to use this function safely.
  */
-void kronosEnableTask(uint8_t priority, bool_t enable);
+void ourtosEnableTask(uint8_t priority, bool_t enable);
 
 /*==================================
  * Private Functions
@@ -229,7 +229,7 @@ static uint8_t _scheduler(void);
 /*
  * Idles until it is either interrupted by the timer interrupt, or
  * the timer interrupt is turned off (i.e. _started is set to false).
- * In the later case, RTIs into the main loop in kronosStart.
+ * In the later case, RTIs into the main loop in ourtosStart.
  */
 static void _idle(void);
 
@@ -289,4 +289,4 @@ static void _createNewStack(uint8_t priority);
  */
 static void _updateTaskTimes(int32_t elapsedTime);
 
-#endif // _KRONOS_H
+#endif // _OURTOS_H

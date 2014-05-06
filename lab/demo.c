@@ -1,5 +1,5 @@
-/* Demo of kronOS
- *  This file demonstrates the functionality of kronOS. kronOS is a lightweight 
+/* Demo of OurTOS
+ *  This file demonstrates the functionality of OurTOS. OurTOS is a lightweight 
  *  premtive multitasking RTOS with priority ceiling. 
  * 
  *  In the demo a series of tasks run and share a resource. The scheduler prints
@@ -29,19 +29,19 @@ void main(void) {
     _initLEDs();
         
     /* set-up the RTOS */
-    kronosInit(taskArray, MAX_PRIORTY, SCHEDULER_FREQ);
-    errCode = kronosAddTask(PRIORITY_WATCHDOG, WATCHDOG_TASK_PERIOD, &watchdogKickTask);
-    errCode = kronosAddTask(PRIORITY_POLL_BTN, POLL_BTN_TASK_PERIOD, &pollBtnsTask);
-    errCode = kronosAddTask(PRIORITY_SHORT, SHORT_TASK_PERIOD, &shortBlockingTask);
-    errCode = kronosAddTask(PRIORITY_LONG, LONG_TASK_PERIOD, &longBlockingTask);
-    errCode = kronosAddMutex(PRIORITY_MUTEX, &blockingMutex);
-    kronosEnableDebug(true);
+    ourtosInit(taskArray, MAX_PRIORTY, SCHEDULER_FREQ);
+    errCode = ourtosAddTask(PRIORITY_WATCHDOG, WATCHDOG_TASK_PERIOD, &watchdogKickTask);
+    errCode = ourtosAddTask(PRIORITY_POLL_BTN, POLL_BTN_TASK_PERIOD, &pollBtnsTask);
+    errCode = ourtosAddTask(PRIORITY_SHORT, SHORT_TASK_PERIOD, &shortBlockingTask);
+    errCode = ourtosAddTask(PRIORITY_LONG, LONG_TASK_PERIOD, &longBlockingTask);
+    errCode = ourtosAddMutex(PRIORITY_MUTEX, &blockingMutex);
+    ourtosEnableDebug(true);
 
     /* starts the watchdog */
     _initWatchdog();
 
     /* start the RTOS. This enables interrupts. */
-    kronosStart();
+    ourtosStart();
 
     for (;;)
     {
@@ -81,11 +81,11 @@ void pollBtnsTask(void) {
 
     if ( 1 == GET_MUTEX_DISABLE_BTN() ) {
         DisableInterrupts;
-        kronosEnableMutexes(true);
+        ourtosEnableMutexes(true);
         EnableInterrupts;
     } else {
         DisableInterrupts;
-        kronosEnableMutexes(false);
+        ourtosEnableMutexes(false);
         EnableInterrupts;
     }
 
@@ -100,10 +100,10 @@ void pollBtnsTask(void) {
 
     /* disable or enable tasks based upon btn */
     DisableInterrupts;
-    kronosEnableTask(PRIORITY_WATCHDOG, taskEnabled[0]);
-    kronosEnableTask(PRIORITY_POLL_BTN, taskEnabled[1]);
-    kronosEnableTask(PRIORITY_SHORT, taskEnabled[2]);
-    kronosEnableTask(PRIORITY_LONG, taskEnabled[3]);
+    ourtosEnableTask(PRIORITY_WATCHDOG, taskEnabled[0]);
+    ourtosEnableTask(PRIORITY_POLL_BTN, taskEnabled[1]);
+    ourtosEnableTask(PRIORITY_SHORT, taskEnabled[2]);
+    ourtosEnableTask(PRIORITY_LONG, taskEnabled[3]);
     EnableInterrupts;
 
     SET_WATCHDOG_FLGS(ID_POLL_BTN);
@@ -115,13 +115,13 @@ void shortBlockingTask(void) {
     SET_LEDS(LED_SHORT_BLK);
 
     DisableInterrupts;
-    kronosAcquireMutex(&blockingMutex);
+    ourtosAcquireMutex(&blockingMutex);
     EnableInterrupts;
 
     _blockingDelayMsec(SHORT_BLOCK_TIME);
     
     DisableInterrupts;
-    kronosReleaseMutex(&blockingMutex);
+    ourtosReleaseMutex(&blockingMutex);
     EnableInterrupts;
 
     SET_WATCHDOG_FLGS(ID_SHORT_BLK);
@@ -132,13 +132,13 @@ void longBlockingTask(void) {
     SET_LEDS(LED_LONG_BLK);
 
     DisableInterrupts;
-    kronosAcquireMutex(&blockingMutex);
+    ourtosAcquireMutex(&blockingMutex);
     EnableInterrupts;
 
     _blockingDelayMsec(LONG_BLOCK_TIME);
     
     DisableInterrupts;
-    kronosReleaseMutex(&blockingMutex);
+    ourtosReleaseMutex(&blockingMutex);
     EnableInterrupts;
 
     SET_WATCHDOG_FLGS(ID_LONG_BLK);
@@ -153,7 +153,7 @@ void longBlockingTask(void) {
 
 void interrupt 2 _watchdogISR( void ) {
     
-    kronosShutdown();
+    ourtosShutdown();
 
     SET_LEDS_OUTPUT();
     SET_LEDS(LED_WATCHDOG);

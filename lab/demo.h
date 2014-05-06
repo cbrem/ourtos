@@ -1,5 +1,5 @@
-/* Demo of kronOS
- *  This file demonstrates the functionality of kronOS. kronOS is a lightweight 
+/* Demo of OurTOS
+ *  This file demonstrates the functionality of OurTOS. OurTOS is a lightweight 
  *  premtive multitasking RTOS with priority ceiling. 
  * 
  *  In the demo a series of tasks run and share a resource. The scheduler prints
@@ -25,7 +25,7 @@
 #include "derivative.h"
 #include "inttypesMC9S12C128.h"
 #include "boolean.h"
-#include "kronOS.h"
+#include "OurTOS.h"
 
 /*==================================
  * MACROS / Inline Functions

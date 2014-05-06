@@ -1,5 +1,5 @@
 /* 
- * kronOS - A lightweight, preemptive multitasking RTOS with priority ceiling.
+ * OurTOS - A lightweight, preemptive multitasking preemptive RTOS with priority ceiling.
  * 
  * Connor Brem (cbrem)
  * Spencer Barton (sebarton)
@@ -34,13 +34,13 @@
 //
 // TODO: in _idle/main loop, maybe delay a little?
 
-#include "kronOS.h"
+#include "OurTOS.h"
 
 /*==================================
  * Public Functions
  *==================================*/
 
-void kronosInit(task_t taskArray[], uint8_t maxPriority, freq_t freq) {
+void ourtosInit(task_t taskArray[], uint8_t maxPriority, freq_t freq) {
 	int i;
 
 	/* Initialize globals.
@@ -66,9 +66,9 @@ void kronosInit(task_t taskArray[], uint8_t maxPriority, freq_t freq) {
 	serialInit(BAUD_9600);
 }
 
-/* ----- Functions for a stopped kronOS ----- */
+/* ----- Functions for a stopped OurTOS ----- */
 
-void kronosStart() {
+void ourtosStart() {
 	_started = true;
 	EnableInterrupts;
 	timerEnableInterrupt();
@@ -82,7 +82,7 @@ void kronosStart() {
 	EnableInterrupts;
 }
 
-bool_t kronosAddTask(uint8_t priority, uint16_t period, fn_t task) {
+bool_t ourtosAddTask(uint8_t priority, uint16_t period, fn_t task) {
 	if (priority >= _maxPriority) {
 		/* This is an invalid priority. */
 		return false;
@@ -105,7 +105,7 @@ bool_t kronosAddTask(uint8_t priority, uint16_t period, fn_t task) {
 	return true;
 }
         
-bool_t kronosAddMutex(uint8_t priority, mutex_t *mutex) {
+bool_t ourtosAddMutex(uint8_t priority, mutex_t *mutex) {
 	if (priority >= _maxPriority) {
 		/* This is an invalid priority. */
 		return false;
@@ -125,20 +125,20 @@ bool_t kronosAddMutex(uint8_t priority, mutex_t *mutex) {
 	return true;
 }
 
-/* ----- Functions for a started kronOS ----- */
+/* ----- Functions for a started OurTOS ----- */
 
-void kronosShutdown(void) {
+void ourtosShutdown(void) {
 	/* Shutdown merely stops the interrupt from running and sets _started to
 	 * false.
 	 * Therefore, when the last scheduled task stops running, in _idle, it will
-	 * RTI to the main loop (i.e. the will loop in kronosStart) instead of
+	 * RTI to the main loop (i.e. the will loop in ourtosStart) instead of
 	 * being interrupted by the timer overflow isr.
 	 */
 	timerDisableInterrupt();
 	_started = false;
 }
 
-void kronosAcquireMutex(mutex_t *mutex) {
+void ourtosAcquireMutex(mutex_t *mutex) {
 	uint8_t priority;
 
 	/* The mutex is merely a reference which holds the priority that it
@@ -161,7 +161,7 @@ void kronosAcquireMutex(mutex_t *mutex) {
 	_taskArray[_currentTask].currentPriority = priority;
 }
 
-void kronosReleaseMutex(mutex_t *mutex) {
+void ourtosReleaseMutex(mutex_t *mutex) {
 	/* Return the current task (i.e. the task that called this function) to its
 	 * normal priority.
 	 * Note that we do not care if mutexes are currently disabled.
@@ -171,17 +171,17 @@ void kronosReleaseMutex(mutex_t *mutex) {
 		_taskArray[_currentTask].normalPriority;	
 }
 
-/* ----- Functions for a started/stopped kronOS ----- */
+/* ----- Functions for a started/stopped OurTOS ----- */
 
-void kronosEnableDebug(bool_t enable) {
+void ourtosEnableDebug(bool_t enable) {
 	_debug = enable;
 }
 
-void kronosEnableMutexes(bool_t enable) {
+void ourtosEnableMutexes(bool_t enable) {
 	_mutexesEnabled = enable;
 }
 
-void kronosEnableTask(uint8_t priority, bool_t enable) {
+void ourtosEnableTask(uint8_t priority, bool_t enable) {
 	if ( priority >= _maxPriority
 		|| _taskArray[priority].usage != USAGE_TASK) {
 		/* This priority is either not valid for this RTOS, or does not
