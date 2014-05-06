@@ -29,6 +29,11 @@
 /* Bytes of stack space per task */
 #define TASK_STACK_SIZE (64)
 
+/* The scheduler schedules task _maxPriority to mean that the main loop should
+ * run.
+ */
+#define MAIN_LOOP_INDEX (_maxPriority)
+
 /*==================================
  * Types
  *==================================*/
@@ -39,26 +44,37 @@
  * The type if exposed to users only for memory-allocation purposes.
  */
 typedef struct {
-    byte_t stack[TASK_STACK_SIZE];
-    uint32_t nextRunTime;
-    fn_t task;
-    uint16_t stackPtr;
-    bool_t running;
-    bool_t enabled;
-    uint8_t normalPriority;
-    uint8_t currentPriority;
+    usage_t usage;                  // The usage of this priority.
+    byte_t stack[TASK_STACK_SIZE];  // Stack for this task.
+    int32_t timeToNextRun;          // Time to next run in ms.
+    uint16_t period;                // Number of ms between task runs.
+    fn_t task;                      // Pointer to the function to run.
+    uint16_t stackPtr;              // Saved stack pointer.
+    bool_t running;                 // It is currently running?
+    bool_t enabled;                 // Should it ever run?
+    uint8_t normalPriority;         // Priority when not holding mutexes.
+    uint8_t currentPriority;        // Priority, possibly elevated by mutexes.
 } task_t;
+
+/*
+ * The usage of a priority.
+ */
+typedef enum {
+    USAGE_NONE,
+    USAGE_TASK,
+    USAGE_MUTEX
+} usage_t;
 
 /*
  * A mutex.
  *
  * NOTE: A mutex will function as intended only for tasks which are scheduled
  * by the kronOS to which the mutex belongs.
+ *
+ * NOTE: If a task acquires a mutex, it must release the mutex before it
+ * finishes running.
  */
-typedef struct {
-    // TODO
-    int TODO;
-} mutex_t;
+typedef uint8_t mutex_t;
 
 /*==================================
  * Exernal Globals
@@ -68,25 +84,23 @@ typedef struct {
  * Local Globals
  *==================================*/
 
-static bool_t _mutexEnabled;
+static bool_t _mutexesEnabled;
 
 static task_t* _taskArray;
 
-static uint8_t _numTasks;
-#define MAIN_LOOP_INDEX (_numTasks)
-
-static uint8_t _currentTask;
+static uint8_t _maxPriority;
 
 /* garabage stack for use during ISR */
-uint8_t _ISRstack[TASK_STACK_SIZE];
+static uint8_t _ISRstack[TASK_STACK_SIZE];
 
 /* main loop stack pointer to enable running of main loop 
  * when nothing else wants to run.
 */
 uint8_t* _mainLoopStackPtr;
 
-// TODO: this could be an enum...
 static bool_t _started;
+
+static uint8_t _currentTask;
 
 /*==================================
  * Public Functions
@@ -97,41 +111,44 @@ static bool_t _started;
  * This function must be called before calling any other kronOS functions.
  * Provides the RTOS with an array, where it will store information about
  * tasks' state.
- * Also, sets the maximum number of tasks that this RTOS can support.
+ *
+ * Also sets the RTOS's max priorty (i.e. the maximum number of task/mutexes
+ * that the RTOS can support). Note that the provided array must be at least
+ * as long at maxPriority. Also note that this bound is *exclusive*. The range
+ * of valid priorities for tasks/mutexes is [0, ..., maxPriority).
+ *
+ * Also sets the maximum period between runs of the RTOS's scheduler.
  */
-void kronosInit(task_t tasks[], uint8_t numTasks);
+void kronosInit(task_t taskAray[], uint8_t maxPriority, freq_t freq);
 
 /* ----- Functions for a stopped kronOS ----- */
 
 /*
  * Starts the RTOS.
+ * This function will block until kronosShutdown is called from within a task.
+ * This function will enable interrupts.
  */
 void kronosStart(void);
 
 /*
- * Sets the maximum period between runs of the RTOS's scheduler.
- */
-void kronosSetSchedulerFreq(freq_t freq);
-
-/*
  * Adds a task to the RTOS.
- * This function must be called before calling rtosStart, and should not be
- * called afterward.
- * This function must be called after calling rtosSetTaskArray.
+ * This function must be called after calling kronosInit.
  * Returns true if the task was successfully added, false otherwise (e.g. if
  * this is not a valid priority).
+ * Clobbers any existing task of mutex at this priority.
  */
-bool_t kronosAddTask(uint8_t priority, uint16_t period, fn_t fnPtr);
+bool_t kronosAddTask(uint8_t priority, uint16_t period, fn_t task);
         
 /*
  * Add a mutex to the RTOS which uses the given priority for priority ceiling.
  * This priority should be strictly higher than the priority of any task which
  * will use the mutex, and should not conflict with the priorities of any other
  * mutexes or any other tasks.
- * This function may only be called before calling rtosStart, and should not be
+ * This function may only be called before calling kronosStart, and should not be
  * called afterward.
  * Returns true if the mutex was successfully added, false otherwise (e.g. if
  * this is not a valid priority).
+ * Clobbers any existing task or mutex at this priority.
  */
 bool_t kronosAddMutex(uint8_t priority, mutex_t *mutex);
 
@@ -144,11 +161,17 @@ void kronosShutdown(void);
 
 /*
  * Acquires the given mutex in a task-safe manner.
+ * Interrupts must be disabled in order to use this function safely.
+ * A mutex is invalid if its priority in the RTOS is replaced by another task.
+ * Acquiring such a mutex is a no-op.
  */
 void kronosAcquireMutex(mutex_t *mutex);
 
 /*
  * Releases the given mutex in a task-safe manner.
+ * Interrupts must be disabled in order to use this function safely.
+ * A mutex is invalid if its priority in the RTOS is replaced by another task.
+ * Releasing such a mutex is a no-op.
  */
 void kronosReleaseMutex(mutex_t *mutex);
 
@@ -156,18 +179,23 @@ void kronosReleaseMutex(mutex_t *mutex);
 
 /*
  * Configures the RTOS to print debug information whenever the scheduler runs.
+ * Interrupts must be disabled in order to use this function safely.
  */
 void kronosEnableDebug(bool_t enable);
 
 /*
  * Enables or disables mutexes globally.
- * // TODO lable all relevant things Atomic
+ * Specifically, determines whether tasks can newly acquire mutexes.
+ * Tasks can still release mutexes when mutexes are "disabled", and
+ * tasks already holding mutexes are not affected.
+ * Interrupts must be disabled in order to use this function safely.
  */
 void kronosEnableMutexes(bool_t enable);
 
 /*
  * Enables or disables the task that was originally added at the given
  * priority.
+ * Interrupts must be disabled in order to use this function safely.
  */
 void kronosEnableTask(uint8_t priority, bool_t enable);
 
@@ -180,6 +208,19 @@ void kronosEnableTask(uint8_t priority, bool_t enable);
  * to run.
  */
 static uint8_t _scheduler(void);
+
+/*
+ * Idles until it is either interrupted by the timer interrupt, or
+ * the timer interrupt is turned off (i.e. _started is set to false).
+ * In the later case, RTIs into the main loop in kronosStart.
+ */
+static void _idle(void);
+
+/*
+ * Print information about the state of the RTOS over serial.
+ * This function is meant for debugging purposes only.
+ */
+static void _debugPrint(void);
 
 /*
  * Runs whenever a timer overflow interrupt fires.
