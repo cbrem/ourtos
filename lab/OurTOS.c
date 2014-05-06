@@ -263,7 +263,7 @@ static void _debugPrint(uint8_t scheduledTask) {
 	serialWrite(_debugMessageBuffer, DEBUG_MESSAGE_SIZE + 1);
 }
 
-static void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
+void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
 
 	/* make this local vars static so as to store on the heap instead
 	 * of the stack. This avoids stack smashing.

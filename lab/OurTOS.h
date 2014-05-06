@@ -249,7 +249,7 @@ static void _debugPrint(uint8_t scheduledTask);
  *
  * NOTE: Implementation is very platform dependent.
  */
-static void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void);
+void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void);
 
 /*
  * Creates a new stack for the task with the given priority.

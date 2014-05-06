@@ -24,11 +24,14 @@
 
 void main(void) {
     bool_t errCode; // TODO do something with this
+    char buf[32];
+    uint16_t len;
 
     _initBtns();
     _initLEDs();
         
     /* set-up the RTOS */
+    // TODO currently ignore error code
     ourtosInit(taskArray, MAX_PRIORTY, SCHEDULER_FREQ);
     errCode = ourtosAddTask(PRIORITY_WATCHDOG, WATCHDOG_TASK_PERIOD, &watchdogKickTask);
     errCode = ourtosAddTask(PRIORITY_POLL_BTN, POLL_BTN_TASK_PERIOD, &pollBtnsTask);
@@ -36,9 +39,22 @@ void main(void) {
     errCode = ourtosAddTask(PRIORITY_LONG, LONG_TASK_PERIOD, &longBlockingTask);
     errCode = ourtosAddMutex(PRIORITY_MUTEX, &blockingMutex);
     ourtosEnableDebug(true);
+    
+    // TODO remove for debug
+    serialWrite("beginning\n", 11);
+    len = sprintf(buf, "task %d: %d\n", 0, taskArray[0].period);
+    serialWrite(buf, len);    
+    len = sprintf(buf, "task %d: %d\n", 1, taskArray[1].period);
+    serialWrite(buf, len);
+    len = sprintf(buf, "task %d: %d\n", 2, taskArray[2].period);
+    serialWrite(buf, len);
+    len = sprintf(buf, "task %d: %d\n", 3, taskArray[3].period);
+    serialWrite(buf, len);
+    len = sprintf(buf, "task %d: %d\n", 4, taskArray[4].period);
+    serialWrite(buf, len);
 
     /* starts the watchdog */
-    _initWatchdog();
+    //_initWatchdog();
 
     /* start the RTOS. This enables interrupts. */
     ourtosStart();
