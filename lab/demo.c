@@ -28,7 +28,7 @@ void main(void) {
     _initLEDs();
         
     /* set-up the RTOS */
-    kronosSetSchedulerPeriod(SCHEDULER_PERIOD);
+    kronosSetSchedulerFreq(SCHEDULER_FREQ);
     kronosSetTaskArray(taskArray, MAX_PRIORTY);
     kronosAddTask(PRIORITY_WATCHDOG, WATCHDOG_TASK_PERIOD, &watchdogKickTask);
     kronosAddTask(PRIORITY_POLL_BTN, POLL_BTN_TASK_PERIOD, &pollBtnsTask);
@@ -137,7 +137,7 @@ void longBlockingTask(void) {
 void interrupt 2 _watchdogISR( void ) {
     
     kronosStop();
-    
+
     SET_LEDS_OUTPUT();
     SET_LEDS(LED_WATCHDOG);
 

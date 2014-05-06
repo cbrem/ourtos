@@ -92,7 +92,7 @@
 /* see http://stackoverflow.com/questions/1067226/c-multi-line-macro-do-while0-vs-scope-block
  * for explaination on multiline macros
  */
-#define SET_MUTEX_DISABLE_BTN_INPUT() \
+#define SET_MUTEX_DISABLE_BTN_INPUT() \ // TODO move to inline
                                     do { \
                                         DDRP = 0; \
                                         PERP = 0xFF; \
