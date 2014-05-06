@@ -34,6 +34,14 @@
  */
 #define MAIN_LOOP_INDEX (_maxPriority)
 
+#define DEBUG_MESSAGE_SIZE 21
+
+/*==================================
+ * Constants
+ *==================================*/
+
+const static char *_debugMessageFormat = "Current task ID: %02X\n";
+
 /*==================================
  * Types
  *==================================*/
@@ -96,11 +104,13 @@ static uint8_t _ISRstack[TASK_STACK_SIZE];
 /* main loop stack pointer to enable running of main loop 
  * when nothing else wants to run.
 */
-uint8_t* _mainLoopStackPtr;
+static uint8_t* _mainLoopStackPtr;
 
 static bool_t _started;
 
 static uint8_t _currentTask;
+
+static char _debugMessageBuffer[DEBUG_MESSAGE_SIZE + 1];
 
 /*==================================
  * Public Functions
@@ -232,6 +242,13 @@ static void _debugPrint(void);
  * NOTE: Implementation is very platform dependent.
  */
 static void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void);
+
+/*
+ * Creates a new stack for the task with the given priority.
+ *
+ * TODO: spensar write dis
+ */
+static void _createNewStack(uint8_t priority);
 
 /* 
  * _updateTaskTimes iterates through the tasks and subtracts 

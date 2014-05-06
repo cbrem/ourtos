@@ -15,10 +15,24 @@
 // TODO: make sure task_t.toNextRun doesn't get implicitly cast
 // to a signed value.
 //
-// TODO: tasks can only hold one priority at a time with this model!
+// TODO: tasks can only hold one mutex at a time with this model!
+//    can we just do this by...mutexes only replacing lower-priority
+//    mutexes...and mutexes store the priority of the mutex they
+//    superceeded...and then release replaces this priority...but
+//    what if that's already been released independantly!!! ooh...
+//    maybe the mutexes have to store a lot of state...
 //
 // TODO: what do we do if a mutex becomes clobbered (i.e. invalid)
 // which a task has it, and then it releases that mutex?
+//
+// TODO: inconsistency between whether things are a no-op or return
+// false when priority is wrong
+//
+// TODO: use started as a guard on addTask, etc.
+//
+// TODO: potential problems if you toggle shutdown/start quickly
+//
+// TODO: in _idle/main loop, maybe delay a little?
 
 #include "kronOS.h"
 
@@ -61,7 +75,7 @@ void kronosStart() {
 	/* Loop until the users stops the RTOS. At this point, return. */
 	while (true) {
 		DisableInterrupts;
-		if (_started) { break; }
+		if (!_started) { break; }
 		EnableInterrupts;
 	}
 	EnableInterrupts;
@@ -183,16 +197,37 @@ void kronosEnableTask(uint8_t priority, bool_t enable) {
  *==================================*/
 
 static uint8_t _scheduler(void) {
-	
-	// TODO: return _maxPriority if mainloop should run
+	uint8_t priority;
 
-	// To schedule a task:
-	//  - no lower-current-priority tasks can be scheduled
-	//  - timeToNextRun <= 0
-	//  - enabled
-	//  - currently being used as a task
+	/* The lowest current priority over tasks that currently can run. */
+	uint8_t lowestCurrentPriority;
 
-	return 0;
+	/* The normal priority of the task with lowestCurrentPriority.
+	 * This can be used to identify the task outside of this function.
+	 */
+	uint8_t lowestNormalPriority;
+
+	/* Add tasks that can run will have priorities less than _maxPriority. */
+	lowestCurrentPriority = _maxPriority;
+
+	/* If no tasks can run, we will return _maxPriority, which is a signal to
+	 * run the main loop.
+	 */
+	lowestNormalPriority = _maxPriority;
+
+	/* Find the normal priority of the task that can run that has the lowest
+	 * current priority.
+	 */
+	for (priority = 0; priority < _maxPriority; priority++) {
+		if (_taskArray[priority].usage == USAGE_TASK
+				&& _taskArray[priority].enabled == true
+				&& _taskArray[priority].timeToNextRun <= 0
+				&& _taskArray[priority].currentPriority < lowestCurrentPriority) {
+			lowestCurrentPriority = _taskArray[priority].currentPriority;
+			lowestNormalPriority = _taskArray[priority].normalPriority;
+		}
+	}
+	return lowestNormalPriority;
 }
 
 static void _idle() {
@@ -224,8 +259,8 @@ static void _idle() {
 	}
 }
 
-static void _debugPrint() {
-	// TODO: write this, and also integrate it into the ISR
+static void _debugPrint(uint8_t scheduledTask) {
+	sprintf(_debugBuffer, debugMessageBuffer, scheduledTask);
 }
 
 static void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
@@ -234,7 +269,7 @@ static void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
 	 * of the stack. This avoids stack smashing.
 	 */
 	static uint8_t* stackPtrTmp;
-	static uint8_t taskIndex;
+	static uint8_t scheduledTask;
 
 	/* acknowledge interrupt */
 	TFLG2_TOF = 1;
@@ -268,7 +303,14 @@ static void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
 	 * The scheduler determines which task to run once the 
 	 * ISR returns.
 	 */
-	taskIndex = _scheduler();
+	scheduledTask = _scheduler();
+
+	/* If serial dubugging is enabled, print information about the current
+	 * state of all tasks.
+	 */
+	if (_debug) {
+		_debugPrint(scheduledTask);	
+	}
 
 	/* Special case if scheduler has no tasks to run.
 	 * In this case the returned index is _numTasks. 
@@ -276,30 +318,30 @@ static void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
 	 * to run. Otherwise simply use the designated task's
 	 * stack ptr.
 	 */
-	if ( MAIN_LOOP_INDEX == taskIndex ) {
+	if ( MAIN_LOOP_INDEX == scheduledTask ) {
 		stackPtrTmp = _mainLoopStackPtr;
 	
 	} else {
 		
-		if ( false == _taskArray[taskIndex].running ) {
+		if ( false == _taskArray[scheduledTask].running ) {
 			/* Create launch stack if not currently running
 			 * This operation sets the stack pointer
 			 */
-			_createNewStack(taskIndex);
+			_createNewStack(scheduledTask);
 		}
 		
 		/* grab stack ptr */
-		stackPtrTmp = _taskArray[taskIndex].stackPtr;
+		stackPtrTmp = _taskArray[scheduledTask].stackPtr;
 		/* task is now runing */
-		_taskArray[taskIndex].running = true;
+		_taskArray[scheduledTask].running = true;
 		
 		/* update next run time to be 1 period away */
-		_taskArray[taskIndex].timeToNextRun += _taskArray[taskIndex].period;
-
+		_taskArray[scheduledTask].timeToNextRun +=
+			_taskArray[scheduledTask].period;
 	}
 
 	/* Set global current task to the scheduled task */
-	_currentTask = taskIndex;
+	_currentTask = scheduledTask;
 
 	/* Set stack pointer to the current task stack pointer */
 	{ asm LDS stackPtrTmp; }
@@ -310,6 +352,10 @@ static void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
 	 * state (as set by the create stack function) if the task
 	 * is being initialized. 
 	 */
+}
+
+static void _createNewStack(uint8_t priority) {
+	// TODO
 }
 
 static void _updateTaskTimes(int32_t elapsedTime) {
