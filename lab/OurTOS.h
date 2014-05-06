@@ -35,7 +35,7 @@
  */
 #define MAIN_LOOP_INDEX (_maxPriority)
 
-#define DEBUG_MESSAGE_SIZE 21
+#define DEBUG_MESSAGE_SIZE 22
 
 #define LOW_BYTE(val)   ( (uint16_t)val & 0xFF )
 #define HIGH_BYTE(val)  ( ((uint16_t)val >> 8) & 0xFF )
@@ -46,7 +46,7 @@
  * Constants
  *==================================*/
 
-static char *_debugMessageFormat = "Current task ID: %02X\n";
+static char *_debugMessageFormat = "Current task ID: Ox%02X\n";
 
 /*==================================
  * Types
