@@ -35,7 +35,7 @@
  */
 #define MAIN_LOOP_PRIORITY (_maxPriority)
 
-#define DEBUG_MSG_BUF_SIZE (256)
+#define DEBUG_MSG_BUF_SIZE (32)
 
 #define LOW_BYTE(val)   ( (uint16_t)val & 0xFF )
 #define HIGH_BYTE(val)  ( ((uint16_t)val >> 8) & 0xFF )
@@ -48,13 +48,7 @@
  * Constant Strings - for debug
  *==================================*/
 
-static byte_t *_debugMsgTop = "==========================================================================\n";
-static byte_t *_debugMsgTaskID = "Current Task ID: %02d\n\n";
-static byte_t *_debugMsgHeader =    "| Priority | CurPriority | Usage | TimeNext | Period | Running | Enabled |\n";
-static byte_t *_debugMsgHeaderBar = "+----------+-------------+-------+----------+--------+---------+---------+\n";
-static byte_t *_debugMsgTaskLine =  "|        %d |           %d |  task |        - |      - |       - |       - |\n";
-static byte_t *_debugMsgMutexLine = "|        %d |           - | mutex |        - |      - |       - |       - |\n";
-static byte_t *_debugMsgNoneLine =  "|        %d |           - |  none |        - |      - |       - |       - |\n";
+static char *_debugMsgFmt = "%03d: %010ldms\n";
 
 /*==================================
  * Types
@@ -233,7 +227,7 @@ static void _idle(void);
  * |        2 |           1 |  task |      467 |    500 |       1 |       1 |
  *  
  */
-static void _debugPrint(uint8_t scheduledTask);
+static void _debugPrint(uint8_t scheduledTask, int32_t elapsedTime);
 
 /* 
  * helper function for debug print
