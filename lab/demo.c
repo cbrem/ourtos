@@ -16,6 +16,8 @@
 
 #include "demo.h"
 
+#define SIMULATION
+
 /*==================================
  * Local Globals
  *==================================*/
@@ -45,7 +47,7 @@ void main(void) {
     errCode = ourtosAddTask(PRIORITY_SHORT, SHORT_TASK_PERIOD, &shortBlockingTask);
     errCode = ourtosAddTask(PRIORITY_LONG, LONG_TASK_PERIOD, &longBlockingTask);
     errCode = ourtosAddMutex(PRIORITY_MUTEX, &blockingMutex);
-    ourtosEnableDebug(true);
+    ourtosEnableDebug(false);
 
     /* starts the watchdog */
     // TODO
@@ -110,6 +112,7 @@ void pollBtnsTask(void) {
         }
     }
 
+#ifndef SIMULATION /* disable btns in simulation */
     /* disable or enable tasks based upon btn */
     DisableInterrupts;
     ourtosEnableTask(PRIORITY_WATCHDOG, taskEnabled[0]);
@@ -117,6 +120,7 @@ void pollBtnsTask(void) {
     ourtosEnableTask(PRIORITY_SHORT, taskEnabled[2]);
     ourtosEnableTask(PRIORITY_LONG, taskEnabled[3]);
     EnableInterrupts;
+#endif
 
     SET_WATCHDOG_FLGS(ID_POLL_BTN);
 

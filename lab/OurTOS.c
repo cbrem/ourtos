@@ -111,8 +111,8 @@ void ourtosStart() {
 		if (!_started) { break; }
 		EnableInterrupts;
 		
-		// TODO: temporary solution!
-		timerBlockingDelayMsec(1);
+		// TODO: do we need dis?
+		{ asm NOP; }
 	}
 	EnableInterrupts;
 }
@@ -292,8 +292,8 @@ static void _idle() {
 		if (!_started) { break; }
 		EnableInterrupts;
 		
-		// TODO: temporary solution!
-		timerBlockingDelayMsec(1);
+		// TODO: do we need this?
+		{ asm NOP; }
 	}
 	EnableInterrupts;
 
@@ -436,7 +436,8 @@ static void _updateTaskTimes(int32_t elapsedTime) {
 
 	/* iter throught valid tasks and subratract elapsedTime */
 	for( i = 0; i < _maxPriority; i++ ) {
-		if ( USAGE_TASK == taskArray[i].usage ) {
+		if ( USAGE_TASK == taskArray[i].usage
+		     && true == taskArray[i].enabled ) {
 			taskArray[i].timeToNextRun -= elapsedTime;
 		}
 	}

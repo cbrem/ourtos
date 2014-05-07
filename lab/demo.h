@@ -75,7 +75,7 @@
 #define PERIOD_10000_MSEC  (10000)
 
 /* task timing - see documentation for reasoning */
-#define SCHEDULER_FREQ          (FREQ_4_MHZ)
+#define SCHEDULER_FREQ          (FREQ_8_MHZ)
 #define POLL_BTN_TASK_PERIOD    (PERIOD_100_MSEC)
 #define WATCHDOG_TASK_PERIOD    (PERIOD_100_MSEC)
 #define SHORT_TASK_PERIOD       (PERIOD_225_MSEC)
