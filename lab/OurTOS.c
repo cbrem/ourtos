@@ -300,52 +300,12 @@ static void _idle() {
 
 /* ---------- debug print --------------- */
 
-static void _debugPrint(uint8_t scheduledTask) {
-	static uint16_t len = DEBUG_MSG_BUF_SIZE; /* to avoid stack smashing */
-
-	/* print top bar */
-	len = sprintf(_debugMsgBuf, _debugMsgTop);
-	serialWrite(_debugMsgBuf, len);
-
-	/* print current task */
-	len = sprintf(_debugMsgBuf, _debugMsgTaskID, scheduledTask);
-	serialWrite(_debugMsgBuf, len);
-
-	/* print header */
-	len = sprintf(_debugMsgBuf, _debugMsgHeader);
-	serialWrite(_debugMsgBuf, len);	
-
-	/* print header bar */
-	len = sprintf(_debugMsgBuf, _debugMsgHeaderBar);
-	serialWrite(_debugMsgBuf, len);	
-
-	_debugPrintTaskArray();
-}
-
-void _debugPrintTaskArray(void) {
-	static uint8_t priority;
+static void _debugPrint(uint8_t scheduledTask, int32_t elapsedTime) {
 	static uint16_t len;
-	static uint16_t curPriority;
 
-	/* print each task info on a newline */
-	for (priority = 0; priority < _maxPriority; priority++) {
-		switch(taskArray[priority].usage) {
-			case USAGE_TASK:
-			  /* do this for explicit casting */
-				curPriority = (int16_t)taskArray[priority].currentPriority;
-				len = sprintf(_debugMsgBuf, _debugMsgTaskLine, priority, curPriority);
-				break;
-			case USAGE_MUTEX:
-				len = sprintf(_debugMsgBuf, _debugMsgMutexLine, priority);
-				break;
-			case USAGE_NONE:
-				len = sprintf(_debugMsgBuf, _debugMsgNoneLine, priority);
-				break;
-		}
-
-		/* print to serial */
-		serialWrite(_debugMsgBuf, len);	
-	}	
+	/* Print info about which task is currently running */
+	len = sprintf(_debugMsgBuf, _debugMsgFmt, scheduledTask, elapsedTime);
+	serialWrite(_debugMsgBuf, len);
 }
 
 /* ---------- Timer ISR --------------- */
@@ -395,11 +355,11 @@ void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
 	 */
 	scheduledTask = _scheduler();
 
-	/* If serial dubugging is enabled, print information about the current
-	 * state of all tasks.
+	/* If serial dubugging is enabled and we have we just changed tasks,
+	 * print information about the current state of all tasks.
 	 */
-	if (_debug) {
-		_debugPrint(scheduledTask);	
+	if (_debug && scheduledTask != _currentTask) {
+		_debugPrint(scheduledTask, elapsedTime);	
 	}
 
 	/* Special case if scheduler has no tasks to run.

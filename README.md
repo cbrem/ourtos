@@ -3,3 +3,6 @@
 A lightweight, preemptively multitasking RTOS with priority ceiling.
  
 Connor Brem & Spencer Barton
+
+"MyTOS. YourTOS. OurTOS."
+
