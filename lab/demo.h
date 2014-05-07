@@ -34,7 +34,7 @@
 
 /* Assorted */
 #define N_TASKS (4)
-#define CYCLES_PER_MS (200)
+#define CYCLES_PER_MS (794)
 
 /* Watchdog */
 #define WATCHDOG_PERIOD         (0x7) /* 2^24 cycles ~ 1 sec for 8MHz Clk */
@@ -64,26 +64,27 @@
 #define MAX_PRIORITY (5)
 
 /* task periods (in msec) */
-#define PERIOD_50_MSEC     50
-#define PERIOD_100_MSEC    100
-#define PERIOD_250_MSEC    250
-#define PERIOD_500_MSEC    500
-#define PERIOD_1000_MSEC   1000
-#define PERIOD_1900_MSEC   1900
-#define PERIOD_2000_MSEC   2000
-#define PERIOD_5000_MSEC   5000
-#define PERIOD_10000_MSEC  10000
+#define PERIOD_50_MSEC     (50)
+#define PERIOD_100_MSEC    (100)
+#define PERIOD_200_MSEC	   (200)
+#define PERIOD_210_MSEC	   (210)
+#define PERIOD_250_MSEC    (250)
+#define PERIOD_500_MSEC    (500)
+#define PERIOD_1000_MSEC   (1000)
+#define PERIOD_2500_MSEC   (2500)
+#define PERIOD_5000_MSEC   (5000)
+#define PERIOD_10000_MSEC  (10000)
 
 /* task timing - see documentation for reasoning */
-#define SCHEDULER_FREQ          (FREQ_1_MHZ)
-#define POLL_BTN_TASK_PERIOD    (PERIOD_500_MSEC)
-#define WATCHDOG_TASK_PERIOD    (PERIOD_500_MSEC)
-#define SHORT_TASK_PERIOD       (PERIOD_2000_MSEC)
-#define LONG_TASK_PERIOD        (PERIOD_1900_MSEC)
+#define SCHEDULER_FREQ          (FREQ_4_MHZ)
+#define POLL_BTN_TASK_PERIOD    (PERIOD_100_MSEC)
+#define WATCHDOG_TASK_PERIOD    (PERIOD_100_MSEC)
+#define SHORT_TASK_PERIOD       (PERIOD_210_MSEC)
+#define LONG_TASK_PERIOD        (PERIOD_200_MSEC)
 
 /* task blocking time (in Msec) */
-#define LONG_BLOCK_TIME     (300)
-#define SHORT_BLOCK_TIME    (100)
+#define LONG_BLOCK_TIME     (50)
+#define SHORT_BLOCK_TIME    (50)
 
 /* hardware pins and switches */
 #define SW3_MASK    (0x0F)

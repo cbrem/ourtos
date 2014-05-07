@@ -48,7 +48,7 @@ void main(void) {
     ourtosEnableDebug(false);
 
     /* starts the watchdog */
-    //_initWatchdog();
+    _initWatchdog();
 
     /* start the RTOS. This enables interrupts. */
     ourtosStart();

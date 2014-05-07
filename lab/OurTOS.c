@@ -271,6 +271,14 @@ static void _idle() {
 	/* Record that current task is no longer running. */
 	DisableInterrupts;
 	taskArray[_currentTask].running = false;
+	/* Update next run time to be 1 period away.
+	 * If timeToNextRun was more than 1 period away before then
+	 * it stays negative which means that the task will 
+	 * attempt to run again as soon as possible. This also
+	 * signals that the task missed at least one prior deadline. 
+	 */
+	taskArray[_currentTask].timeToNextRun +=
+		taskArray[_currentTask].period;
 	EnableInterrupts;
 
 	/* As long as _started is true (i.e. the timer isr is enabled),
@@ -417,14 +425,6 @@ void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
 		/* task is now runing */
 		taskArray[scheduledTask].running = true;
 		
-		/* Update next run time to be 1 period away.
-		 * If timeToNextRun was more than 1 period away before then
-		 * it stays negative which means that the task will 
-		 * attempt to run again as soon as possible. This also
-		 * signals that the task missed at least one prior deadline. 
-		 */
-		taskArray[scheduledTask].timeToNextRun +=
-			taskArray[scheduledTask].period;
 	}
 
 	/* Set global current task to the scheduled task */

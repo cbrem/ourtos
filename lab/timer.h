@@ -51,11 +51,12 @@
 /*
  * Timer overflow frequencies which this library supports.
  */
+// TODO rename this enum to be less deceptive
 typedef enum {
-    FREQ_8_MHZ, 	// .000125 ms
-    FREQ_4_MHZ, 	// .00025 ms
-    FREQ_2_MHZ, 	// .0005 ms
-    FREQ_1_MHZ,		// .001 ms
+    FREQ_8_MHZ, 	// 8.192 ms period
+    FREQ_4_MHZ, 	// 16.384 ms period
+    FREQ_2_MHZ, 	// 32.768 ms period
+    FREQ_1_MHZ,		// 65.536 ms period 
 } freq_t;
 
 /*==================================
