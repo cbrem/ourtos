@@ -25,16 +25,16 @@ void serialInit(baud_t baud) {
     SCICR2 = 0x00;
 }
 
-void serialWrite(byte_t buffer[], uint8_t len) {
-    uint8_t i;
+void serialWrite(byte_t buffer[], uint16_t len) {
+    uint16_t i;
 
     for (i = 0; i < len; i++) {
         _serialWriteByte(buffer[i]);
     }
 }
 
-void serialRead(byte_t buffer[], uint8_t len) {
-    uint8_t i;
+void serialRead(byte_t buffer[], uint16_t len) {
+    uint16_t i;
 
     for (i = 0; i < len; i++) {
         buffer[i] = _serialReadByte();

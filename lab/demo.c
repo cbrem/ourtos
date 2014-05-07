@@ -29,6 +29,7 @@ void main(void) {
     _initLEDs();
         
     /* set-up the RTOS */
+    // TODO currently ignore error code
     ourtosInit(taskArray, MAX_PRIORTY, SCHEDULER_FREQ);
     errCode = ourtosAddTask(PRIORITY_WATCHDOG, WATCHDOG_TASK_PERIOD, &watchdogKickTask);
     errCode = ourtosAddTask(PRIORITY_POLL_BTN, POLL_BTN_TASK_PERIOD, &pollBtnsTask);
@@ -38,7 +39,7 @@ void main(void) {
     ourtosEnableDebug(true);
 
     /* starts the watchdog */
-    _initWatchdog();
+    //_initWatchdog();
 
     /* start the RTOS. This enables interrupts. */
     ourtosStart();

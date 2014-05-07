@@ -17,8 +17,8 @@ typedef unsigned int  uint16_t;
 typedef   signed long  int32_t;
 typedef unsigned long uint32_t;
 
-typedef unsigned char byte_t;
-typedef unsigned int word_t;
+typedef char byte_t;
+typedef int word_t;
 
 #define WORD_LEN_BITS (16)
 #define BYTE_LEN_BITS (8)

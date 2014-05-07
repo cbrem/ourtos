@@ -62,7 +62,7 @@ void ourtosInit(task_t taskArray[], uint8_t maxPriority, freq_t freq) {
 	_started = false;
 	_debug = false;
 	_mutexesEnabled = true;
-	_currentTask = MAIN_LOOP_INDEX;
+	_currentTask = MAIN_LOOP_PRIORITY;
 
 	/* Initialize task array.
 	 * Mark that all priorities are not yet devoted to either mutexes or tasks.
@@ -225,7 +225,7 @@ static uint8_t _scheduler(void) {
 	/* If no tasks can run, we will return _maxPriority, which is a signal to
 	 * run the main loop.
 	 */
-	lowestNormalPriority = _maxPriority;
+	lowestNormalPriority = MAIN_LOOP_PRIORITY;
 
 	/* Find the normal priority of the task that can run that has the lowest
 	 * current priority.
@@ -268,12 +268,62 @@ static void _idle() {
 	{ asm RTI; }
 }
 
+/* ---------- debug print --------------- */
+
 static void _debugPrint(uint8_t scheduledTask) {
-	sprintf(_debugMessageBuffer, _debugMessageFormat, scheduledTask);
-	serialWrite(_debugMessageBuffer, DEBUG_MESSAGE_SIZE + 1);
+	static uint16_t len = DEBUG_MSG_BUF_SIZE; /* to avoid stack smashing */
+
+	/* print top bar */
+	len = sprintf(_debugMsgBuf, _debugMsgTop);
+	serialWrite(_debugMsgBuf, len);
+
+	/* print current task */
+	len = sprintf(_debugMsgBuf, _debugMsgTaskID, scheduledTask);
+	serialWrite(_debugMsgBuf, len);
+
+	/* print header */
+	len = sprintf(_debugMsgBuf, _debugMsgHeader);
+	serialWrite(_debugMsgBuf, len);	
+
+	/* print header bar */
+	len = sprintf(_debugMsgBuf, _debugMsgHeaderBar);
+	serialWrite(_debugMsgBuf, len);	
+
+	_debugPrintTaskArray();
 }
 
-static void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
+void _debugPrintTaskArray(void) {
+	uint8_t priority;
+	uint16_t len;
+
+	/* print each task info on a newline */
+	for (priority = 0; priority < _maxPriority; priority++) {
+		switch(_taskArray[priority].usage) {
+			case USAGE_TASK:
+				len = sprintf(_debugMsgBuf, _debugMsgTaskLine,
+					priority, 
+					_taskArray[priority].currentPriority,
+					_taskArray[priority].timeToNextRun,
+					_taskArray[priority].period,
+					_taskArray[priority].running,
+					_taskArray[priority].enabled);
+				break;
+			case USAGE_MUTEX:
+				len = sprintf(_debugMsgBuf, _debugMsgMutexLine, priority);
+				break;
+			case USAGE_NONE:
+				len = sprintf(_debugMsgBuf, _debugMsgNoneLine, priority);
+				break;
+		}
+
+		/* print to serial */
+		serialWrite(_debugMsgBuf, len);	
+	}	
+}
+
+/* ---------- Timer ISR --------------- */
+
+void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
 
 	/* make this local vars static so as to store on the heap instead
 	 * of the stack. This avoids stack smashing.
@@ -291,7 +341,7 @@ static void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
 	/* Save stack ptr
 	 * special case on main loop. 
 	 * The main loop stack pointer is saved in a seperate variable*/
-	if (MAIN_LOOP_INDEX == _currentTask) {
+	if (MAIN_LOOP_PRIORITY == _currentTask) {
 		_mainLoopStackPtr = stackPtrTmp;
 	} else {
 		_taskArray[_currentTask].stackPtr = stackPtrTmp;		
@@ -300,8 +350,9 @@ static void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
 	/* Set current stack to ISR stack.
 	 * The ISR stack keeps the ISR from stack smashing
 	 * an uninitialized task's stack.
+	 * start at lowest memory address in stack, note this is ptr arithmatic.
 	 */
-	stackPtrTmp = _ISRstack;
+	stackPtrTmp = _ISRstack + TASK_STACK_SIZE - 1;
 	{ asm LDS stackPtrTmp; }
 
 	/* update time variables */
@@ -330,7 +381,7 @@ static void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
 	 * to run. Otherwise simply use the designated task's
 	 * stack ptr.
 	 */
-	if ( MAIN_LOOP_INDEX == scheduledTask ) {
+	if ( MAIN_LOOP_PRIORITY == scheduledTask ) {
 		stackPtrTmp = _mainLoopStackPtr;
 	
 	} else {
