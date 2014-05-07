@@ -17,6 +17,20 @@
 #include "demo.h"
 
 /*==================================
+ * Local Globals
+ *==================================*/
+
+// TODO move local globals to c files
+
+/* task array 
+ *  add 1 to include main loop as lowest priority task
+ */
+static task_t _taskArray[MAX_PRIORTY]; 
+
+/* each task sets a flag for the watchdog */
+static uint8_t _watchdogFlags;
+
+/*==================================
 * Public Functions
 *==================================*/
 
@@ -30,7 +44,7 @@ void main(void) {
         
     /* set-up the RTOS */
     // TODO currently ignore error code
-    ourtosInit(taskArray, MAX_PRIORTY, SCHEDULER_FREQ);
+    ourtosInit(_taskArray, MAX_PRIORTY, SCHEDULER_FREQ);
     errCode = ourtosAddTask(PRIORITY_WATCHDOG, WATCHDOG_TASK_PERIOD, &watchdogKickTask);
     errCode = ourtosAddTask(PRIORITY_POLL_BTN, POLL_BTN_TASK_PERIOD, &pollBtnsTask);
     errCode = ourtosAddTask(PRIORITY_SHORT, SHORT_TASK_PERIOD, &shortBlockingTask);

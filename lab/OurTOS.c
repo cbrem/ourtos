@@ -47,6 +47,31 @@
 #include "OurTOS.h"
 
 /*==================================
+ * Local Globals
+ *==================================*/
+
+static bool_t _mutexesEnabled;
+static bool_t _debug;
+
+static task_t* _taskArray;
+
+static uint8_t _maxPriority;
+
+/* garabage stack for use during ISR */
+static uint8_t _ISRstack[TASK_STACK_SIZE];
+
+/* main loop stack pointer to enable running of main loop 
+ * when nothing else wants to run.
+*/
+static uint8_t* _mainLoopStackPtr;
+
+static bool_t _started;
+
+static uint8_t _currentTask;
+
+static byte_t _debugMsgBuf[DEBUG_MSG_BUF_SIZE];
+
+/*==================================
  * Public Functions
  *==================================*/
 

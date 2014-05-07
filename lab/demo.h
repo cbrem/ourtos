@@ -127,11 +127,6 @@ static void SET_LEDS(uint8_t val) {
  * Exernal Globals
  *==================================*/
 
-/* task array 
- *  add 1 to include main loop as lowest priority task
- */
-task_t taskArray[MAX_PRIORTY]; 
-
 /* mutex for demo purposes only - it does not actual control any resource */
 mutex_t blockingMutex;
 
