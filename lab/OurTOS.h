@@ -42,6 +42,8 @@
 
 #define RTI_DUMY_REG_BYTES (11)
 
+#define MAX_PRIORITY (5) // TODO fix the restriction
+
 /*==================================
  * Constant Strings - for debug
  *==================================*/
@@ -97,8 +99,10 @@ typedef struct {
 typedef uint8_t mutex_t;
 
 /*==================================
- * Exernal Globals
+ * External Globals
  *==================================*/
+
+extern task_t taskArray[MAX_PRIORITY]; // TODO we will fight the compiler another day
 
 /*==================================
  * Public Functions
@@ -117,7 +121,7 @@ typedef uint8_t mutex_t;
  *
  * Also sets the maximum period between runs of the RTOS's scheduler.
  */
-void ourtosInit(task_t taskAray[], uint8_t maxPriority, freq_t freq);
+void ourtosInit(uint8_t maxPriority, freq_t freq);
 
 /* ----- Functions for a stopped OurTOS ----- */
 
