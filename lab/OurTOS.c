@@ -283,20 +283,17 @@ static void _debugPrint(uint8_t scheduledTask) {
 }
 
 void _debugPrintTaskArray(void) {
-	uint8_t priority;
-	uint16_t len;
+	static uint8_t priority;
+	static uint16_t len;
+	static uint16_t curPriority;
 
 	/* print each task info on a newline */
 	for (priority = 0; priority < _maxPriority; priority++) {
 		switch(_taskArray[priority].usage) {
 			case USAGE_TASK:
-				len = sprintf(_debugMsgBuf, _debugMsgTaskLine,
-					priority, 
-					_taskArray[priority].currentPriority,
-					_taskArray[priority].timeToNextRun,
-					_taskArray[priority].period,
-					_taskArray[priority].running,
-					_taskArray[priority].enabled);
+			  /* do this for explicit casting */
+				curPriority = (int16_t)_taskArray[priority].currentPriority;
+				len = sprintf(_debugMsgBuf, _debugMsgTaskLine, priority, curPriority);
 				break;
 			case USAGE_MUTEX:
 				len = sprintf(_debugMsgBuf, _debugMsgMutexLine, priority);

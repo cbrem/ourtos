@@ -50,9 +50,9 @@ static byte_t *_debugMsgTop = "=================================================
 static byte_t *_debugMsgTaskID = "Current Task ID: %02d\n\n";
 static byte_t *_debugMsgHeader =    "| Priority | CurPriority | Usage | TimeNext | Period | Running | Enabled |\n";
 static byte_t *_debugMsgHeaderBar = "+----------+-------------+-------+----------+--------+---------+---------+\n";
-static byte_t *_debugMsgTaskLine =  "|       %02d |          %02d |  task |   %06d | %06d |       %01d |       %01d |\n";
-static byte_t *_debugMsgMutexLine = "|       %02d |           - | mutex |        - |      - |       - |       - |\n";
-static byte_t *_debugMsgNoneLine =  "|       %02d |           - |  none |        - |      - |       - |       - |\n";
+static byte_t *_debugMsgTaskLine =  "|        %d |           %d |  task |        - |      - |       - |       - |\n";
+static byte_t *_debugMsgMutexLine = "|        %d |            - | mutex |        - |      - |       - |       - |\n";
+static byte_t *_debugMsgNoneLine =  "|        %d |            - |  none |        - |      - |       - |       - |\n";
 
 
 /*==================================
