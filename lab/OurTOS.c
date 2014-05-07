@@ -47,10 +47,33 @@
 #include "OurTOS.h"
 
 /*==================================
+ * Local Globals
+ *==================================*/
+
+static bool_t _mutexesEnabled;
+static bool_t _debug;
+
+static uint8_t _maxPriority;
+
+/* garabage stack for use during ISR */
+static uint8_t _ISRstack[TASK_STACK_SIZE];
+
+/* main loop stack pointer to enable running of main loop 
+ * when nothing else wants to run.
+*/
+static uint8_t* _mainLoopStackPtr;
+
+static bool_t _started;
+
+static uint8_t _currentTask;
+
+static byte_t _debugMsgBuf[DEBUG_MSG_BUF_SIZE];
+
+/*==================================
  * Public Functions
  *==================================*/
 
-void ourtosInit(task_t taskArray[], uint8_t maxPriority, freq_t freq) {
+void ourtosInit(uint8_t maxPriority, freq_t freq) {
 	int i;
 
 	/* Initialize globals.
@@ -67,9 +90,8 @@ void ourtosInit(task_t taskArray[], uint8_t maxPriority, freq_t freq) {
 	/* Initialize task array.
 	 * Mark that all priorities are not yet devoted to either mutexes or tasks.
 	 */
-	_taskArray = taskArray;
 	for (i = 0; i < _maxPriority; i++) {
-		_taskArray[i].usage = USAGE_NONE;
+		taskArray[i].usage = USAGE_NONE;
 	}
 
 	timerInit(freq);
@@ -101,16 +123,16 @@ bool_t ourtosAddTask(uint8_t priority, uint16_t period, fn_t task) {
 	/* Fill the struct for this task, clobbering any existing task or mutex
 	 * at this priority.
 	 */
-	_taskArray[priority].usage = USAGE_TASK;
-	/* Leave _taskArray[priority].stack uninitialized */
-	_taskArray[priority].timeToNextRun = period;	// TODO: unsigned -> signed cast here?
-	_taskArray[priority].period = period;
-    _taskArray[priority].task = task;
-    /* Leave _taskArray[priority].stackPtr uninitialized */
-    _taskArray[priority].running = false;
-    _taskArray[priority].enabled = true;
-    _taskArray[priority].normalPriority = priority;
-    _taskArray[priority].currentPriority = priority;
+	taskArray[priority].usage = USAGE_TASK;
+	/* Leave taskArray[priority].stack uninitialized */
+	taskArray[priority].timeToNextRun = period;	// TODO: unsigned -> signed cast here?
+	taskArray[priority].period = period;
+    taskArray[priority].task = task;
+    /* Leave taskArray[priority].stackPtr uninitialized */
+    taskArray[priority].running = false;
+    taskArray[priority].enabled = true;
+    taskArray[priority].normalPriority = priority;
+    taskArray[priority].currentPriority = priority;
 
 	return true;
 }
@@ -121,11 +143,11 @@ bool_t ourtosAddMutex(uint8_t priority, mutex_t *mutex) {
 		return false;
 	}
 
-	/* Mark in _taskArray that this priority is reserved for a mutex, and that
+	/* Mark in taskArray that this priority is reserved for a mutex, and that
 	 * there is no task here.
 	 * Note that this will clobber any task currently here.
 	 */
-	_taskArray[priority].usage = USAGE_MUTEX;
+	taskArray[priority].usage = USAGE_MUTEX;
 
 	/* Make the mutex reference the given priority so that it remains
 	 * associated with this priority in the user's program.
@@ -156,7 +178,7 @@ void ourtosAcquireMutex(mutex_t *mutex) {
 	 */
 	priority = *mutex;
 
-	if (_taskArray[priority].usage != USAGE_MUTEX
+	if (taskArray[priority].usage != USAGE_MUTEX
 		|| _mutexesEnabled) {
 		/* This mutex has been clobbered by a task since it was created,
 		 * or mutexes are disabled.
@@ -168,7 +190,7 @@ void ourtosAcquireMutex(mutex_t *mutex) {
 	/* Promote the current task (i.e. the task that called this function) to
 	 * the priority associated with the mutex.
 	 */
-	_taskArray[_currentTask].currentPriority = priority;
+	taskArray[_currentTask].currentPriority = priority;
 }
 
 void ourtosReleaseMutex(mutex_t *mutex) {
@@ -177,8 +199,8 @@ void ourtosReleaseMutex(mutex_t *mutex) {
 	 * Note that we do not care if mutexes are currently disabled.
 	 */
 	(void)mutex; // TODO mutex set-up may not be best
-	_taskArray[_currentTask].currentPriority =
-		_taskArray[_currentTask].normalPriority;	
+	taskArray[_currentTask].currentPriority =
+		taskArray[_currentTask].normalPriority;	
 }
 
 /* ----- Functions for a started/stopped OurTOS ----- */
@@ -193,7 +215,7 @@ void ourtosEnableMutexes(bool_t enable) {
 
 void ourtosEnableTask(uint8_t priority, bool_t enable) {
 	if ( priority >= _maxPriority
-		|| _taskArray[priority].usage != USAGE_TASK) {
+		|| taskArray[priority].usage != USAGE_TASK) {
 		/* This priority is either not valid for this RTOS, or does not
 		 * currently correspond to a task.
 		 * Do nothing.
@@ -201,7 +223,7 @@ void ourtosEnableTask(uint8_t priority, bool_t enable) {
 		return;
 	}
 
-	_taskArray[priority].enabled = enable;
+	taskArray[priority].enabled = enable;
 }
 
 /*==================================
@@ -231,12 +253,12 @@ static uint8_t _scheduler(void) {
 	 * current priority.
 	 */
 	for (priority = 0; priority < _maxPriority; priority++) {
-		if (_taskArray[priority].usage == USAGE_TASK
-				&& _taskArray[priority].enabled == true
-				&& _taskArray[priority].timeToNextRun <= 0
-				&& _taskArray[priority].currentPriority < lowestCurrentPriority) {
-			lowestCurrentPriority = _taskArray[priority].currentPriority;
-			lowestNormalPriority = _taskArray[priority].normalPriority;
+		if (taskArray[priority].usage == USAGE_TASK
+				&& taskArray[priority].enabled == true
+				&& taskArray[priority].timeToNextRun <= 0
+				&& taskArray[priority].currentPriority < lowestCurrentPriority) {
+			lowestCurrentPriority = taskArray[priority].currentPriority;
+			lowestNormalPriority = taskArray[priority].normalPriority;
 		}
 	}
 	return lowestNormalPriority;
@@ -248,7 +270,7 @@ static void _idle() {
 
 	/* Record that current task is no longer running. */
 	DisableInterrupts;
-	_taskArray[_currentTask].running = false;
+	taskArray[_currentTask].running = false;
 	EnableInterrupts;
 
 	/* As long as _started is true (i.e. the timer isr is enabled),
@@ -299,10 +321,10 @@ void _debugPrintTaskArray(void) {
 
 	/* print each task info on a newline */
 	for (priority = 0; priority < _maxPriority; priority++) {
-		switch(_taskArray[priority].usage) {
+		switch(taskArray[priority].usage) {
 			case USAGE_TASK:
 			  /* do this for explicit casting */
-				curPriority = (int16_t)_taskArray[priority].currentPriority;
+				curPriority = (int16_t)taskArray[priority].currentPriority;
 				len = sprintf(_debugMsgBuf, _debugMsgTaskLine, priority, curPriority);
 				break;
 			case USAGE_MUTEX:
@@ -341,7 +363,7 @@ void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
 	if (MAIN_LOOP_PRIORITY == _currentTask) {
 		_mainLoopStackPtr = stackPtrTmp;
 	} else {
-		_taskArray[_currentTask].stackPtr = stackPtrTmp;		
+		taskArray[_currentTask].stackPtr = stackPtrTmp;		
 	}
 
 	/* Set current stack to ISR stack.
@@ -383,7 +405,7 @@ void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
 	
 	} else {
 		
-		if ( false == _taskArray[scheduledTask].running ) {
+		if ( false == taskArray[scheduledTask].running ) {
 			/* Create launch stack if not currently running
 			 * This operation sets the stack pointer.
 			 */
@@ -391,9 +413,9 @@ void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
 		}
 		
 		/* grab stack ptr */
-		stackPtrTmp = _taskArray[scheduledTask].stackPtr;
+		stackPtrTmp = taskArray[scheduledTask].stackPtr;
 		/* task is now runing */
-		_taskArray[scheduledTask].running = true;
+		taskArray[scheduledTask].running = true;
 		
 		/* Update next run time to be 1 period away.
 		 * If timeToNextRun was more than 1 period away before then
@@ -401,8 +423,8 @@ void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
 		 * attempt to run again as soon as possible. This also
 		 * signals that the task missed at least one prior deadline. 
 		 */
-		_taskArray[scheduledTask].timeToNextRun +=
-			_taskArray[scheduledTask].period;
+		taskArray[scheduledTask].timeToNextRun +=
+			taskArray[scheduledTask].period;
 	}
 
 	/* Set global current task to the scheduled task */
@@ -420,26 +442,26 @@ void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
 }
 
 static void _createNewStack(uint8_t priority) {
-	uint8_t stackPtr = TASK_STACK_SIZE;
+	static uint8_t stackPtr = TASK_STACK_SIZE;
 
 	/* set-up the return fuction lowest on the stack
 	 * This is the function that the task returns to upon
 	 * completion.
 	 */
-	_taskArray[priority].stack[stackPtr - 1] = LOW_BYTE(&_idle);
-	_taskArray[priority].stack[stackPtr - 2] = HIGH_BYTE(&_idle);
+	taskArray[priority].stack[stackPtr - 1] = LOW_BYTE(&_idle);
+	taskArray[priority].stack[stackPtr - 2] = HIGH_BYTE(&_idle);
 
 	/* set-up the function pointer. This is placed such that it becomes 
 	 * the return function for the RTI from the timer ISR
 	 */
-	_taskArray[priority].stack[stackPtr - 3] = LOW_BYTE(&_taskArray[priority].task);
-	_taskArray[priority].stack[stackPtr - 4] = HIGH_BYTE(&_taskArray[priority].task);
+	taskArray[priority].stack[stackPtr - 3] = LOW_BYTE(taskArray[priority].task);
+	taskArray[priority].stack[stackPtr - 4] = HIGH_BYTE(taskArray[priority].task);
 
 	/* set the various task struct elems. The stack pointer is the 
 	 * location in the task's stack pointing to the top of the dummy 
 	 * register values which are used in the timer ISR RTI.
 	 */
-	_taskArray[priority].stackPtr = &_taskArray[priority].stack[stackPtr - RTI_DUMY_REG_BYTES];
+	taskArray[priority].stackPtr = &taskArray[priority].stack[stackPtr - RTI_DUMY_REG_BYTES];
 }
 
 static void _updateTaskTimes(int32_t elapsedTime) {
@@ -447,8 +469,8 @@ static void _updateTaskTimes(int32_t elapsedTime) {
 
 	/* iter throught valid tasks and subratract elapsedTime */
 	for( i = 0; i < _maxPriority; i++ ) {
-		if ( USAGE_TASK == _taskArray[i].usage ) {
-			_taskArray[i].timeToNextRun -= elapsedTime;
+		if ( USAGE_TASK == taskArray[i].usage ) {
+			taskArray[i].timeToNextRun -= elapsedTime;
 		}
 	}
 

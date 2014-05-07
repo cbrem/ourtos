@@ -10,6 +10,22 @@
 #include "timer.h"
 
 /*==================================
+ * Local Globals
+ *==================================*/
+
+/* Current time in ms */
+static uint32_t _timeCurrentMsec;
+
+/* Current timer counter (ms) in 8.24 fixed point */
+static uint32_t _timeCountMsec;
+
+/* timeIncrement is the value to increment the timer counter by each rollover */
+static uint32_t _timeIncrement;
+
+/* timestamp for use in elapsed time */
+static uint32_t _lastTimestamp;
+
+/*==================================
  * Public Functions
  *==================================*/
 

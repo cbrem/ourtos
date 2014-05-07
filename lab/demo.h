@@ -25,6 +25,7 @@
 #include "derivative.h"
 #include "inttypesMC9S12C128.h"
 #include "boolean.h"
+
 #include "OurTOS.h"
 
 /*==================================
@@ -33,7 +34,6 @@
 
 /* Assorted */
 #define N_TASKS (4)
-#define MAX_PRIORTY (5)
 #define CYCLES_PER_MS (200)
 
 /* Watchdog */
@@ -61,6 +61,8 @@
 #define PRIORITY_SHORT      (3)
 #define PRIORITY_LONG       (4)
 
+#define MAX_PRIORITY (5)
+
 /* task periods (in msec) */
 #define PERIOD_50_MSEC     50
 #define PERIOD_100_MSEC    100
@@ -73,7 +75,7 @@
 #define PERIOD_10000_MSEC  10000
 
 /* task timing - see documentation for reasoning */
-#define SCHEDULER_FREQ          (FREQ_8_MHZ)
+#define SCHEDULER_FREQ          (FREQ_1_MHZ)
 #define POLL_BTN_TASK_PERIOD    (PERIOD_500_MSEC)
 #define WATCHDOG_TASK_PERIOD    (PERIOD_500_MSEC)
 #define SHORT_TASK_PERIOD       (PERIOD_2000_MSEC)
@@ -127,22 +129,10 @@ static void SET_LEDS(uint8_t val) {
  * Exernal Globals
  *==================================*/
 
-/* task array 
- *  add 1 to include main loop as lowest priority task
- */
-task_t taskArray[MAX_PRIORTY]; 
+task_t taskArray[MAX_PRIORITY];
 
 /* mutex for demo purposes only - it does not actual control any resource */
 mutex_t blockingMutex;
-
-/*==================================
- * Local Globals
- *==================================*/
-
-// TODO move local globals to c files
-
-/* each task sets a flag for the watchdog */
-static uint8_t _watchdogFlags;
 
 /*==================================
  * Public Functions

@@ -29,8 +29,8 @@ Entry point: 0xC029 (_Startup)
 _startupData is allocated at 0xC031 and uses 6 Bytes
 extern struct _tagStartup {
   unsigned nofZeroOut     1
-  _Range   pZeroOut       0x500     794
-  _Copy    *toCopyDownBeg 0xCE78
+  _Range   pZeroOut       0x500     793
+  _Copy    *toCopyDownBeg 0xCE73
 } _startupData;
 
 *********************************************************************************************
@@ -40,11 +40,11 @@ Section Name                    Size  Type     From       To       Segment
 .init                             49     R     0xC000     0xC030   ROM_C000
 .startData                        10     R     0xC031     0xC03A   ROM_C000
 .rodata                          116     R     0xC03B     0xC0AE   ROM_C000
-.rodata1                         479     R     0xC0AF     0xC28D   ROM_C000
-.text                           2927     R     0xC28E     0xCDFC   ROM_C000
-.copy                             21     R     0xCE78     0xCE8C   ROM_C000
+.rodata1                         484     R     0xC0AF     0xC292   ROM_C000
+.text                           2917     R     0xC293     0xCDF7   ROM_C000
+.copy                             23     R     0xCE73     0xCE89   ROM_C000
 .stack                           256   R/W      0x400      0x4FF   RAM
-.data                             16   R/W      0x500      0x50F   RAM
+.data                             17   R/W      0x500      0x510   RAM
 .abs_section_8                     1   N/I        0x8        0x8   .absSeg0
 .abs_section_9                     1   N/I        0x9        0x9   .absSeg1
 .abs_section_a                     1   N/I        0xA        0xA   .absSeg2
@@ -268,14 +268,14 @@ Section Name                    Size  Type     From       To       Segment
 .abs_section_17e                   2   N/I      0x17E      0x17F   .absSeg220
 .abs_section_fffa                  2     R     0xFFFA     0xFFFB   .absSeg221
 .abs_section_ffde                  2     R     0xFFDE     0xFFDF   .absSeg222
-.bss                             367   R/W      0x510      0x67E   RAM
-RUNTIME                          123     R     0xCDFD     0xCE77   ROM_C000
-.common                          411   R/W      0x67F      0x819   RAM
+.bss                             365   R/W      0x511      0x67D   RAM
+RUNTIME                          123     R     0xCDF8     0xCE72   ROM_C000
+.common                          411   R/W      0x67E      0x818   RAM
 .vectSeg223_vect                   2     R     0xFFFE     0xFFFF   .vectSeg223
 
 Summary of section sizes per section type:
-READ_ONLY (R):         E93 (dec:     3731)
-READ_WRITE (R/W):      41A (dec:     1050)
+READ_ONLY (R):         E90 (dec:     3728)
+READ_WRITE (R/W):      419 (dec:     1049)
 NO_INIT (N/I):         104 (dec:      260)
 
 *********************************************************************************************
@@ -522,97 +522,97 @@ MODULE:                 -- Start12.c.o --
      __SEG_END_SSTACK                           500       0       0       1               
 MODULE:                 -- PRINTF.C.o (ansisi.lib) --
 - PROCEDURES:
-     vprintf                                   C28E     478    1144      49   .text       
-     _out                                      C706       C      12       9   .text       
-     deposit_char                              C712       F      15       1   .text       
-     sprintf                                   C721      29      41       6   .text       
+     vprintf                                   C293     478    1144      49   .text       
+     _out                                      C70B       C      12       9   .text       
+     deposit_char                              C717       F      15       1   .text       
+     sprintf                                   C726      29      41       6   .text       
 - VARIABLES:
      pow10                                     C03B      28      40       4   .rodata     
      pow16                                     C063      20      32       4   .rodata     
      pow8                                      C083      2C      44       4   .rodata     
-     pbuf                                       510       6       6      15   .bss        
+     pbuf                                       511       6       6      15   .bss        
 MODULE:                 -- rtshc12.c.o (ansisi.lib) --
 - PROCEDURES:
-     _BSHL                                     CDFD       8       8       1   RUNTIME     
-     _LCMP_P                                   CE05      15      21       3   RUNTIME     
-     _LNEG                                     CE1A       D      13       1   RUNTIME     
-     _ILSEXT                                   CE27       7       7       2   RUNTIME     
-     _CASE_DIRECT_BYTE                         CE2E       5       5       1   RUNTIME     
-     _CASE_CHECKED_BYTE                        CE33      14      20       3   RUNTIME     
-     _CASE_SEARCH_8                            CE47      17      23       1   RUNTIME     
-     _CASE_SEARCH_8_BYTE                       CE5E      1A      26       1   RUNTIME     
+     _BSHL                                     CDF8       8       8       1   RUNTIME     
+     _LCMP_P                                   CE00      15      21       3   RUNTIME     
+     _LNEG                                     CE15       D      13       1   RUNTIME     
+     _ILSEXT                                   CE22       7       7       2   RUNTIME     
+     _CASE_DIRECT_BYTE                         CE29       5       5       1   RUNTIME     
+     _CASE_CHECKED_BYTE                        CE2E      14      20       3   RUNTIME     
+     _CASE_SEARCH_8                            CE42      17      23       1   RUNTIME     
+     _CASE_SEARCH_8_BYTE                       CE59      1A      26       1   RUNTIME     
 - VARIABLES:
 MODULE:                 -- demo.c.o --
 - PROCEDURES:
-     SET_MUTEX_DISABLE_BTN_INPUT               C74A       9       9       1   .text       
-     SET_TASK_ENABLE_BTN_INPUT                 C753       7       7       1   .text       
-     SET_LEDS                                  C75A       C      12       6   .text       
-     main                                      C766      5F      95       1   .text       
-     watchdogKickTask                          C7C5      1A      26       1   .text       
-     pollBtnsTask                              C7DF      79     121       1   .text       
-     shortBlockingTask                         C858      24      36       1   .text       
-     longBlockingTask                          C87C      24      36       1   .text       
-     _watchdogISR                              C8A0       D      13       1   .text       
-     _initBtns                                 C8AD       6       6       1   .text       
-     _initLEDs                                 C8B3       7       7       1   .text       
-     _blockingDelayMsec                        C8BA      1B      27       2   .text       
+     SET_MUTEX_DISABLE_BTN_INPUT               C74F       9       9       1   .text       
+     SET_TASK_ENABLE_BTN_INPUT                 C758       7       7       1   .text       
+     SET_LEDS                                  C75F       C      12       6   .text       
+     main                                      C76B      5B      91       1   .text       
+     watchdogKickTask                          C7C6      1A      26       1   .text       
+     pollBtnsTask                              C7E0      79     121       1   .text       
+     shortBlockingTask                         C859      24      36       1   .text       
+     longBlockingTask                          C87D      24      36       1   .text       
+     _watchdogISR                              C8A1       D      13       1   .text       
+     _initBtns                                 C8AE       6       6       1   .text       
+     _initLEDs                                 C8B4       7       7       1   .text       
+     _blockingDelayMsec                        C8BB      1B      27       2   .text       
 - VARIABLES:
-     _watchdogFlags                             516       1       1       5   .bss        
+     _watchdogFlags                             517       1       1       5   .bss        
      _Vector_2                                 FFFA       2       2       0   .abs_section_fffa
-     taskArray                                  67F     19A     410       1   .common     
-     blockingMutex                              819       1       1       5   .common     
+     taskArray                                  67E     19A     410      50   .common     
+     blockingMutex                              818       1       1       5   .common     
 MODULE:                 -- serial.c.o --
 - PROCEDURES:
-     serialInit                                C8D5      15      21       1   .text       
-     serialWrite                               C8EA      21      33       2   .text       
-     _serialWriteByte                          C90B       C      12       1   .text       
-     _prescaleForBaud                          C917      35      53       1   .text       
+     serialInit                                C8D6      15      21       1   .text       
+     serialWrite                               C8EB      21      33       2   .text       
+     _serialWriteByte                          C90C       C      12       1   .text       
+     _prescaleForBaud                          C918      35      53       1   .text       
 - VARIABLES:
 MODULE:                 -- modclock.c.o --
 - PROCEDURES:
-     clockSetup                                C94C      20      32       1   .text       
+     clockSetup                                C94D      20      32       1   .text       
 - VARIABLES:
 MODULE:                 -- timer.c.o --
 - PROCEDURES:
-     timerInit                                 C96C      2A      42       1   .text       
-     timerGetCurrentMsec                       C996       7       7       1   .text       
-     timerEnableInterrupt                      C99D       4       4       1   .text       
-     timerDisableInterrupt                     C9A1       4       4       1   .text       
-     timerUpdateCurrent                        C9A5      33      51       1   .text       
-     timerElapsedTime                          C9D8      26      38       1   .text       
-     _freq2Prescaler                           C9FE      4C      76       1   .text       
+     timerInit                                 C96D      2A      42       1   .text       
+     timerGetCurrentMsec                       C997       7       7       1   .text       
+     timerEnableInterrupt                      C99E       4       4       1   .text       
+     timerDisableInterrupt                     C9A2       4       4       1   .text       
+     timerUpdateCurrent                        C9A6      33      51       1   .text       
+     timerElapsedTime                          C9D9      26      38       1   .text       
+     _freq2Prescaler                           C9FF      4C      76       1   .text       
 - VARIABLES:
-     _timeCurrentMsec                           517       4       4       9   .bss        
-     _timeCountMsec                             51B       4       4       7   .bss        
-     _timeIncrement                             51F       4       4       8   .bss        
-     _lastTimestamp                             523       4       4       7   .bss        
+     _timeCurrentMsec                           518       4       4       9   .bss        
+     _timeCountMsec                             51C       4       4       7   .bss        
+     _timeIncrement                             520       4       4       8   .bss        
+     _lastTimestamp                             524       4       4       7   .bss        
 MODULE:                 -- OurTOS.c.o --
 - PROCEDURES:
-     ourtosInit                                CA4A      4D      77       1   .text       
-     ourtosStart                               CA97      19      25       1   .text       
-     ourtosAddTask                             CAB0      3F      63       4   .text       
-     ourtosAddMutex                            CAEF      25      37       1   .text       
-     ourtosShutdown                            CB14       9       9       1   .text       
-     ourtosAcquireMutex                        CB1D      2F      47       2   .text       
-     ourtosReleaseMutex                        CB4C      12      18       2   .text       
-     ourtosEnableDebug                         CB5E       4       4       1   .text       
-     ourtosEnableMutexes                       CB62       4       4       1   .text       
-     ourtosEnableTask                          CB66      20      32       4   .text       
-     _scheduler                                CB86      58      88       1   .text       
-     _idle                                     CBDE      25      37       2   .text       
-     _debugPrint                               CC03      53      83       1   .text       
-     _debugPrintTaskArray                      CC56      79     121       1   .text       
-     _timerIsr                                 CCCF      B6     182       1   .text       
-     _createNewStack                           CD85      3C      60       1   .text       
-     _updateTaskTimes                          CDC1      3C      60       1   .text       
+     ourtosInit                                CA4B      47      71       1   .text       
+     ourtosStart                               CA92      19      25       1   .text       
+     ourtosAddTask                             CAAB      46      70       4   .text       
+     ourtosAddMutex                            CAF1      24      36       1   .text       
+     ourtosShutdown                            CB15       9       9       1   .text       
+     ourtosAcquireMutex                        CB1E      2C      44       2   .text       
+     ourtosReleaseMutex                        CB4A      11      17       2   .text       
+     ourtosEnableDebug                         CB5B       4       4       1   .text       
+     ourtosEnableMutexes                       CB5F       4       4       1   .text       
+     ourtosEnableTask                          CB63      20      32       4   .text       
+     _scheduler                                CB83      62      98       1   .text       
+     _idle                                     CBE5      23      35       2   .text       
+     _debugPrint                               CC08      53      83       1   .text       
+     _debugPrintTaskArray                      CC5B      76     118       1   .text       
+     _timerIsr                                 CCD1      AC     172       1   .text       
+     _createNewStack                           CD7D      3C      60       1   .text       
+     _updateTaskTimes                          CDB9      3F      63       1   .text       
 - VARIABLES:
      STRING......................1             C0AF      4C      76       1   .rodata1    
      STRING.Current.Task.ID...02.2             C0FB      18      24       1   .rodata1    
      STRING...Priority...CurPrio.3             C113      4C      76       1   .rodata1    
      STRING......................4             C15F      4C      76       1   .rodata1    
-     STRING..........d...........5             C1AB      4B      75       1   .rodata1    
-     STRING..........d...........6             C1F6      4C      76       1   .rodata1    
-     STRING..........d...........7             C242      4C      76       1   .rodata1    
+     STRING...........d..........5             C1AB      4E      78       1   .rodata1    
+     STRING...........d..........6             C1F9      4D      77       1   .rodata1    
+     STRING...........d..........7             C246      4D      77       1   .rodata1    
      _debugMsgTop                               500       2       2       1   .data       
      _debugMsgTaskID                            502       2       2       1   .data       
      _debugMsgHeader                            504       2       2       1   .data       
@@ -621,21 +621,21 @@ MODULE:                 -- OurTOS.c.o --
      _debugMsgMutexLine                         50A       2       2       1   .data       
      _debugMsgNoneLine                          50C       2       2       1   .data       
      len.8                                      50E       2       2       1   .data       
-     _mutexesEnabled                            527       2       2       3   .bss        
-     _debug                                     529       2       2       3   .bss        
-     _taskArray                                 52B       2       2      19   .bss        
-     _maxPriority                               52D       1       1      12   .bss        
-     _ISRstack                                  52E      40      64       1   .bss        
-     _mainLoopStackPtr                          56E       2       2       3   .bss        
-     _started                                   570       2       2       5   .bss        
-     _currentTask                               572       1       1       7   .bss        
-     _debugMsgBuf                               573     100     256       8   .bss        
-     priority.9                                 673       1       1       7   .bss        
-     len.10                                     674       2       2       2   .bss        
-     curPriority.11                             676       2       2       1   .bss        
-     stackPtrTmp.12                             678       2       2       8   .bss        
-     scheduledTask.13                           67A       1       1       7   .bss        
-     elapsedTime.14                             67B       4       4       2   .bss        
+     stackPtr.15                                510       1       1       1   .data       
+     _mutexesEnabled                            528       2       2       3   .bss        
+     _debug                                     52A       2       2       3   .bss        
+     _maxPriority                               52C       1       1      12   .bss        
+     _ISRstack                                  52D      40      64       1   .bss        
+     _mainLoopStackPtr                          56D       2       2       3   .bss        
+     _started                                   56F       2       2       5   .bss        
+     _currentTask                               571       1       1       7   .bss        
+     _debugMsgBuf                               572     100     256       8   .bss        
+     priority.9                                 672       1       1       7   .bss        
+     len.10                                     673       2       2       2   .bss        
+     curPriority.11                             675       2       2       1   .bss        
+     stackPtrTmp.12                             677       2       2       8   .bss        
+     scheduledTask.13                           679       1       1       6   .bss        
+     elapsedTime.14                             67A       4       4       2   .bss        
      _Vector_16                                FFDE       2       2       0   .abs_section_ffde
 
 *********************************************************************************************
@@ -646,12 +646,12 @@ MODULE STATISTIC
   Start12.c.o                                  0     49      0
   PRINTF.C.o (ansisi.lib)                      6   1212    116
   rtshc12.c.o (ansisi.lib)                     0    123      0
-  demo.c.o                                   412    395      2
+  demo.c.o                                   412    391      2
   serial.c.o                                   0    119      0
   modclock.c.o                                 0     32      0
   timer.c.o                                   16    222      0
-  OurTOS.c.o                                 360    947    481
-  other                                      256     12     21
+  OurTOS.c.o                                 359    941    486
+  other                                      256     12     23
 
 *********************************************************************************************
 SECTION USE IN OBJECT-ALLOCATION SECTION
@@ -669,10 +669,10 @@ SECTION: ".text"
   _createNewStack _updateTaskTimes 
 SECTION: ".data"
   _debugMsgTop _debugMsgTaskID _debugMsgHeader _debugMsgHeaderBar 
-  _debugMsgTaskLine _debugMsgMutexLine _debugMsgNoneLine len.8 
+  _debugMsgTaskLine _debugMsgMutexLine _debugMsgNoneLine len.8 stackPtr.15 
 SECTION: ".bss"
   pbuf _watchdogFlags _timeCurrentMsec _timeCountMsec _timeIncrement 
-  _lastTimestamp _mutexesEnabled _debug _taskArray _maxPriority _ISRstack 
+  _lastTimestamp _mutexesEnabled _debug _maxPriority _ISRstack 
   _mainLoopStackPtr _started _currentTask _debugMsgBuf priority.9 len.10 
   curPriority.11 stackPtrTmp.12 scheduledTask.13 elapsedTime.14 
 SECTION: ".init"
@@ -682,8 +682,8 @@ SECTION: ".rodata"
 SECTION: ".rodata1"
   STRING......................1 STRING.Current.Task.ID...02.2 
   STRING...Priority...CurPrio.3 STRING......................4 
-  STRING..........d...........5 STRING..........d...........6 
-  STRING..........d...........7 
+  STRING...........d..........5 STRING...........d..........6 
+  STRING...........d..........7 
 SECTION: ".abs_section_8"
   _PORTE 
 SECTION: ".abs_section_9"
@@ -1369,29 +1369,29 @@ OBJECT LIST SORTED BY ADDRESS
      _debugMsgMutexLine                         50A       2       2       1   .data       
      _debugMsgNoneLine                          50C       2       2       1   .data       
      len.8                                      50E       2       2       1   .data       
-     pbuf                                       510       6       6      15   .bss        
-     _watchdogFlags                             516       1       1       5   .bss        
-     _timeCurrentMsec                           517       4       4       9   .bss        
-     _timeCountMsec                             51B       4       4       7   .bss        
-     _timeIncrement                             51F       4       4       8   .bss        
-     _lastTimestamp                             523       4       4       7   .bss        
-     _mutexesEnabled                            527       2       2       3   .bss        
-     _debug                                     529       2       2       3   .bss        
-     _taskArray                                 52B       2       2      19   .bss        
-     _maxPriority                               52D       1       1      12   .bss        
-     _ISRstack                                  52E      40      64       1   .bss        
-     _mainLoopStackPtr                          56E       2       2       3   .bss        
-     _started                                   570       2       2       5   .bss        
-     _currentTask                               572       1       1       7   .bss        
-     _debugMsgBuf                               573     100     256       8   .bss        
-     priority.9                                 673       1       1       7   .bss        
-     len.10                                     674       2       2       2   .bss        
-     curPriority.11                             676       2       2       1   .bss        
-     stackPtrTmp.12                             678       2       2       8   .bss        
-     scheduledTask.13                           67A       1       1       7   .bss        
-     elapsedTime.14                             67B       4       4       2   .bss        
-     taskArray                                  67F     19A     410       1   .common     
-     blockingMutex                              819       1       1       5   .common     
+     stackPtr.15                                510       1       1       1   .data       
+     pbuf                                       511       6       6      15   .bss        
+     _watchdogFlags                             517       1       1       5   .bss        
+     _timeCurrentMsec                           518       4       4       9   .bss        
+     _timeCountMsec                             51C       4       4       7   .bss        
+     _timeIncrement                             520       4       4       8   .bss        
+     _lastTimestamp                             524       4       4       7   .bss        
+     _mutexesEnabled                            528       2       2       3   .bss        
+     _debug                                     52A       2       2       3   .bss        
+     _maxPriority                               52C       1       1      12   .bss        
+     _ISRstack                                  52D      40      64       1   .bss        
+     _mainLoopStackPtr                          56D       2       2       3   .bss        
+     _started                                   56F       2       2       5   .bss        
+     _currentTask                               571       1       1       7   .bss        
+     _debugMsgBuf                               572     100     256       8   .bss        
+     priority.9                                 672       1       1       7   .bss        
+     len.10                                     673       2       2       2   .bss        
+     curPriority.11                             675       2       2       1   .bss        
+     stackPtrTmp.12                             677       2       2       8   .bss        
+     scheduledTask.13                           679       1       1       6   .bss        
+     elapsedTime.14                             67A       4       4       2   .bss        
+     taskArray                                  67E     19A     410      50   .common     
+     blockingMutex                              818       1       1       5   .common     
      Init                                      C000      29      41       1   .init       
      _Startup                                  C029       8       8       0   .init       
      pow10                                     C03B      28      40       4   .rodata     
@@ -1401,62 +1401,62 @@ OBJECT LIST SORTED BY ADDRESS
      STRING.Current.Task.ID...02.2             C0FB      18      24       1   .rodata1    
      STRING...Priority...CurPrio.3             C113      4C      76       1   .rodata1    
      STRING......................4             C15F      4C      76       1   .rodata1    
-     STRING..........d...........5             C1AB      4B      75       1   .rodata1    
-     STRING..........d...........6             C1F6      4C      76       1   .rodata1    
-     STRING..........d...........7             C242      4C      76       1   .rodata1    
-     vprintf                                   C28E     478    1144      49   .text       
-     _out                                      C706       C      12       9   .text       
-     deposit_char                              C712       F      15       1   .text       
-     sprintf                                   C721      29      41       6   .text       
-     SET_MUTEX_DISABLE_BTN_INPUT               C74A       9       9       1   .text       
-     SET_TASK_ENABLE_BTN_INPUT                 C753       7       7       1   .text       
-     SET_LEDS                                  C75A       C      12       6   .text       
-     main                                      C766      5F      95       1   .text       
-     watchdogKickTask                          C7C5      1A      26       1   .text       
-     pollBtnsTask                              C7DF      79     121       1   .text       
-     shortBlockingTask                         C858      24      36       1   .text       
-     longBlockingTask                          C87C      24      36       1   .text       
-     _watchdogISR                              C8A0       D      13       1   .text       
-     _initBtns                                 C8AD       6       6       1   .text       
-     _initLEDs                                 C8B3       7       7       1   .text       
-     _blockingDelayMsec                        C8BA      1B      27       2   .text       
-     serialInit                                C8D5      15      21       1   .text       
-     serialWrite                               C8EA      21      33       2   .text       
-     _serialWriteByte                          C90B       C      12       1   .text       
-     _prescaleForBaud                          C917      35      53       1   .text       
-     clockSetup                                C94C      20      32       1   .text       
-     timerInit                                 C96C      2A      42       1   .text       
-     timerGetCurrentMsec                       C996       7       7       1   .text       
-     timerEnableInterrupt                      C99D       4       4       1   .text       
-     timerDisableInterrupt                     C9A1       4       4       1   .text       
-     timerUpdateCurrent                        C9A5      33      51       1   .text       
-     timerElapsedTime                          C9D8      26      38       1   .text       
-     _freq2Prescaler                           C9FE      4C      76       1   .text       
-     ourtosInit                                CA4A      4D      77       1   .text       
-     ourtosStart                               CA97      19      25       1   .text       
-     ourtosAddTask                             CAB0      3F      63       4   .text       
-     ourtosAddMutex                            CAEF      25      37       1   .text       
-     ourtosShutdown                            CB14       9       9       1   .text       
-     ourtosAcquireMutex                        CB1D      2F      47       2   .text       
-     ourtosReleaseMutex                        CB4C      12      18       2   .text       
-     ourtosEnableDebug                         CB5E       4       4       1   .text       
-     ourtosEnableMutexes                       CB62       4       4       1   .text       
-     ourtosEnableTask                          CB66      20      32       4   .text       
-     _scheduler                                CB86      58      88       1   .text       
-     _idle                                     CBDE      25      37       2   .text       
-     _debugPrint                               CC03      53      83       1   .text       
-     _debugPrintTaskArray                      CC56      79     121       1   .text       
-     _timerIsr                                 CCCF      B6     182       1   .text       
-     _createNewStack                           CD85      3C      60       1   .text       
-     _updateTaskTimes                          CDC1      3C      60       1   .text       
-     _BSHL                                     CDFD       8       8       1   RUNTIME     
-     _LCMP_P                                   CE05      15      21       3   RUNTIME     
-     _LNEG                                     CE1A       D      13       1   RUNTIME     
-     _ILSEXT                                   CE27       7       7       2   RUNTIME     
-     _CASE_DIRECT_BYTE                         CE2E       5       5       1   RUNTIME     
-     _CASE_CHECKED_BYTE                        CE33      14      20       3   RUNTIME     
-     _CASE_SEARCH_8                            CE47      17      23       1   RUNTIME     
-     _CASE_SEARCH_8_BYTE                       CE5E      1A      26       1   RUNTIME     
+     STRING...........d..........5             C1AB      4E      78       1   .rodata1    
+     STRING...........d..........6             C1F9      4D      77       1   .rodata1    
+     STRING...........d..........7             C246      4D      77       1   .rodata1    
+     vprintf                                   C293     478    1144      49   .text       
+     _out                                      C70B       C      12       9   .text       
+     deposit_char                              C717       F      15       1   .text       
+     sprintf                                   C726      29      41       6   .text       
+     SET_MUTEX_DISABLE_BTN_INPUT               C74F       9       9       1   .text       
+     SET_TASK_ENABLE_BTN_INPUT                 C758       7       7       1   .text       
+     SET_LEDS                                  C75F       C      12       6   .text       
+     main                                      C76B      5B      91       1   .text       
+     watchdogKickTask                          C7C6      1A      26       1   .text       
+     pollBtnsTask                              C7E0      79     121       1   .text       
+     shortBlockingTask                         C859      24      36       1   .text       
+     longBlockingTask                          C87D      24      36       1   .text       
+     _watchdogISR                              C8A1       D      13       1   .text       
+     _initBtns                                 C8AE       6       6       1   .text       
+     _initLEDs                                 C8B4       7       7       1   .text       
+     _blockingDelayMsec                        C8BB      1B      27       2   .text       
+     serialInit                                C8D6      15      21       1   .text       
+     serialWrite                               C8EB      21      33       2   .text       
+     _serialWriteByte                          C90C       C      12       1   .text       
+     _prescaleForBaud                          C918      35      53       1   .text       
+     clockSetup                                C94D      20      32       1   .text       
+     timerInit                                 C96D      2A      42       1   .text       
+     timerGetCurrentMsec                       C997       7       7       1   .text       
+     timerEnableInterrupt                      C99E       4       4       1   .text       
+     timerDisableInterrupt                     C9A2       4       4       1   .text       
+     timerUpdateCurrent                        C9A6      33      51       1   .text       
+     timerElapsedTime                          C9D9      26      38       1   .text       
+     _freq2Prescaler                           C9FF      4C      76       1   .text       
+     ourtosInit                                CA4B      47      71       1   .text       
+     ourtosStart                               CA92      19      25       1   .text       
+     ourtosAddTask                             CAAB      46      70       4   .text       
+     ourtosAddMutex                            CAF1      24      36       1   .text       
+     ourtosShutdown                            CB15       9       9       1   .text       
+     ourtosAcquireMutex                        CB1E      2C      44       2   .text       
+     ourtosReleaseMutex                        CB4A      11      17       2   .text       
+     ourtosEnableDebug                         CB5B       4       4       1   .text       
+     ourtosEnableMutexes                       CB5F       4       4       1   .text       
+     ourtosEnableTask                          CB63      20      32       4   .text       
+     _scheduler                                CB83      62      98       1   .text       
+     _idle                                     CBE5      23      35       2   .text       
+     _debugPrint                               CC08      53      83       1   .text       
+     _debugPrintTaskArray                      CC5B      76     118       1   .text       
+     _timerIsr                                 CCD1      AC     172       1   .text       
+     _createNewStack                           CD7D      3C      60       1   .text       
+     _updateTaskTimes                          CDB9      3F      63       1   .text       
+     _BSHL                                     CDF8       8       8       1   RUNTIME     
+     _LCMP_P                                   CE00      15      21       3   RUNTIME     
+     _LNEG                                     CE15       D      13       1   RUNTIME     
+     _ILSEXT                                   CE22       7       7       2   RUNTIME     
+     _CASE_DIRECT_BYTE                         CE29       5       5       1   RUNTIME     
+     _CASE_CHECKED_BYTE                        CE2E      14      20       3   RUNTIME     
+     _CASE_SEARCH_8                            CE42      17      23       1   RUNTIME     
+     _CASE_SEARCH_8_BYTE                       CE59      1A      26       1   RUNTIME     
      _Vector_16                                FFDE       2       2       0   .abs_section_ffde
      _Vector_2                                 FFFA       2       2       0   .abs_section_fffa
 
@@ -1481,46 +1481,47 @@ rtshc12.c.o (ansisi.lib):
 demo.c.o:
   STRING......................1 STRING.Current.Task.ID...02.2 
   STRING...Priority...CurPrio.3 STRING......................4 
-  STRING..........d...........5 STRING..........d...........6 
-  STRING..........d...........7 _debugMsgTop _debugMsgTaskID _debugMsgHeader 
+  STRING...........d..........5 STRING...........d..........6 
+  STRING...........d..........7 _debugMsgTop _debugMsgTaskID _debugMsgHeader 
   _debugMsgHeaderBar _debugMsgTaskLine _debugMsgMutexLine _debugMsgNoneLine 
-  _timeCurrentMsec _timeCountMsec _timeIncrement _lastTimestamp _mutexesEnabled 
-  _debug _taskArray _maxPriority _ISRstack _mainLoopStackPtr _started 
-  _currentTask _debugMsgBuf 
-OurTOS.c.o:
-  _timeCurrentMsec _timeCountMsec _timeIncrement _lastTimestamp 
 
 *********************************************************************************************
 COPYDOWN SECTION
 ---------------------------------------------------------------------------------------------
-------- ROM-ADDRESS: 0xCE78 ---- SIZE       4 ---
+------- ROM-ADDRESS: 0xCE73 ---- SIZE       4 ---
 Filling bytes inserted
- 000F0500
-------- ROM-ADDRESS: 0xCE7C ---- RAM-ADDRESS: 0x500 ---- SIZE       2 ---
+ 00110500
+------- ROM-ADDRESS: 0xCE77 ---- RAM-ADDRESS: 0x500 ---- SIZE       2 ---
 Name of initialized Object : _debugMsgTop
  C0AF
-------- ROM-ADDRESS: 0xCE7E ---- RAM-ADDRESS: 0x502 ---- SIZE       2 ---
+------- ROM-ADDRESS: 0xCE79 ---- RAM-ADDRESS: 0x502 ---- SIZE       2 ---
 Name of initialized Object : _debugMsgTaskID
  C0FB
-------- ROM-ADDRESS: 0xCE80 ---- RAM-ADDRESS: 0x504 ---- SIZE       2 ---
+------- ROM-ADDRESS: 0xCE7B ---- RAM-ADDRESS: 0x504 ---- SIZE       2 ---
 Name of initialized Object : _debugMsgHeader
  C113
-------- ROM-ADDRESS: 0xCE82 ---- RAM-ADDRESS: 0x506 ---- SIZE       2 ---
+------- ROM-ADDRESS: 0xCE7D ---- RAM-ADDRESS: 0x506 ---- SIZE       2 ---
 Name of initialized Object : _debugMsgHeaderBar
  C15F
-------- ROM-ADDRESS: 0xCE84 ---- RAM-ADDRESS: 0x508 ---- SIZE       2 ---
+------- ROM-ADDRESS: 0xCE7F ---- RAM-ADDRESS: 0x508 ---- SIZE       2 ---
 Name of initialized Object : _debugMsgTaskLine
  C1AB
-------- ROM-ADDRESS: 0xCE86 ---- RAM-ADDRESS: 0x50A ---- SIZE       2 ---
+------- ROM-ADDRESS: 0xCE81 ---- RAM-ADDRESS: 0x50A ---- SIZE       2 ---
 Name of initialized Object : _debugMsgMutexLine
- C1F6
-------- ROM-ADDRESS: 0xCE88 ---- RAM-ADDRESS: 0x50C ---- SIZE       2 ---
+ C1F9
+------- ROM-ADDRESS: 0xCE83 ---- RAM-ADDRESS: 0x50C ---- SIZE       2 ---
 Name of initialized Object : _debugMsgNoneLine
- C242
-------- ROM-ADDRESS: 0xCE8A ---- RAM-ADDRESS: 0x50E ---- SIZE       1 ---
+ C246
+------- ROM-ADDRESS: 0xCE85 ---- RAM-ADDRESS: 0x50E ---- SIZE       1 ---
 Name of initialized Object : len.8
  01
-------- ROM-ADDRESS: 0xCE8B ---- SIZE       2 ---
+------- ROM-ADDRESS: 0xCE86 ---- SIZE       1 ---
+Filling bytes inserted
+ 00
+------- ROM-ADDRESS: 0xCE87 ---- RAM-ADDRESS: 0x510 ---- SIZE       1 ---
+Name of initialized Object : stackPtr.15
+ 40
+------- ROM-ADDRESS: 0xCE88 ---- SIZE       2 ---
 Filling bytes inserted
  0000
 
@@ -1531,9 +1532,9 @@ _debugMsgTop              USES STRING......................1
 _debugMsgTaskID           USES STRING.Current.Task.ID...02.2 
 _debugMsgHeader           USES STRING...Priority...CurPrio.3 
 _debugMsgHeaderBar        USES STRING......................4 
-_debugMsgTaskLine         USES STRING..........d...........5 
-_debugMsgMutexLine        USES STRING..........d...........6 
-_debugMsgNoneLine         USES STRING..........d...........7 
+_debugMsgTaskLine         USES STRING...........d..........5 
+_debugMsgMutexLine        USES STRING...........d..........6 
+_debugMsgNoneLine         USES STRING...........d..........7 
 Init                      USES _startupData 
 _Startup                  USES __SEG_END_SSTACK Init main 
 vprintf                   USES vprintf _out _CASE_SEARCH_8_BYTE 
@@ -1545,8 +1546,8 @@ sprintf                   USES pbuf deposit_char vprintf
 SET_MUTEX_DISABLE_BTN_INPUT USES _DDRP _PERP 
 SET_TASK_ENABLE_BTN_INPUT USES _DDRAB _PUCR 
 SET_LEDS                  USES _PORTAB 
-main                      USES _initBtns _initLEDs taskArray ourtosInit 
-                                watchdogKickTask ourtosAddTask pollBtnsTask shortBlockingTask 
+main                      USES _initBtns _initLEDs ourtosInit watchdogKickTask 
+                                ourtosAddTask pollBtnsTask shortBlockingTask 
                                 longBlockingTask blockingMutex ourtosAddMutex ourtosEnableDebug 
                                 ourtosStart 
 watchdogKickTask          USES SET_LEDS _watchdogFlags 
@@ -1574,32 +1575,32 @@ timerUpdateCurrent        USES _timeCountMsec _timeIncrement _timeCurrentMsec
 timerElapsedTime          USES timerGetCurrentMsec _lastTimestamp 
 _freq2Prescaler           USES _CASE_CHECKED_BYTE _timeIncrement 
 ourtosInit                USES _maxPriority _started _debug _mutexesEnabled 
-                                _currentTask _taskArray timerInit serialInit 
+                                _currentTask taskArray timerInit serialInit 
 ourtosStart               USES _started timerEnableInterrupt 
-ourtosAddTask             USES _maxPriority _taskArray 
-ourtosAddMutex            USES _maxPriority _taskArray 
+ourtosAddTask             USES _maxPriority taskArray 
+ourtosAddMutex            USES _maxPriority taskArray 
 ourtosShutdown            USES timerDisableInterrupt _started 
-ourtosAcquireMutex        USES _taskArray _mutexesEnabled _currentTask 
-ourtosReleaseMutex        USES _currentTask _taskArray 
+ourtosAcquireMutex        USES taskArray _mutexesEnabled _currentTask 
+ourtosReleaseMutex        USES _currentTask taskArray 
 ourtosEnableDebug         USES _debug 
 ourtosEnableMutexes       USES _mutexesEnabled 
-ourtosEnableTask          USES _maxPriority _taskArray 
-_scheduler                USES _maxPriority _taskArray 
-_idle                     USES _currentTask _taskArray _started 
+ourtosEnableTask          USES _maxPriority taskArray 
+_scheduler                USES _maxPriority taskArray 
+_idle                     USES _currentTask taskArray _started 
                                 _mainLoopStackPtr 
 _debugPrint               USES _debugMsgTop _debugMsgBuf sprintf 
                                 _debugMsgTaskID _debugMsgHeader _debugMsgHeaderBar 
                                 _debugPrintTaskArray len.8 serialWrite 
-_debugPrintTaskArray      USES priority.9 _taskArray _CASE_CHECKED_BYTE 
+_debugPrintTaskArray      USES priority.9 taskArray _CASE_CHECKED_BYTE 
                                 curPriority.11 _debugMsgTaskLine _debugMsgBuf sprintf 
                                 _debugMsgMutexLine _debugMsgNoneLine len.10 serialWrite 
                                 _maxPriority 
 _timerIsr                 USES _TFLG2 stackPtrTmp.12 _maxPriority _currentTask 
-                                _mainLoopStackPtr _taskArray _ISRstack timerUpdateCurrent 
+                                _mainLoopStackPtr taskArray _ISRstack timerUpdateCurrent 
                                 timerElapsedTime elapsedTime.14 _updateTaskTimes _scheduler 
                                 scheduledTask.13 _debug _debugPrint _createNewStack 
-_createNewStack           USES _taskArray _idle 
-_updateTaskTimes          USES _taskArray _maxPriority 
+_createNewStack           USES stackPtr.15 _idle taskArray 
+_updateTaskTimes          USES taskArray _maxPriority 
 _Vector_16                USES _timerIsr 
 _Vector_2                 USES _watchdogISR 
 
@@ -1754,6 +1755,6 @@ STATISTIC SECTION
 
 ExeFile:
 --------
-Number of blocks to be downloaded: 9
-Total size of all blocks to be downloaded: 3731
+Number of blocks to be downloaded: 8
+Total size of all blocks to be downloaded: 3728
 

@@ -42,6 +42,8 @@
 
 #define RTI_DUMY_REG_BYTES (11)
 
+#define MAX_PRIORITY (5) // TODO fix the restriction
+
 /*==================================
  * Constant Strings - for debug
  *==================================*/
@@ -51,8 +53,8 @@ static byte_t *_debugMsgTaskID = "Current Task ID: %02d\n\n";
 static byte_t *_debugMsgHeader =    "| Priority | CurPriority | Usage | TimeNext | Period | Running | Enabled |\n";
 static byte_t *_debugMsgHeaderBar = "+----------+-------------+-------+----------+--------+---------+---------+\n";
 static byte_t *_debugMsgTaskLine =  "|        %d |           %d |  task |        - |      - |       - |       - |\n";
-static byte_t *_debugMsgMutexLine = "|        %d |            - | mutex |        - |      - |       - |       - |\n";
-static byte_t *_debugMsgNoneLine =  "|        %d |            - |  none |        - |      - |       - |       - |\n";
+static byte_t *_debugMsgMutexLine = "|        %d |           - | mutex |        - |      - |       - |       - |\n";
+static byte_t *_debugMsgNoneLine =  "|        %d |           - |  none |        - |      - |       - |       - |\n";
 
 /*==================================
  * Types
@@ -97,33 +99,10 @@ typedef struct {
 typedef uint8_t mutex_t;
 
 /*==================================
- * Exernal Globals
+ * External Globals
  *==================================*/
 
-/*==================================
- * Local Globals
- *==================================*/
-
-static bool_t _mutexesEnabled;
-static bool_t _debug;
-
-static task_t* _taskArray;
-
-static uint8_t _maxPriority;
-
-/* garabage stack for use during ISR */
-static uint8_t _ISRstack[TASK_STACK_SIZE];
-
-/* main loop stack pointer to enable running of main loop 
- * when nothing else wants to run.
-*/
-static uint8_t* _mainLoopStackPtr;
-
-static bool_t _started;
-
-static uint8_t _currentTask;
-
-static byte_t _debugMsgBuf[DEBUG_MSG_BUF_SIZE];
+extern task_t taskArray[MAX_PRIORITY]; // TODO we will fight the compiler another day
 
 /*==================================
  * Public Functions
@@ -142,7 +121,7 @@ static byte_t _debugMsgBuf[DEBUG_MSG_BUF_SIZE];
  *
  * Also sets the maximum period between runs of the RTOS's scheduler.
  */
-void ourtosInit(task_t taskAray[], uint8_t maxPriority, freq_t freq);
+void ourtosInit(uint8_t maxPriority, freq_t freq);
 
 /* ----- Functions for a stopped OurTOS ----- */
 
