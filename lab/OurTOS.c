@@ -324,6 +324,9 @@ void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
 	static uint8_t* stackPtrTmp;
 	static uint8_t scheduledTask;
 	static int32_t elapsedTime, curTime;
+	
+	// TODO remove post demo
+	static bool_t printedMutex = false;
 
 	/* acknowledge interrupt */
 	TFLG2_TOF = 1;
@@ -365,8 +368,20 @@ void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
 	 * print information about the current state of all tasks.
 	 */
 	if (_debug && scheduledTask != _currentTask) {
-	  curTime = timerGetCurrentMsec();
+		curTime = timerGetCurrentMsec();
 		_debugPrint(scheduledTask, curTime);	
+	}
+
+	// TODO remove after demo
+	/* task 4 is set to run but task 3 is ready to run */
+	if ((false == printedMutex) && 
+	    (scheduledTask == 4) &&
+		  (taskArray[3].enabled == true) &&
+		  (taskArray[3].timeToNextRun <= 0) ) {
+		serialWrite("HA I GOT YOUR MUTEX!!\n", 23);
+		printedMutex = true;
+	} else if (scheduledTask != 4){
+	  printedMutex = false; 
 	}
 
 	/* Special case if scheduler has no tasks to run.

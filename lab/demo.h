@@ -111,10 +111,17 @@ static void SET_TASK_ENABLE_BTN_INPUT(void) {
 
 /* LEDs */
 #define SET_LEDS_OUTPUT() (DDRB |= LED_MASK) 
+/* TODO need this?
 static void SET_LEDS(uint8_t val) {
     PORTB &= ~LED_MASK;
     PORTB |= (~val << NIB_LEN_BITS) & LED_MASK;
 }
+ */
+#define SET_LEDS(val) { \
+    PORTB &= ~LED_MASK; \
+    PORTB |= (~val << NIB_LEN_BITS) & LED_MASK; \
+}
+
 #define GET_LEDS() ( (PORTB >> NIB_LEN_BITS) & (LED_MASK >> NIB_LEN_BITS) )
 
 /* Assorted LED light pattens  - 1 is ON, 0 is OFF */

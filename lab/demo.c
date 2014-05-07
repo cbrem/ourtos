@@ -16,7 +16,7 @@
 
 #include "demo.h"
 
-#define SIMULATION
+//#define SIMULATION
 
 /*==================================
  * Local Globals
@@ -47,11 +47,10 @@ void main(void) {
     errCode = ourtosAddTask(PRIORITY_SHORT, SHORT_TASK_PERIOD, &shortBlockingTask);
     errCode = ourtosAddTask(PRIORITY_LONG, LONG_TASK_PERIOD, &longBlockingTask);
     errCode = ourtosAddMutex(PRIORITY_MUTEX, &blockingMutex);
-    ourtosEnableDebug(false);
+    ourtosEnableDebug(true);
 
     /* starts the watchdog */
-    // TODO
-    //_initWatchdog();
+    _initWatchdog();
 
     /* start the RTOS. This enables interrupts. */
     ourtosStart();
@@ -70,8 +69,7 @@ void watchdogKickTask(void) {
     SET_LEDS(LED_WATCHDOG_KICK);
 
     if ( WATCHDOG_FLG_ALL_SET == _watchdogFlags ) {
-        // TODO
-        //_FEED_COP();
+        _FEED_COP();
 
         /* watchdog clear must be atomic so that tasks setting flags
          * are not intermingled with clearing the flags.
@@ -113,10 +111,14 @@ void pollBtnsTask(void) {
     }
 
 #ifndef SIMULATION /* disable btns in simulation */
-    /* disable or enable tasks based upon btn */
+    /* Disable or enable tasks based upon btn.
+     * Note that we cannot disable task 1 (i.e. pollButtonTask),
+     * because this would prevent us from enabling/disabling any tasks in the
+     * future.
+     */
     DisableInterrupts;
     ourtosEnableTask(PRIORITY_WATCHDOG, taskEnabled[0]);
-    ourtosEnableTask(PRIORITY_POLL_BTN, taskEnabled[1]);
+    // ourtosEnableTask(PRIORITY_POLL_BTN, taskEnabled[1]);
     ourtosEnableTask(PRIORITY_SHORT, taskEnabled[2]);
     ourtosEnableTask(PRIORITY_LONG, taskEnabled[3]);
     EnableInterrupts;
@@ -169,7 +171,7 @@ void longBlockingTask(void) {
 
 void interrupt 2 _watchdogISR( void ) {
     
-    ourtosShutdown();
+    //ourtosShutdown();
 
     SET_LEDS_OUTPUT();
     SET_LEDS(LED_WATCHDOG);
