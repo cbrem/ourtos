@@ -16,11 +16,21 @@
 // to a signed value.
 //
 // TODO: tasks can only hold one mutex at a time with this model!
-//    can we just do this by...mutexes only replacing lower-priority
+//    - can we just do this by...mutexes only replacing lower-priority
 //    mutexes...and mutexes store the priority of the mutex they
 //    superceeded...and then release replaces this priority...but
 //    what if that's already been released independantly!!! ooh...
 //    maybe the mutexes have to store a lot of state...
+//    - BUT: here's what we can do:
+//      * each mutex knows the ID of the task that is holding it
+//      * on acquire, mutex m must scan all other mutexes to find
+//        the highest-priority mutex h which the grabbing task holds
+//        then, it sets the current task's currentPriority to
+//        min(h, m)
+//      * on release, mutex must scan all mutexes to find highest-
+//        priority mutex other than itself that the task currently
+//        holds. set current task's currentPriority to this value.
+//        if none, then set it to normalPriority
 //
 // TODO: what do we do if a mutex becomes clobbered (i.e. invalid)
 // which a task has it, and then it releases that mutex?

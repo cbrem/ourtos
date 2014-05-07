@@ -54,7 +54,6 @@ static byte_t *_debugMsgTaskLine =  "|        %d |           %d |  task |       
 static byte_t *_debugMsgMutexLine = "|        %d |            - | mutex |        - |      - |       - |       - |\n";
 static byte_t *_debugMsgNoneLine =  "|        %d |            - |  none |        - |      - |       - |       - |\n";
 
-
 /*==================================
  * Types
  *==================================*/
