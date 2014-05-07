@@ -45,10 +45,11 @@ void main(void) {
     errCode = ourtosAddTask(PRIORITY_SHORT, SHORT_TASK_PERIOD, &shortBlockingTask);
     errCode = ourtosAddTask(PRIORITY_LONG, LONG_TASK_PERIOD, &longBlockingTask);
     errCode = ourtosAddMutex(PRIORITY_MUTEX, &blockingMutex);
-    ourtosEnableDebug(false);
+    ourtosEnableDebug(true);
 
     /* starts the watchdog */
-    _initWatchdog();
+    // TODO
+    //_initWatchdog();
 
     /* start the RTOS. This enables interrupts. */
     ourtosStart();
@@ -67,7 +68,8 @@ void watchdogKickTask(void) {
     SET_LEDS(LED_WATCHDOG_KICK);
 
     if ( WATCHDOG_FLG_ALL_SET == _watchdogFlags ) {
-        _FEED_COP();
+        // TODO
+        //_FEED_COP();
 
         /* watchdog clear must be atomic so that tasks setting flags
          * are not intermingled with clearing the flags.
@@ -101,7 +103,7 @@ void pollBtnsTask(void) {
 
     /* poll all task enable btns */
     for( i = 0; i < N_TASKS; i++) {
-        if ( 0 != GET_TASK_ENABLE_BTN(i) ) {
+        if ( 0 == GET_TASK_ENABLE_BTN(i) ) {
             taskEnabled[i] = true;
         } else {
             taskEnabled[i] = false;
@@ -128,7 +130,7 @@ void shortBlockingTask(void) {
     ourtosAcquireMutex(&blockingMutex);
     EnableInterrupts;
 
-    _blockingDelayMsec(SHORT_BLOCK_TIME);
+    timerBlockingDelayMsec(SHORT_BLOCK_TIME);
     
     DisableInterrupts;
     ourtosReleaseMutex(&blockingMutex);
@@ -145,7 +147,7 @@ void longBlockingTask(void) {
     ourtosAcquireMutex(&blockingMutex);
     EnableInterrupts;
 
-    _blockingDelayMsec(LONG_BLOCK_TIME);
+    timerBlockingDelayMsec(LONG_BLOCK_TIME);
     
     DisableInterrupts;
     ourtosReleaseMutex(&blockingMutex);
@@ -203,19 +205,4 @@ void _initWatchdog(void) {
     /* set time period */
     _ENABLE_COP(WATCHDOG_PERIOD);
 
-}
-
-/* ------ Helper functions ------*/
-
-void _blockingDelayMsec(uint16_t delayMS) {
-    uint16_t i;
-
-    for (;delayMS > 0; delayMS--) {
-        for (i = 0; i < CYCLES_PER_MS; i++) {
-            asm NOP;
-              asm NOP;
-              asm NOP;
-              asm NOP;
-          }
-    }
 }

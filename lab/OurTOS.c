@@ -110,6 +110,9 @@ void ourtosStart() {
 		DisableInterrupts;
 		if (!_started) { break; }
 		EnableInterrupts;
+		
+		// TODO: temporary solution!
+		timerBlockingDelayMsec(1);
 	}
 	EnableInterrupts;
 }
@@ -288,6 +291,9 @@ static void _idle() {
 		DisableInterrupts;
 		if (!_started) { break; }
 		EnableInterrupts;
+		
+		// TODO: temporary solution!
+		timerBlockingDelayMsec(1);
 	}
 	EnableInterrupts;
 
@@ -317,7 +323,7 @@ void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
 	 */
 	static uint8_t* stackPtrTmp;
 	static uint8_t scheduledTask;
-	static int32_t elapsedTime;
+	static int32_t elapsedTime, curTime;
 
 	/* acknowledge interrupt */
 	TFLG2_TOF = 1;
@@ -359,7 +365,8 @@ void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
 	 * print information about the current state of all tasks.
 	 */
 	if (_debug && scheduledTask != _currentTask) {
-		_debugPrint(scheduledTask, elapsedTime);	
+	  curTime = timerGetCurrentMsec();
+		_debugPrint(scheduledTask, curTime);	
 	}
 
 	/* Special case if scheduler has no tasks to run.
@@ -425,7 +432,7 @@ static void _createNewStack(uint8_t priority) {
 }
 
 static void _updateTaskTimes(int32_t elapsedTime) {
-	int i;
+	static int i;
 
 	/* iter throught valid tasks and subratract elapsedTime */
 	for( i = 0; i < _maxPriority; i++ ) {

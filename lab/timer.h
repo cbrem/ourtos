@@ -26,6 +26,8 @@
 #define TIMER_INTERRUPT_VECTOR (16)
 #define THREE_BIT_MASK (0x7)
 
+#define CYCLES_PER_MS (794)
+
 /* time prescalers per freq */
 #define FREQ_8_MHZ_PRESCALER 	(0)
 #define FREQ_4_MHZ_PRESCALER 	(1)
@@ -109,6 +111,12 @@ void timerUpdateCurrent(void);
  */
  // TODO fix undefined behavior
 int32_t timerElapsedTime(void);
+
+/* _blockingDelayMsec runs for the given number of milliseconds 
+ * This function is implemented with nop loops so times are approximate
+ */
+// TODO: make static again
+void timerBlockingDelayMsec(uint16_t delayMS);
 
 /*==================================
  * Private Functions

@@ -72,12 +72,28 @@ void timerUpdateCurrent(void) {
 }
 
 int32_t timerElapsedTime(void) {
+    static uint32_t curTime;
+    static int32_t elapsedTime;
+
     /* this cast is the undefined behavior */
-    uint32_t curTime = timerGetCurrentMsec();
-    int32_t elapsedTime = (int32_t)(curTime - _lastTimestamp);
+    curTime = timerGetCurrentMsec();
+    elapsedTime = (int32_t)(curTime - _lastTimestamp);
     /* update the global last timestamp */
     _lastTimestamp = curTime;
     return elapsedTime;
+}
+
+void timerBlockingDelayMsec(uint16_t delayMS) {
+    uint16_t i;
+
+    for (;delayMS > 0; delayMS--) {
+        for (i = 0; i < CYCLES_PER_MS; i++) {
+            asm NOP;
+              asm NOP;
+              asm NOP;
+              asm NOP;
+          }
+    }
 }
 
 /*==================================

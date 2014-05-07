@@ -25,7 +25,7 @@
 #include "derivative.h"
 #include "inttypesMC9S12C128.h"
 #include "boolean.h"
-
+#include "timer.h"
 #include "OurTOS.h"
 
 /*==================================
@@ -34,7 +34,6 @@
 
 /* Assorted */
 #define N_TASKS (4)
-#define CYCLES_PER_MS (794)
 
 /* Watchdog */
 #define WATCHDOG_PERIOD         (0x7) /* 2^24 cycles ~ 1 sec for 8MHz Clk */
@@ -67,7 +66,7 @@
 #define PERIOD_50_MSEC     (50)
 #define PERIOD_100_MSEC    (100)
 #define PERIOD_200_MSEC	   (200)
-#define PERIOD_210_MSEC	   (210)
+#define PERIOD_225_MSEC	   (225)
 #define PERIOD_250_MSEC    (250)
 #define PERIOD_500_MSEC    (500)
 #define PERIOD_1000_MSEC   (1000)
@@ -79,7 +78,7 @@
 #define SCHEDULER_FREQ          (FREQ_4_MHZ)
 #define POLL_BTN_TASK_PERIOD    (PERIOD_100_MSEC)
 #define WATCHDOG_TASK_PERIOD    (PERIOD_100_MSEC)
-#define SHORT_TASK_PERIOD       (PERIOD_210_MSEC)
+#define SHORT_TASK_PERIOD       (PERIOD_225_MSEC)
 #define LONG_TASK_PERIOD        (PERIOD_200_MSEC)
 
 /* task blocking time (in Msec) */
@@ -203,12 +202,5 @@ void _initLEDs(void);
  * - timer rate set by macro WATCHDOG_PERIOD
  */
 void _initWatchdog(void);
-
-/* ------ Helper functions ------*/
-
-/* _blockingDelayMsec runs for the given number of milliseconds 
- * This function is implemented with nop loops so times are approximate
- */
-static void _blockingDelayMsec(uint16_t delayMS);
 
 #endif
