@@ -76,6 +76,17 @@ There is none. We used the board with nothing added.
 
 \sectPart{Code Review}
 
+
+\begin{tabular}{| l | l | l | p{25em} |}
+        \hline
+        \textbf{Defect \#} & \textbf{File} & \textbf{Line \#} & \textbf{Description} \\ \hline
+        1 & OurTOS.c & 111 & Typo. Was \texttt{\_started}. Should be \texttt{!\_started}. \\ \hline
+        2 & OurTOS.c & 115 & Interrupt does not run b/c no time between EnableInterrupts and DisableInterrupts. \\ \hline
+        3  & OurTOS.c & 132 & Not storing priority in \texttt{task\_t}. \\ \hline
+        4 & OurTOS.c & 283 & Should only updates a task's \texttt{timeToNextRun} after it has finished running. \\ \hline
+        5 & OurTOS.c & 351 & \texttt{stackPtrTmp} should start at the highest address of \texttt{\_ISRstack}, not the lowest. \\ \hline
+\end{tabular}
+
 %-------------------------------------------------------
 
 \sectPart{Worst Case Timing Analysis}
@@ -84,6 +95,8 @@ We kept the watchdog timeout at 1 minute for convenience.
 
 We observed the following worst case latency over 2 minutes of a trial run:
 
+\vspace{1em}
+
 \begin{tabular}{l | l}
 Watchdog Task & 107ms \\
 Poll Btn Task & 104ms \\
@@ -91,7 +104,11 @@ Short Task & 228 ms \\
 Long Task & 253 ms \\ 
 \end{tabular}
 
+\vspace{1em}
+
 The run-times of the various functions:
+
+\vspace{1em}
 
 \begin{tabular}{l | l}
 Scheduler & .06 ms \\
@@ -102,7 +119,11 @@ Long Task & 50.2 ms \\
 Blocking Time & .01 ms (when not in debug mode) \\
 \end{tabular}
 
+\vspace{1em}
+
 The expected worst case latency for each task is:
+
+\vspace{1em}
 
 \begin{tabular}{l | l}
 Watchdog Task & .01 ms \\
@@ -111,11 +132,15 @@ Short Task & 50.22 ms \\
 Long Task & 100.42 ms \\ 
 \end{tabular}
 
+\vspace{1em}
+
 This analysis for worst case latency is made simple by the fact that we designed the periods so that each high priority task only has time run once in the worst case when blocking a lower priority task.
 
 The main source for blocking time is the poll button task when it updates the task enable state (demo.c 119-124).
 
 %-------------------------------------------------------
+
+\newpage
 
 \sectPart{Test Plan Execution}
 
@@ -141,7 +166,7 @@ Black Box:
     \textbf{Test} & \textbf{Description} & \textbf{Test} \\ \hline
     1 & Run the RTOS and ensure that serial data is being transmitted to the computer & Pass \\ \hline
     2 & Record the serial transmission in a log file for each of the following tests. Ensure that the data is in the specified format. Check that the log records the RTOS initialization message and that mutexs are enabled. & Pass \\ \hline
-    3 & Ensure all the SW3-x start in the off position. Restart the module and ensure that all tasks are disabled in the serial log. \\ \hline
+    3 & Ensure all the SW3-x start in the off position. Restart the module and ensure that all tasks are disabled in the serial log. & Pass \\ \hline
     4 & Look at the logs to ensure that the Watchdog triggers after about 1 second. & Pass \\ \hline
     5 & Look at the logs to ensure that the Watchdog event is followed by a software restart. & Pass \\ \hline
     6 & Enable the Watchdog Task and restart the module. Press and hold the \texttt{mutexDisable} for 1 second. Check in the log that while \texttt{mutexDisable} was held the module changed the state from \texttt{State 2} to \texttt{State 3} and changed back after the button was released. & Pass \\ \hline
@@ -155,6 +180,8 @@ Black Box:
 Note: We had to change the timing and printing requirements to meet scheduling requirements so we effectively passed the above tests but only after we changed the task timing and reduced the logging feature.
 
 %-------------------------------------------------------
+
+\newpage
 
 \sectPart{Corrected Documentation}
 
@@ -185,6 +212,8 @@ We changed the task periods and reduced the logging.
 \end{center}
 
 %-------------------------------------------------------
+
+\newpage
 
 \sectPart{Project Photos}
 
