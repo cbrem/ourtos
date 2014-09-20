@@ -182,7 +182,7 @@ void ourtosAcquireMutex(mutex_t *mutex) {
 	priority = *mutex;
 
 	if (taskArray[priority].usage != USAGE_MUTEX
-		|| _mutexesEnabled) {
+		|| !_mutexesEnabled) {
 		/* This mutex has been clobbered by a task since it was created,
 		 * or mutexes are disabled.
 		 * Do nothing.
