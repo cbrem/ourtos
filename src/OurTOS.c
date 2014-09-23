@@ -1,48 +1,11 @@
-/* 
+/*
  * OurTOS - A lightweight, preemptive multitasking preemptive RTOS with priority ceiling.
- * 
+ *
  * Connor Brem (cbrem)
  * Spencer Barton (sebarton)
  * Group C1
  * 18-348 Lab 11
  */
-
-// TODO: somehow track which priorities actually have associated
-// values. because we shouldn't try to run tasks that are null!
-//
-// TODO: do we even need _started?
-//
-// TODO: make sure task_t.toNextRun doesn't get implicitly cast
-// to a signed value.
-//
-// TODO: tasks can only hold one mutex at a time with this model!
-//    - can we just do this by...mutexes only replacing lower-priority
-//    mutexes...and mutexes store the priority of the mutex they
-//    superceeded...and then release replaces this priority...but
-//    what if that's already been released independantly!!! ooh...
-//    maybe the mutexes have to store a lot of state...
-//    - BUT: here's what we can do:
-//      * each mutex knows the ID of the task that is holding it
-//      * on acquire, mutex m must scan all other mutexes to find
-//        the highest-priority mutex h which the grabbing task holds
-//        then, it sets the current task's currentPriority to
-//        min(h, m)
-//      * on release, mutex must scan all mutexes to find highest-
-//        priority mutex other than itself that the task currently
-//        holds. set current task's currentPriority to this value.
-//        if none, then set it to normalPriority
-//
-// TODO: what do we do if a mutex becomes clobbered (i.e. invalid)
-// which a task has it, and then it releases that mutex?
-//
-// TODO: inconsistency between whether things are a no-op or return
-// false when priority is wrong
-//
-// TODO: use started as a guard on addTask, etc.
-//
-// TODO: potential problems if you toggle shutdown/start quickly
-//
-// TODO: in _idle/main loop, maybe delay a little?
 
 #include "OurTOS.h"
 
@@ -58,7 +21,7 @@ static uint8_t _maxPriority;
 /* garabage stack for use during ISR */
 static uint8_t _ISRstack[TASK_STACK_SIZE];
 
-/* main loop stack pointer to enable running of main loop 
+/* main loop stack pointer to enable running of main loop
  * when nothing else wants to run.
 */
 static uint8_t* _mainLoopStackPtr;
@@ -110,7 +73,7 @@ void ourtosStart() {
 		DisableInterrupts;
 		if (!_started) { break; }
 		EnableInterrupts;
-		
+
 		// TODO: do we need dis?
 		{ asm NOP; }
 	}
@@ -139,7 +102,7 @@ bool_t ourtosAddTask(uint8_t priority, uint16_t period, fn_t task) {
 
 	return true;
 }
-        
+
 bool_t ourtosAddMutex(uint8_t priority, mutex_t *mutex) {
 	if (priority >= _maxPriority) {
 		/* This is an invalid priority. */
@@ -203,7 +166,7 @@ void ourtosReleaseMutex(mutex_t *mutex) {
 	 */
 	(void)mutex; // TODO mutex set-up may not be best
 	taskArray[_currentTask].currentPriority =
-		taskArray[_currentTask].normalPriority;	
+		taskArray[_currentTask].normalPriority;
 }
 
 /* ----- Functions for a started/stopped OurTOS ----- */
@@ -276,9 +239,9 @@ static void _idle() {
 	taskArray[_currentTask].running = false;
 	/* Update next run time to be 1 period away.
 	 * If timeToNextRun was more than 1 period away before then
-	 * it stays negative which means that the task will 
+	 * it stays negative which means that the task will
 	 * attempt to run again as soon as possible. This also
-	 * signals that the task missed at least one prior deadline. 
+	 * signals that the task missed at least one prior deadline.
 	 */
 	taskArray[_currentTask].timeToNextRun +=
 		taskArray[_currentTask].period;
@@ -291,7 +254,7 @@ static void _idle() {
 		DisableInterrupts;
 		if (!_started) { break; }
 		EnableInterrupts;
-		
+
 		// TODO: do we need this?
 		{ asm NOP; }
 	}
@@ -300,7 +263,7 @@ static void _idle() {
 	/* If _started becomes false (i.e. the timer isr is stopped),
 	 * RTI into the main loop.
 	 */
-	{ asm LDS _mainLoopStackPtr; } 
+	{ asm LDS _mainLoopStackPtr; }
 	{ asm RTI; }
 }
 
@@ -324,7 +287,7 @@ void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
 	static uint8_t* stackPtrTmp;
 	static uint8_t scheduledTask;
 	static int32_t elapsedTime, curTime;
-	
+
 	// TODO remove post demo
 	static bool_t printedMutex = false;
 
@@ -335,12 +298,12 @@ void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
 	{ asm STS stackPtrTmp; }
 
 	/* Save stack ptr
-	 * special case on main loop. 
+	 * special case on main loop.
 	 * The main loop stack pointer is saved in a seperate variable*/
 	if (MAIN_LOOP_PRIORITY == _currentTask) {
 		_mainLoopStackPtr = stackPtrTmp;
 	} else {
-		taskArray[_currentTask].stackPtr = stackPtrTmp;		
+		taskArray[_currentTask].stackPtr = stackPtrTmp;
 	}
 
 	/* Set current stack to ISR stack.
@@ -359,7 +322,7 @@ void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
 	_updateTaskTimes(elapsedTime);
 
 	/* Run the scheduler every time through the ISR
-	 * The scheduler determines which task to run once the 
+	 * The scheduler determines which task to run once the
 	 * ISR returns.
 	 */
 	scheduledTask = _scheduler();
@@ -369,44 +332,44 @@ void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
 	 */
 	if (_debug && scheduledTask != _currentTask) {
 		curTime = timerGetCurrentMsec();
-		_debugPrint(scheduledTask, curTime);	
+		_debugPrint(scheduledTask, curTime);
 	}
 
 	// TODO remove after demo
 	/* task 4 is set to run but task 3 is ready to run */
-	if ((false == printedMutex) && 
+	if ((false == printedMutex) &&
 	    (scheduledTask == 4) &&
 		  (taskArray[3].enabled == true) &&
 		  (taskArray[3].timeToNextRun <= 0) ) {
 		serialWrite("HA I GOT YOUR MUTEX!!\n", 23);
 		printedMutex = true;
 	} else if (scheduledTask != 4){
-	  printedMutex = false; 
+	  printedMutex = false;
 	}
 
 	/* Special case if scheduler has no tasks to run.
-	 * In this case the returned index is _numTasks. 
-	 * The main loop will be run until a task is ready 
+	 * In this case the returned index is _numTasks.
+	 * The main loop will be run until a task is ready
 	 * to run. Otherwise simply use the designated task's
 	 * stack ptr.
 	 */
 	if ( MAIN_LOOP_PRIORITY == scheduledTask ) {
 		stackPtrTmp = _mainLoopStackPtr;
-	
+
 	} else {
-		
+
 		if ( false == taskArray[scheduledTask].running ) {
 			/* Create launch stack if not currently running
 			 * This operation sets the stack pointer.
 			 */
 			_createNewStack(scheduledTask);
 		}
-		
+
 		/* grab stack ptr */
 		stackPtrTmp = taskArray[scheduledTask].stackPtr;
 		/* task is now runing */
 		taskArray[scheduledTask].running = true;
-		
+
 	}
 
 	/* Set global current task to the scheduled task */
@@ -415,11 +378,11 @@ void interrupt (TIMER_INTERRUPT_VECTOR) _timerIsr(void) {
 	/* Set stack pointer to the current task stack pointer */
 	{ asm LDS stackPtrTmp; }
 
-	/* ISR does an RTI to return to the current stack. The 
+	/* ISR does an RTI to return to the current stack. The
 	 * RTI restores all of the state (registers, cond codes, etc)
 	 * if the task was running before or simply loads the dummy
 	 * state (as set by the create stack function) if the task
-	 * is being initialized. 
+	 * is being initialized.
 	 */
 }
 
@@ -433,14 +396,14 @@ static void _createNewStack(uint8_t priority) {
 	taskArray[priority].stack[stackPtr - 1] = LOW_BYTE(&_idle);
 	taskArray[priority].stack[stackPtr - 2] = HIGH_BYTE(&_idle);
 
-	/* set-up the function pointer. This is placed such that it becomes 
+	/* set-up the function pointer. This is placed such that it becomes
 	 * the return function for the RTI from the timer ISR
 	 */
 	taskArray[priority].stack[stackPtr - 3] = LOW_BYTE(taskArray[priority].task);
 	taskArray[priority].stack[stackPtr - 4] = HIGH_BYTE(taskArray[priority].task);
 
-	/* set the various task struct elems. The stack pointer is the 
-	 * location in the task's stack pointing to the top of the dummy 
+	/* set the various task struct elems. The stack pointer is the
+	 * location in the task's stack pointing to the top of the dummy
 	 * register values which are used in the timer ISR RTI.
 	 */
 	taskArray[priority].stackPtr = &taskArray[priority].stack[stackPtr - RTI_DUMY_REG_BYTES];

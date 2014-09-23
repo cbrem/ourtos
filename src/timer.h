@@ -1,4 +1,4 @@
-/* 
+/*
  * timer.h - A small timer library.
  *
  * Connor Brem (cbrem)
@@ -35,7 +35,7 @@
 #define FREQ_1_MHZ_PRESCALER 	(3)
 
 /* time increments per freq - all are 32 bit
- * for 8.24 fixed point representation 
+ * for 8.24 fixed point representation
  */
 #define FREQ_8_MHZ_INCR (0x083126E9)
 #define FREQ_4_MHZ_INCR (0x10624DD2)
@@ -58,7 +58,7 @@ typedef enum {
     FREQ_8_MHZ, 	// 8.192 ms period
     FREQ_4_MHZ, 	// 16.384 ms period
     FREQ_2_MHZ, 	// 32.768 ms period
-    FREQ_1_MHZ,		// 65.536 ms period 
+    FREQ_1_MHZ,		// 65.536 ms period
 } freq_t;
 
 /*==================================
@@ -103,7 +103,7 @@ void timerUpdateCurrent(void);
 
 /*
  * timerElapsedTime returns the elapsed time since last calling this function
- * This function relies on _lastTimestamp global. Behavior of this 
+ * This function relies on _lastTimestamp global. Behavior of this
  * function is undefined if not sampled frequently enough.
  *
  * NOTE: This function may yield invalid results if interrupted.
@@ -112,7 +112,7 @@ void timerUpdateCurrent(void);
  // TODO fix undefined behavior
 int32_t timerElapsedTime(void);
 
-/* _blockingDelayMsec runs for the given number of milliseconds 
+/* _blockingDelayMsec runs for the given number of milliseconds
  * This function is implemented with nop loops so times are approximate
  */
 // TODO: make static again
@@ -122,7 +122,7 @@ void timerBlockingDelayMsec(uint16_t delayMS);
  * Private Functions
  *==================================*/
 
-/* 
+/*
  * _freq2Prescaler returns a 3 bit prescaler value based on the given
  * freq. Calculated values are assumed to be based off of an 8MHz bus clock.
  * Also updates the timeIncrement variable for the given freq.

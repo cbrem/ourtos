@@ -1,13 +1,13 @@
 /* Demo of OurTOS
- *  This file demonstrates the functionality of OurTOS. OurTOS is a lightweight 
- *  premtive multitasking RTOS with priority ceiling. 
- * 
+ *  This file demonstrates the functionality of OurTOS. OurTOS is a lightweight
+ *  premtive multitasking RTOS with priority ceiling.
+ *
  *  In the demo a series of tasks run and share a resource. The scheduler prints
- *  out the task state over serial whenever it runs. A watchdog task is 
+ *  out the task state over serial whenever it runs. A watchdog task is
  *  implemented as well as a poll button task.
- * 
+ *
  *  See documentation for further details
- * 
+ *
  * Connor Brem (cbrem)
  * Spencer Barton (sebarton)
  * Group C1
@@ -21,7 +21,7 @@
  * Includes
  *==================================*/
 
-#include <hidef.h>  
+#include <hidef.h>
 #include "derivative.h"
 #include "inttypesMC9S12C128.h"
 #include "boolean.h"
@@ -46,11 +46,11 @@
 #define ID_SHORT_BLK    (1)
 #define ID_LONG_BLK     (2)
 
-/* 
- * task priorities 
- * priorities are ordered 0-4 with 0 being the highest priority. 
+/*
+ * task priorities
+ * priorities are ordered 0-4 with 0 being the highest priority.
  * In order to use priority ceiling a priority slot is left above short task and
- *  long task. This slot is for the mutex so that when either of these tasks 
+ *  long task. This slot is for the mutex so that when either of these tasks
  *  inherits the mutex it rises to priority above the other task that needs the
  *  mutex.
  */
@@ -98,7 +98,7 @@ static void SET_MUTEX_DISABLE_BTN_INPUT(void) {
 }
 #define GET_MUTEX_DISABLE_BTN() ( (~PTP) & 1 )
 
-/* 
+/*
  * set bits of SW3 on PORT B as 0 to enable input
  * also set pull-up resistors to work properly with CPU module
  * see MC9S12C128V1 data sheet section 4.3.2.10
@@ -110,13 +110,8 @@ static void SET_TASK_ENABLE_BTN_INPUT(void) {
 #define GET_TASK_ENABLE_BTN(BTN_N) (PORTB & (1 << BTN_N))
 
 /* LEDs */
-#define SET_LEDS_OUTPUT() (DDRB |= LED_MASK) 
-/* TODO need this?
-static void SET_LEDS(uint8_t val) {
-    PORTB &= ~LED_MASK;
-    PORTB |= (~val << NIB_LEN_BITS) & LED_MASK;
-}
- */
+#define SET_LEDS_OUTPUT() (DDRB |= LED_MASK)
+
 #define SET_LEDS(val) { \
     PORTB &= ~LED_MASK; \
     PORTB |= (~val << NIB_LEN_BITS) & LED_MASK; \
@@ -126,11 +121,11 @@ static void SET_LEDS(uint8_t val) {
 
 /* Assorted LED light pattens  - 1 is ON, 0 is OFF */
 #define LED_OFF             (0x0) /* 0000 */
-#define LED_WATCHDOG        (0xF) /* 1111 */ 
-#define LED_WATCHDOG_KICK   (0x1) /* 0001 */                     
-#define LED_POLL_BTN        (0x2) /* 0010 */ 
-#define LED_SHORT_BLK       (0x4) /* 0100 */ 
-#define LED_LONG_BLK        (0x8) /* 1000 */ 
+#define LED_WATCHDOG        (0xF) /* 1111 */
+#define LED_WATCHDOG_KICK   (0x1) /* 0001 */
+#define LED_POLL_BTN        (0x2) /* 0010 */
+#define LED_SHORT_BLK       (0x4) /* 0100 */
+#define LED_LONG_BLK        (0x8) /* 1000 */
 
 /*==================================
  * Exernal Globals
@@ -154,24 +149,24 @@ void main(void);
 
 /* ------ Tasks ------ */
 
-/* 
+/*
  * pollBtnsTask modifies the _mutexDisableBtn and _taskEnableBtn variables by polling
  *  the current hardware button state
  */
 void pollBtnsTask(void);
 
-/* 
+/*
  * watchdogKickTask kicks the watchdog periodically
  *  Note: the watchdog is called the COP for our board
  */
 void watchdogKickTask(void);
 
-/* 
+/*
  * shortBlockingTask grabs a mutex and holds it for a short time
  */
 void shortBlockingTask(void);
 
-/* 
+/*
  * longBlockingTask grabs a mutex and holds it for a long time
  */
 void longBlockingTask(void);
@@ -189,15 +184,15 @@ void interrupt 2 _watchdogISR(void);
 
 /* ------ Initialization ------ */
 
-/* 
- * initBtns initializes the btns for pollBtnsTask 
+/*
+ * initBtns initializes the btns for pollBtnsTask
  * - sets _mutexDisableBtn and _taskEnableBtn to defaults of False
  * - enables mutex diable btn as input
  * - enables switches for tasks as input
  */
 void _initBtns(void);
 
-/* 
+/*
  * initLEDs enables the LEDs and starts them OFF
  */
 void _initLEDs(void);

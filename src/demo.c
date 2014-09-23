@@ -1,11 +1,11 @@
 /* Demo of OurTOS
- *  This file demonstrates the functionality of OurTOS. OurTOS is a lightweight 
- *  premtive multitasking RTOS with priority ceiling. 
- * 
+ *  This file demonstrates the functionality of OurTOS. OurTOS is a lightweight
+ *  premtive multitasking RTOS with priority ceiling.
+ *
  *  In the demo a series of tasks run and share a resource. The scheduler prints
- *  out the task state over serial whenever it runs. A watchdog task is 
+ *  out the task state over serial whenever it runs. A watchdog task is
  *  implemented as well as a poll button task.
- * 
+ *
  *  See documentation for further details
  *
  * Connor Brem (cbrem)
@@ -22,8 +22,6 @@
  * Local Globals
  *==================================*/
 
-// TODO move local globals to c files
-
 /* each task sets a flag for the watchdog */
 static uint8_t _watchdogFlags;
 
@@ -34,13 +32,12 @@ static uint8_t _watchdogFlags;
 /* ------ Main ------ */
 
 void main(void) {
-    bool_t errCode; // TODO do something with this
+    bool_t errCode;
 
     _initBtns();
     _initLEDs();
-        
+
     /* set-up the RTOS */
-    // TODO currently ignore error code
     ourtosInit(MAX_PRIORITY, SCHEDULER_FREQ);
     errCode = ourtosAddTask(PRIORITY_WATCHDOG, WATCHDOG_TASK_PERIOD, &watchdogKickTask);
     errCode = ourtosAddTask(PRIORITY_POLL_BTN, POLL_BTN_TASK_PERIOD, &pollBtnsTask);
@@ -80,7 +77,7 @@ void watchdogKickTask(void) {
 
     } else {
         /* not all of the watchdog flags are set
-         * so watchdog cannot be kicked yet 
+         * so watchdog cannot be kicked yet
          */
     }
 }
@@ -129,7 +126,7 @@ void pollBtnsTask(void) {
 }
 
 void shortBlockingTask(void) {
-    
+
     SET_LEDS(LED_SHORT_BLK);
 
     DisableInterrupts;
@@ -137,7 +134,7 @@ void shortBlockingTask(void) {
     EnableInterrupts;
 
     timerBlockingDelayMsec(SHORT_BLOCK_TIME);
-    
+
     DisableInterrupts;
     ourtosReleaseMutex(&blockingMutex);
     EnableInterrupts;
@@ -154,7 +151,7 @@ void longBlockingTask(void) {
     EnableInterrupts;
 
     timerBlockingDelayMsec(LONG_BLOCK_TIME);
-    
+
     DisableInterrupts;
     ourtosReleaseMutex(&blockingMutex);
     EnableInterrupts;
@@ -170,7 +167,7 @@ void longBlockingTask(void) {
 /* ------ Interrupt Service Routines ------ */
 
 void interrupt 2 _watchdogISR( void ) {
-    
+
     //ourtosShutdown();
 
     SET_LEDS_OUTPUT();
@@ -184,7 +181,7 @@ void interrupt 2 _watchdogISR( void ) {
 /* ------ Initialization ------ */
 
 void _initBtns(void) {
-    
+
     /* set mutex disable btn as input */
     SET_MUTEX_DISABLE_BTN_INPUT();
     SET_TASK_ENABLE_BTN_INPUT();

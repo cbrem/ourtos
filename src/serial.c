@@ -1,4 +1,4 @@
-/* 
+/*
  * serial.c - A small serial library.
  *
  * Connor Brem (cbrem)
@@ -9,14 +9,11 @@
 
 #include "serial.h"
 
-// TODO: instead of prescale, maybe pass in
-// type which chooses baud from an enum?
 void serialInit(baud_t baud) {
     uint16_t prescale;
 
     prescale = _prescaleForBaud(baud);
 
-    // TODO: put these in macros?
     SCIBDL = prescale & 0xFF;
     SCIBDH = (prescale >> 8) & 0xFF;
 
@@ -54,7 +51,7 @@ static void _serialWriteByte(byte_t byte) {
 }
 
 static uint16_t _prescaleForBaud(baud_t baud) {
-    switch(baud) { 
+    switch(baud) {
     case BAUD_300:   return 0x0683;
     case BAUD_600:   return 0x0341;
     case BAUD_1200:  return 0x01a1;
